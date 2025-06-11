@@ -1,0 +1,30 @@
+{
+	"git.confirmSync": false,
+	"[typescript]": {
+		"editor.defaultFormatter": "vscode.typescript-language-features"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "vscode.typescript-language-features"
+	},
+	"[html]": {
+		"editor.defaultFormatter": "vscode.html-language-features"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "vscode.json-language-features"	
+	},
+	"[css]": {
+		"editor.defaultFormatter":"vscode.css-language-features"
+	},
+	"diffEditor.ignoreTrimWhitespace": true,
+	"typescript.preferences.quoteStyle": "single",
+	"javascript.preferences.quoteStyle": "single",
+	"typescript.preferences.importModuleSpecifierEnding": "js",
+	"typescript.updateImportsOnFileMove.enabled": "never",
+	"javascript.updateImportsOnFileMove.enabled": "never",
+	"editor.formatOnSave": true,
+	"editor.fontWeight": "normal",
+	"editor.tabSize": 4,
+	"editor.insertSpaces": false,
+	"editor.detectIndentation": false,
+	"javascript.format.semicolons": "insert"
+}
