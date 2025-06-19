@@ -4,16 +4,25 @@
 		"editor.defaultFormatter": "vscode.typescript-language-features"
 	},
 	"[javascript]": {
-		"editor.defaultFormatter": "vscode.typescript-language-features"
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[javascriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"[html]": {
 		"editor.defaultFormatter": "vscode.html-language-features"
 	},
 	"[json]": {
-		"editor.defaultFormatter": "vscode.json-language-features"	
+		"editor.defaultFormatter": "vscode.json-language-features"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "vscode.json-language-features"
 	},
 	"[css]": {
-		"editor.defaultFormatter":"vscode.css-language-features"
+		"editor.defaultFormatter": "vscode.css-language-features"
+	},
+	"[scss]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"diffEditor.ignoreTrimWhitespace": true,
 	"typescript.preferences.quoteStyle": "single",
@@ -26,5 +35,5 @@
 	"editor.tabSize": 4,
 	"editor.insertSpaces": false,
 	"editor.detectIndentation": false,
-	"javascript.format.semicolons": "insert"
+	"javascript.format.semicolons": "insert",
 }
