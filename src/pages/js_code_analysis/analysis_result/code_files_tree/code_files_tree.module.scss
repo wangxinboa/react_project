@@ -1,0 +1,26 @@
+.code_files {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+
+	> .code_files_header {
+		width: 100%;
+
+		/* >.upload_code_files {} */
+	}
+
+	> .code_files_tree {
+		width: 100%;
+		flex: 1;
+		overflow: auto;
+
+		.code_files_tree_node {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			width: 100%;
+			height: 100%;
+		}
+	}
+}
