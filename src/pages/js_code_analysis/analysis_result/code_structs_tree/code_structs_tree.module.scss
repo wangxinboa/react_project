@@ -1,0 +1,48 @@
+.code_structs_tree {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+
+	.code_structs_tree_node {
+		position: relative;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		width: 100%;
+		height: 100%;
+
+		> .code_structs_tree_node_type {
+			padding: 0 10px 0 0;
+			font-size: 14px;
+		}
+		> .code_structs_tree_node_title {
+			font-size: 14px;
+			flex: 1;
+		}
+		> .code_structs_tree_node_operations {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			gap: 8px;
+
+			> .code_structs_tree_node_operation {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				// width: fit-content;
+				// height: fit-content;
+				height: 18px;
+				padding: 0 4px;
+				font-size: 12px;
+				// border-radius: 6px;
+				// border: 1px solid rgb(217, 217, 217);
+			}
+			> .code_structs_tree_node_operation:hover {
+				font-size: 12px;
+			}
+		}
+	}
+}
