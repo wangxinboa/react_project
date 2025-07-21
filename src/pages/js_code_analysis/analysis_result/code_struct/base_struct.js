@@ -1,0 +1,23 @@
+export default class BaseStruct {
+	constructor(key, parent = null, map = {}) {
+		this.currentKey = key;
+		this.keysPath = parent === null ? [key] : [...parent.keysPath, key];
+		this.key = this.keysPath.join("-");
+
+		this.children = [];
+
+		this.file = parent ? parent.file : this;
+
+		this.parent = parent;
+
+		this.map = map;
+		this.map[this.key] = this;
+	}
+
+	addChild(struct) {
+		this.children.push(struct);
+		return this;
+	}
+
+	toJSON() {}
+}
