@@ -1,0 +1,26 @@
+.upload_code_files {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+
+	> .upload_code_files_header {
+		display: flex;
+		gap: 8px;
+		width: 100%;
+	}
+
+	> .upload_code_files_list {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		height: 260px;
+		overflow: auto;
+
+		> .upload_code_files_file {
+			width: 100%;
+			height: 28px;
+			line-height: 28px;
+			font-size: 16px;
+		}
+	}
+}
