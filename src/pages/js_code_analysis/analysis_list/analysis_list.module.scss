@@ -1,0 +1,22 @@
+.analysis_list {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	max-height: 100%;
+
+	> .analysis_list_header {
+		padding-top: 10px;
+		padding-bottom: 10px;
+		width: 100%;
+	}
+	> .analysis_list_body {
+		padding-bottom: 10px;
+		width: 100%;
+		flex: 1;
+		overflow: auto;
+	}
+	> .analysis_list_footer {
+		padding-bottom: 10px;
+		width: 100%;
+	}
+}

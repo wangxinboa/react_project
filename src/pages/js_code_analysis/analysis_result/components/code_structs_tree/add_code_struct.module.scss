@@ -1,0 +1,10 @@
+.add_code_struct_component_form_container {
+	padding: 8px 0 0 0;
+	width: 100%;
+
+	> .add_code_struct_component_form_container_title {
+		display: inline-flex;
+		align-items: center;
+		height: 32px;
+	}
+}
