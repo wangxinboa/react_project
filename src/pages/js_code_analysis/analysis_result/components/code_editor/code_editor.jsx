@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useRef, useContext } from "react";
 
 import { AnalysisResultContext } from "../../analysis_result.jsx";
-import CodeFile from "../../code_files/code_file.js";
+// import CodeFile from "../../code_files/code_file.js";
+import { setScroll, setRange } from "../../code_files/code_file_ace_message.js";
 
 import styles from "./code_editor.module.scss";
 
 let _editor_ = null;
+let _aceMessage_ = null;
 
 const CodeEditor = () => {
 	const { selectedCodeFile } = useContext(AnalysisResultContext);
@@ -17,17 +19,21 @@ const CodeEditor = () => {
 	/** 当 CodeEditor 滚动时 */
 	const handleOnChangeScroll = useCallback(() => {
 		if (selectedCodeFile !== null) {
-			CodeFile.setScroll(
-				selectedCodeFile,
+			_aceMessage_ = selectedCodeFile.aceMessage;
+			setScroll(
+				_aceMessage_,
 				editorRef.current.editor.session.getScrollTop(),
 				editorRef.current.editor.session.getScrollLeft()
 			);
+			_aceMessage_ = null;
 		}
 	}, [selectedCodeFile]);
 	/** 当 CodeEditor 选择的 range 有变化时*/
 	const handleOnChangeSelection = useCallback(() => {
 		if (selectedCodeFile !== null) {
-			CodeFile.setRange(selectedCodeFile, editorRef.current.editor.selection.getRange());
+			_aceMessage_ = selectedCodeFile.aceMessage;
+			setRange(_aceMessage_, editorRef.current.editor.selection.getRange());
+			_aceMessage_ = null;
 		}
 	}, [selectedCodeFile]);
 
@@ -43,9 +49,6 @@ const CodeEditor = () => {
 		editorRef.current.editor = _editor_;
 
 		_editor_ = null;
-
-		// todo: 测试用, 待删除
-		window._editor_ = _editor_;
 	}, []);
 
 	useEffect(() => {
@@ -58,10 +61,13 @@ const CodeEditor = () => {
 			// 设置 CodeEditor 信息
 			editorRef.current.suppressSelectionEvents = true;
 
-			_editor_.setValue(selectedCodeFile.code);
-			_editor_.session.setScrollTop(selectedCodeFile.vScroll);
-			_editor_.session.setScrollLeft(selectedCodeFile.hScroll);
-			_editor_.selection.setSelectionRange(selectedCodeFile.range);
+			_aceMessage_ = selectedCodeFile.aceMessage;
+			_editor_.setValue(_aceMessage_.code);
+			_editor_.session.setScrollTop(_aceMessage_.vScroll);
+			_editor_.session.setScrollLeft(_aceMessage_.hScroll);
+			_editor_.selection.setSelectionRange(_aceMessage_.range);
+			_aceMessage_ = null;
+
 			_editor_.focus();
 
 			editorRef.current.suppressSelectionEvents = false;

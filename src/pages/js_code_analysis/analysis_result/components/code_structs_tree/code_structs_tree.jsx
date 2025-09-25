@@ -19,6 +19,7 @@ const CodeStructsTree = () => {
 		setCodeStructsTreeSelectedKeys,
 		codeStructsMap,
 		setSelectedCodeStruct,
+		onAddNewCodeStruct,
 	} = useContext(AnalysisResultContext);
 
 	const addCodeStructRef = useRef(null);
@@ -28,11 +29,12 @@ const CodeStructsTree = () => {
 		setCodeStructsTreeData([...codeStructsTreeData]);
 	}, [codeStructsTreeData, setCodeStructsTreeData]);
 	/** AddCodeStruct 添加新代码结构节点完成 */
-	const handleOnAddCodeStructFinish = useCallback(
-		(node) => {
+	const handleOnAddCodeStruct = useCallback(
+		(newStruct) => {
+			onAddNewCodeStruct(newStruct);
 			renderByTreeData();
 		},
-		[renderByTreeData]
+		[onAddNewCodeStruct, renderByTreeData]
 	);
 	/** Tree 组件内节点是否允许拖拽的判断 */
 	const treeAllowDrop = useCallback((info) => {
@@ -76,7 +78,7 @@ const CodeStructsTree = () => {
 	);
 	/** 点击添加代码结构 */
 	const handleOnAddStruct = useCallback((node) => {
-		addCodeStructRef.current.setModalParentCodeStruct(node);
+		addCodeStructRef.current.startAddCodeStruct(node);
 	}, []);
 	/** 点击删除代码结构 */
 	const handleOnDelStruct = useCallback(
@@ -91,14 +93,15 @@ const CodeStructsTree = () => {
 		(node) => {
 			return (
 				<div className={styles.code_structs_tree_node}>
-					<div className={styles.code_structs_tree_node_type}>{node.type}</div>
-					<div className={styles.code_structs_tree_node_title}>{node.name}</div>
+					{/* <div className={styles.code_structs_tree_node_type}>{node.type}</div> */}
+					<div className={styles.code_structs_tree_node_title}>{node.getTitle()}</div>
 					<div className={styles.code_structs_tree_node_operations}>
 						<div
 							className={styles.code_structs_tree_node_operation}
 							type="text"
 							size="small"
-							onClick={() => {
+							onClick={(event) => {
+								event.stopPropagation();
 								handleOnAddStruct(node);
 							}}
 						>
@@ -108,7 +111,8 @@ const CodeStructsTree = () => {
 							className={styles.code_structs_tree_node_operation}
 							type="text"
 							size="small"
-							onClick={() => {
+							onClick={(event) => {
+								event.stopPropagation();
 								handleOnDelStruct(node);
 							}}
 						>
@@ -128,7 +132,7 @@ const CodeStructsTree = () => {
 
 	return (
 		<div className={styles.code_structs_tree}>
-			<AddCodeStruct ref={addCodeStructRef} onFinish={handleOnAddCodeStructFinish} />
+			<AddCodeStruct ref={addCodeStructRef} onAddCodeStruct={handleOnAddCodeStruct} />
 			{Array.isArray(codeStructsTreeData) && codeStructsTreeData.length > 0 ? (
 				<Tree
 					multiple={false}

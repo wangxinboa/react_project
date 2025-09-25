@@ -2,14 +2,13 @@ import RootFolder from "./root_folder.js";
 import Folder from "./folder.js";
 import File from "./file.js";
 
-export default function getFiles(
+export default function createFilesTreeFromFileList(
 	files,
 	RootFolderClass = RootFolder,
 	FolderClass = Folder,
 	FileClass = File
 ) {
 	// 将 files 信息转化为 tree
-
 	let root = new RootFolderClass();
 
 	for (let i = 0; i < files.length; i++) {
@@ -51,5 +50,6 @@ export default function getFiles(
 			}
 		});
 	}
+
 	return root;
 }

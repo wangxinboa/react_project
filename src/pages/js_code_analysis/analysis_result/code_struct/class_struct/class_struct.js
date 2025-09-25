@@ -1,51 +1,60 @@
 import BaseStruct from "../base_struct.js";
 
-export const ClassStructType = "Class";
-
-export const ClassStructQuickFormOptions = [
-	{
-		type: "Input",
-		itemPtops: {
-			label: "id",
-			name: "id",
-			rules: [{ required: true, message: "请输入 class id" }],
-		},
-	},
-];
-
 export default class ClassStruct extends BaseStruct {
-	constructor(parent, options) {
-		super(options.id, parent, parent.map);
+	constructor(baseKey, parent, option) {
+		super(baseKey, parent, parent.map);
 
-		this.type = ClassStructType;
+		this.isClassStruct = true;
+		this.type = ClassStruct.type;
 
-		this.name = options.id;
+		this.id = option.id;
 
 		this.methodsMap = {};
 		this.propertyMap = {};
 
-		this.parent.addChild(this);
+		this.parent.addChildStruct(this);
 	}
 
 	addMethod(classMethodStruct) {
 		this.methodsMap[classMethodStruct.key] = classMethodStruct;
-		this.addChild(classMethodStruct);
+		this.addChildStruct(classMethodStruct);
 		return this;
 	}
 
 	addProperty(classPropertyStruct) {
 		this.methodsMap[classPropertyStruct.key] = classPropertyStruct;
-		this.addChild(classPropertyStruct);
+		this.addChildStruct(classPropertyStruct);
 		return this;
 	}
 
 	toJSON() {
 		return {
-			type: ClassStructType,
-			parent: this.parent.key,
-
-			id: this.name,
+			type: ClassStruct.type,
+			id: this.id,
 			children: this.children,
 		};
 	}
+
+	static type = "Class";
+	/**
+	 * 根据 Form object 生成对应的 ClassStruct 的 key
+	 * @returns {string}
+	 */
+	static createBaseKeyFromForm(formValues) {
+		return `${ClassStruct.type}:${formValues.id}`;
+	}
+	static createStructFromForm(parentStruct, values) {
+		return new ClassStruct(ClassStruct.createBaseKeyFromForm(values), parentStruct, values);
+	}
+
+	static quickFormOption = [
+		{
+			type: "Input",
+			itemPtops: {
+				label: "id",
+				name: "id",
+				rules: [{ required: true, message: "请输入 class id" }],
+			},
+		},
+	];
 }

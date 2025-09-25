@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useImperativeHandle } from "react";
+import { forwardRef, useState, useEffect, useCallback, useImperativeHandle } from "react";
 import { Modal, Button, Select, message } from "antd";
 import CFileUpload from "../../../../../components/file_upload_button/file_upload_button.jsx";
 
@@ -6,7 +6,7 @@ import styles from "./upload_code_files.module.scss";
 
 const AnalysisResultSettingHandleOnOKMessageKey = "AnalysisResultSettingHandleOnOKMessageKey";
 
-const UploadCodeFiles = React.forwardRef(function UploadCodeFiles(props, ref) {
+const UploadCodeFiles = forwardRef((props, ref) => {
 	const { onOk, autoCloseOnOk = true } = props;
 
 	const [visible, setVisible] = useState(false);
@@ -77,8 +77,11 @@ const UploadCodeFiles = React.forwardRef(function UploadCodeFiles(props, ref) {
 		ref,
 		() => {
 			return {
-				setVisible(_visible) {
-					setVisible(_visible);
+				startUpload() {
+					setVisible(true);
+				},
+				endUpload() {
+					setVisible(false);
 				},
 			};
 		},

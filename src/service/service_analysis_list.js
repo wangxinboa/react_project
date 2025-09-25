@@ -2,7 +2,7 @@ let AnalysisList = null;
 
 export function serviceGetAnalysisList() {
 	if (AnalysisList === null) {
-		return fetch("/js_code_analysis/js_code_analysis_list.json")
+		return fetch("http://localhost:7999/js_code_analysis/js_code_analysis_list.json")
 			.then((res) => {
 				return res.json();
 			})

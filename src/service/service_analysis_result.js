@@ -1,20 +1,40 @@
-const AnalysisResultMap = {};
+const CodeFilesMessageMap = {};
 
-export function serviceGetServiceAnalysisResult(url) {
-	if (AnalysisResultMap[url] === void 0) {
+export function serviceGetCodeFilesMessage(url) {
+	if (CodeFilesMessageMap[url] === void 0) {
 		return fetch(url)
 			.then((res) => {
 				return res.json();
 			})
 			.then((res) => {
-				AnalysisResultMap[url] = res;
+				CodeFilesMessageMap[url] = res;
 				return {
-					data: AnalysisResultMap[url],
+					data: CodeFilesMessageMap[url],
 				};
 			});
 	} else {
 		return Promise.resolve({
-			data: AnalysisResultMap[url],
+			data: CodeFilesMessageMap[url],
+		});
+	}
+}
+
+const AnalysisMessageMap = {};
+export function serviceGetAnalysisMessage(url) {
+	if (AnalysisMessageMap[url] === void 0) {
+		return fetch(url)
+			.then((res) => {
+				return res.json();
+			})
+			.then((res) => {
+				AnalysisMessageMap[url] = res;
+				return {
+					data: AnalysisMessageMap[url],
+				};
+			});
+	} else {
+		return Promise.resolve({
+			data: AnalysisMessageMap[url],
 		});
 	}
 }

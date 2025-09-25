@@ -1,9 +1,12 @@
+// code_structs_tree.jsx
 .code_structs_tree {
 	display: flex;
 	flex-direction: column;
+	padding: 0 0 10px 0;
 	width: 100%;
 	height: 100%;
-	overflow: auto;
+	overflow-y: auto;
+	overflow-x: hidden;
 
 	.code_structs_tree_node {
 		position: relative;
@@ -19,8 +22,13 @@
 			font-size: 14px;
 		}
 		> .code_structs_tree_node_title {
+			display: block;
+			width: 0;
 			font-size: 14px;
 			flex: 1;
+			word-wrap: break-word;
+			word-break: normal;
+			overflow: hidden;
 		}
 		> .code_structs_tree_node_operations {
 			opacity: 0;
@@ -57,5 +65,17 @@
 				opacity: 1;
 			}
 		}
+	}
+}
+
+// add_code_struct.jsx
+.add_code_struct_component_form_container {
+	padding: 8px 0 0 0;
+	width: 100%;
+
+	> .add_code_struct_component_form_container_title {
+		display: inline-flex;
+		align-items: center;
+		height: 32px;
 	}
 }

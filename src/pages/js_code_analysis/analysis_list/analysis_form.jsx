@@ -1,35 +1,64 @@
-import { useCallback, useEffect } from "react";
+import { forwardRef, useCallback, useImperativeHandle, useState } from "react";
 import { Modal, Form, Input } from "antd";
 
+const AnalysisFormStatus = {
+	Add: "Add",
+	Edit: "Edit",
+};
 const formNameName = "name";
 const formNameLabel = "项目名称";
 const formUrlName = "url";
 const formUrlLabel = "项目地址";
 
-export default function AnalysisForm(props) {
-	const { data, visible, setVisible, onOk } = props;
+const AnalysisForm = forwardRef((props, ref) => {
+	const { onAddOk, onEditOk } = props;
 
 	const [form] = Form.useForm();
 
+	const [visible, setVisible] = useState(null);
+	const [record, setRecord] = useState(null);
+	const [status, setStatus] = useState(null);
+	const isAdd = status === AnalysisFormStatus.Add;
+	const isEdit = status === AnalysisFormStatus.Edit;
+
 	const handleOnOk = useCallback(() => {
-		onOk(form.getFieldsValue());
+		const formValues = form.getFieldsValue();
+		if (isAdd) {
+			onAddOk?.(formValues);
+		} else if (isEdit) {
+			onEditOk?.(record, formValues);
+		}
 		setVisible(false);
-	}, [form, onOk, setVisible]);
+	}, [form, isAdd, isEdit, onAddOk, onEditOk, record]);
 	const handleonCancel = useCallback(() => {
 		setVisible(false);
-	}, [setVisible]);
+	}, []);
 
-	useEffect(() => {
-		if (data) {
-			form.setFieldValue(formNameName, data[formNameName]);
-			form.setFieldValue(formUrlName, data[formUrlName]);
-		}
-	}, [data, form]);
+	useImperativeHandle(
+		ref,
+		() => {
+			return {
+				startAddAnalysis() {
+					setStatus(AnalysisFormStatus.Add);
+					setVisible(true);
+				},
+				startEditAnalysis(record) {
+					form.setFieldValue(formNameName, record[formNameName]);
+					form.setFieldValue(formUrlName, record[formUrlName]);
+
+					setRecord(record);
+					setStatus(AnalysisFormStatus.Edit);
+					setVisible(true);
+				},
+			};
+		},
+		[form]
+	);
 
 	return (
 		<Modal
 			style={{ display: "flex", flexDirection: "column" }}
-			title={`${data ? "编辑" : "新增"}分析代码`}
+			title={`${isAdd ? "新增" : "编辑"}分析代码`}
 			open={visible}
 			onOk={handleOnOk}
 			onCancel={handleonCancel}
@@ -44,4 +73,6 @@ export default function AnalysisForm(props) {
 			</Form>
 		</Modal>
 	);
-}
+});
+
+export default AnalysisForm;

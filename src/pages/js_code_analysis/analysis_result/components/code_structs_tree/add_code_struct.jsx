@@ -1,29 +1,22 @@
-import React, { useState, useImperativeHandle, useCallback, useMemo } from "react";
-import { Drawer, Select } from "antd";
+import { forwardRef, useState, useImperativeHandle, useCallback } from "react";
+import { Drawer, Select, message } from "antd";
 
 import AntdQuickForm from "../../../../../components/antd_quick_form/antd_quick_form.jsx";
-import CodeStructMessage from "../../code_struct/code_struct_message.js";
+import CodeStructsClassMap from "../../code_struct/code_struct_utils/code_structs_class_map.js";
+import AllStructOptions from "../../code_struct/code_struct_utils/all_struct_options.js";
 
-import styles from "./add_code_struct.module.scss";
+import styles from "./code_structs_tree.module.scss";
 
-const AddCodeStruct = React.forwardRef(function AddCodeStruct(props, ref) {
-	const { onFinish } = props;
+const AddCodeStruct = forwardRef((props, ref) => {
+	const { onAddCodeStruct } = props;
 	const [parentCodeStruct, setParentCodeStruct] = useState(null);
 	const [selectedStructTypes, setSelectedStructTypes] = useState([]);
 
-	const childrenStructSelectOptions = useMemo(() => {
-		return CodeStructMessage[parentCodeStruct?.type]?.childrenStructSelectOptions ?? [];
-	}, [parentCodeStruct]);
-
-	const childrenStructQuickFormOptions = useMemo(() => {
-		return CodeStructMessage[parentCodeStruct?.type]?.QuickFormOptions ?? [];
-	}, [parentCodeStruct]);
-
-	const handleOnOK = useCallback(() => {
+	const handleOnDrawerOK = useCallback(() => {
 		setParentCodeStruct(null);
 	}, []);
 
-	const handleOnClose = useCallback(() => {
+	const handleOnDrawerClose = useCallback(() => {
 		setParentCodeStruct(null);
 	}, []);
 
@@ -31,7 +24,7 @@ const AddCodeStruct = React.forwardRef(function AddCodeStruct(props, ref) {
 		ref,
 		() => {
 			return {
-				setModalParentCodeStruct(_parentCodeStruct) {
+				startAddCodeStruct(_parentCodeStruct) {
 					setParentCodeStruct(_parentCodeStruct);
 				},
 			};
@@ -45,33 +38,39 @@ const AddCodeStruct = React.forwardRef(function AddCodeStruct(props, ref) {
 			placement="right"
 			width={500}
 			open={parentCodeStruct !== null}
-			onOk={handleOnOK}
-			onClose={handleOnClose}
+			onOk={handleOnDrawerOK}
+			onClose={handleOnDrawerClose}
 		>
 			<Select
 				mode="tags"
 				style={{ width: "100%" }}
-				options={childrenStructSelectOptions}
+				options={AllStructOptions}
 				value={selectedStructTypes}
 				onChange={setSelectedStructTypes}
 			/>
-			{childrenStructQuickFormOptions.map((quickFormOption) => {
-				if (selectedStructTypes.length > 0 && !selectedStructTypes.includes(quickFormOption.type)) {
+			{AllStructOptions.map((structOptions) => {
+				const _childStructType = structOptions.value;
+
+				if (selectedStructTypes.length > 0 && !selectedStructTypes.includes(_childStructType)) {
 					return null;
 				}
 
 				return (
-					<div className={styles.add_code_struct_component_form_container} key={quickFormOption.type}>
-						<div className={styles.add_code_struct_component_form_container_title}>
-							结构类型: {quickFormOption.type}
-						</div>
+					<div className={styles.add_code_struct_component_form_container} key={_childStructType}>
+						<div className={styles.add_code_struct_component_form_container_title}>结构类型: {_childStructType}</div>
 						<AntdQuickForm
 							onFinish={(values) => {
-								onFinish(new quickFormOption.Struct(parentCodeStruct, values));
-								setParentCodeStruct(null);
+								try {
+									onAddCodeStruct(
+										CodeStructsClassMap[structOptions.value].createStructFromForm(parentCodeStruct, values)
+									);
+									setParentCodeStruct(null);
+								} catch (e) {
+									message.error(`添加代码结构失败: ${String(e)}`);
+								}
 							}}
 							submitTitle="添加结构"
-							options={quickFormOption.options}
+							options={CodeStructsClassMap[structOptions.value].quickFormOption}
 						/>
 					</div>
 				);

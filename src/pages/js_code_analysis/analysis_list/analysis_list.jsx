@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Pagination } from "antd";
 
 import AnalysisTable from "./analysis_table.jsx";
@@ -17,12 +17,11 @@ import {
 import styles from "./analysis_list.module.scss";
 
 export default function AnalysisList() {
-	const [analysisFormVisible, setAnalysisFormVisible] = useState(false);
-	const [editingAnalysisCode, setEditingAnalysisCode] = useState(null);
+	const analysisFormRef = useRef(null);
 
 	const [analysisList, setAnalysisList] = useState([]);
 	const { page, setPage, pageSize, setPageSize, total, setTotal } = usePagination(1, 20);
-
+	/** 更新分页信息 */
 	const handleOnPaginationChange = useCallback(
 		(page, pageSize) => {
 			setPage(page);
@@ -30,41 +29,46 @@ export default function AnalysisList() {
 		},
 		[setPage, setPageSize]
 	);
-
+	/** 获取分析结果列表数据 */
 	const getAnalysisListPage = useCallback(() => {
 		serviceGetAnalysisListPage(page, pageSize).then((res) => {
 			setAnalysisList(res.data);
 			setTotal(res.total);
 		});
 	}, [page, pageSize, setTotal]);
-
-	const downloadAnalysisList = useCallback(() => {
+	/** 下载分析结果列表 json 数据 */
+	const downloadAnalysisListJson = useCallback(() => {
 		serviceGetAnalysisList().then((res) => {
 			downloadJSON(JSON.stringify(res.data), "js_code_analysis_list.json");
 		});
 	}, []);
+	/** 点击添加分析结果记录 */
 	const startAddAnalysisCode = useCallback(() => {
-		setAnalysisFormVisible(true);
+		analysisFormRef.current?.startAddAnalysis();
 	}, []);
-
-	const handleOnAnalysisFormOk = useCallback(
+	/** 完成添加分析结果记录 */
+	const handleOnAnalysisFormAddOk = useCallback(
 		(data) => {
-			if (editingAnalysisCode) {
-				serviceUpdateAnalysisListRecord(editingAnalysisCode.id, data).then(getAnalysisListPage);
-			} else {
-				servicAddAnalysisListRecord(data).then(getAnalysisListPage);
-			}
+			return servicAddAnalysisListRecord(data).then(getAnalysisListPage);
 		},
-		[editingAnalysisCode, getAnalysisListPage]
+		[getAnalysisListPage]
 	);
-
+	/** 完成编辑分析结果记录 */
+	const handleOnAnalysisFormEditOk = useCallback(
+		(record, data) => {
+			return serviceUpdateAnalysisListRecord(record.id, data).then(getAnalysisListPage);
+		},
+		[getAnalysisListPage]
+	);
+	/** 点击编辑分析结果记录 */
 	const handleEditAnalysisRecord = useCallback((record) => {
-		setAnalysisFormVisible(true);
-		setEditingAnalysisCode(record);
+		analysisFormRef.current?.startEditAnalysis(record);
 	}, []);
+	/** 跳转到分析页面 */
 	const handleAnalyseCodeRecord = useCallback((record) => {
 		toAnalysisContentPage(record.name, record.url);
 	}, []);
+	/** 点删除辑分析结果记录 */
 	const handleDeleteAnalysisRecord = useCallback(
 		(record) => {
 			serviceDeleteAnalysisListRecord(record.id).then(getAnalysisListPage);
@@ -82,7 +86,7 @@ export default function AnalysisList() {
 				<Button onClick={startAddAnalysisCode} style={{ marginRight: "10px" }}>
 					新增分析代码
 				</Button>
-				<Button onClick={downloadAnalysisList}>下载分析列表</Button>
+				<Button onClick={downloadAnalysisListJson}>下载分析列表</Button>
 			</div>
 			<div className={styles.analysis_list_body}>
 				<AnalysisTable
@@ -95,12 +99,7 @@ export default function AnalysisList() {
 			<div className={styles.analysis_list_footer}>
 				<Pagination align="end" current={page} pageSize={pageSize} total={total} onChange={handleOnPaginationChange} />
 			</div>
-			<AnalysisForm
-				data={editingAnalysisCode}
-				visible={analysisFormVisible}
-				setVisible={setAnalysisFormVisible}
-				onOk={handleOnAnalysisFormOk}
-			/>
+			<AnalysisForm ref={analysisFormRef} onEditOk={handleOnAnalysisFormEditOk} onAddOk={handleOnAnalysisFormAddOk} />
 		</div>
 	);
 }

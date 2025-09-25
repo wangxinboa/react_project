@@ -1,40 +1,80 @@
-import { useState, useMemo, createContext, useEffect } from "react";
+import { useMemo, createContext, useEffect } from "react";
+import { message } from "antd";
 
 import AnalysisResultPage from "./analysis_result_page.jsx";
 
-import getCodeFiles from "./code_files/get_files.js";
-import { getStructFromJSON } from "./code_struct/code_struct_utils.js";
-import FileStruct from "./code_struct/file_struct.js";
+import useCodeFilesTree from "./components/code_files_tree/use_code_files_tree.js";
+import useCodeStructsTree from "./components/code_structs_tree/use_code_structs_tree.js";
+import useConfigureAnalysis from "./components/configure_analysis/use_configure_analysis.js";
+import useAnalysisMessage from "./components/analysis_message/use_analysis_message.js";
 
-import { getQuery } from "../../../utils/utils.js";
-import { serviceGetServiceAnalysisResult } from "../../../service/service_analysis_result.js";
+import { getQuery, downloadJSON } from "../../../utils/utils.js";
+import { serviceGetCodeFilesMessage, serviceGetAnalysisMessage } from "../../../service/service_analysis_result.js";
 
 export const AnalysisResultContext = createContext();
 
-let _codeStructsMap_ = null;
-let _codeFileStructsMap_ = null;
-let _codeFileStructKey_ = null;
-
 const AnalysisResult = () => {
-	// code file
-	const [codeFilesMap, setCodeFilesMap] = useState(null);
+	// code files
+	const {
+		codeFilesMap,
+		codeFilesTreeData,
+		codeFilesTreeExpandedKeys,
+		setCodeFilesTreeExpandedKeys,
+		codeFilesTreeSelectedKeys,
+		setCodeFilesTreeSelectedKeys,
 
-	const [codeFilesTreeData, setCodeFilesTreeData] = useState([]);
-	const [codeFilesTreeExpandedKeys, setCodeFilesTreeExpandedKeys] = useState([]);
-	const [codeFilesTreeSelectedKeys, setCodeFilesTreeSelectedKeys] = useState([]);
+		initCodeFilesFromFiles,
+		initCodeFilesFromService,
+		createServiceDataFromCodeFiles,
 
-	const [selectedCodeFile, setSelectedCodeFile] = useState(null);
-	// code struct
-	const [codeStructsTreeData, setCodeStructsTreeData] = useState(null);
-	const [codeStructsTreeSelectedKeys, setCodeStructsTreeSelectedKeys] = useState([]);
+		selectedCodeFile,
+	} = useCodeFilesTree();
+	// code structs
+	const {
+		codeStructsMap,
 
-	const [codeFileStructsMap, setCodeFileStructsMap] = useState({});
-	const [codeStructsMap, setCodeStructsMap] = useState({});
+		codeStructsTreeData,
+		setCodeStructsTreeData,
+		codeStructsTreeSelectedKeys,
+		setCodeStructsTreeSelectedKeys,
 
-	const [selectedCodeStruct, setSelectedCodeStruct] = useState(null);
+		selectedCodeStruct,
+		setSelectedCodeStruct,
+
+		allCodeStructSelectOptions,
+		onAddNewCodeStruct,
+
+		initCodeStructsFromService,
+		createServiceDataFromCodeStructs,
+	} = useCodeStructsTree(selectedCodeFile);
+	// analysis config
+	const { initAnalysisConfigFromService, createServiceDataFromAnalysisConfig, analysisConfig, setAnalysisConfig } =
+		useConfigureAnalysis();
+	// analysis message
+	const {
+		initAnalysisMessageFromService,
+		createServiceDataFromAnalysisMessage,
+		codeStructAnalysisMap,
+		usedCodeStructsTreeData,
+		useCodeStructsTreeData,
+		setUsedCodeStructsTreeData,
+		selectedCodeStructAnalysis,
+	} = useAnalysisMessage(selectedCodeStruct);
+
+	// 下载 json 文件时需要的文件名
+	const analysisName = useMemo(() => {
+		return getQuery("analysis_name");
+	}, []);
+	const codeStructsName = useMemo(() => {
+		return `${analysisName}.json`;
+	}, [analysisName]);
+	const codeAnalysisName = useMemo(() => {
+		return `${analysisName}_analysis.json`;
+	}, [analysisName]);
 
 	const providerValue = useMemo(() => {
 		return {
+			/** code file */
 			codeFilesMap,
 			codeFilesTreeData,
 			codeFilesTreeExpandedKeys,
@@ -42,111 +82,130 @@ const AnalysisResult = () => {
 			codeFilesTreeSelectedKeys,
 			setCodeFilesTreeSelectedKeys,
 			selectedCodeFile,
-			setSelectedCodeFile,
-
-			codeFileStructsMap,
+			initCodeFilesFromFiles,
+			/** code struct */
 			codeStructsMap,
+			allCodeStructSelectOptions,
 			codeStructsTreeData,
 			setCodeStructsTreeData,
 			codeStructsTreeSelectedKeys,
 			setCodeStructsTreeSelectedKeys,
 			selectedCodeStruct,
 			setSelectedCodeStruct,
-			/** 返回最后下载的所有 json 信息 */
-			getDownloadJson() {
-				return JSON.stringify({
-					codeFilesMap: codeFilesMap,
-					// CodeFilesTree
-					codeFilesTree: {
-						treeData: codeFilesTreeData,
-						expandedKeys: codeFilesTreeExpandedKeys,
-						selectedKeys: codeFilesTreeSelectedKeys,
-					},
-
-					codeFileStructs: {
-						codeFileStructsMap,
-						codeFileNames: Object.keys(codeFileStructsMap),
-					},
-				});
+			onAddNewCodeStruct,
+			/** analysis config */
+			initAnalysisConfigFromService,
+			createServiceDataFromAnalysisConfig,
+			analysisConfig,
+			setAnalysisConfig,
+			/** analysis message */
+			codeStructAnalysisMap,
+			usedCodeStructsTreeData,
+			useCodeStructsTreeData,
+			setUsedCodeStructsTreeData,
+			selectedCodeStructAnalysis,
+			/** 点击下载代码结构 */
+			downloadCodeStructs() {
+				downloadJSON(
+					JSON.stringify({
+						// CodeFilesTree 相关信息
+						codeFilesTree: createServiceDataFromCodeFiles(),
+						codeFileStructs: createServiceDataFromCodeStructs(),
+						analysisConfig: createServiceDataFromAnalysisConfig(),
+					}),
+					codeStructsName
+				);
 			},
-			/** 通过上传的文件设置 CodeFilesTree 信息 */
-			setCodeFilesTreeMessageFromFiles(files) {
-				return getCodeFiles(files)
-					.readFilesAsText()
-					.then((rootFolder) => {
-						setCodeFilesMap(rootFolder.codeFilesMap);
-
-						setCodeFilesTreeData([rootFolder.toJSON()]);
-
-						setCodeFilesTreeExpandedKeys([]);
-						setCodeFilesTreeSelectedKeys([]);
-					});
+			/** 点击下载代码分析 */
+			downloadCodeAnalysis() {
+				downloadJSON(
+					JSON.stringify({
+						// CodeFilesTree 相关信息
+						analysisMessage: createServiceDataFromAnalysisMessage(),
+					}),
+					codeAnalysisName
+				);
 			},
 		};
 	}, [
-		codeFileStructsMap,
+		allCodeStructSelectOptions,
+		analysisConfig,
+		codeAnalysisName,
 		codeFilesMap,
 		codeFilesTreeData,
 		codeFilesTreeExpandedKeys,
 		codeFilesTreeSelectedKeys,
+		codeStructAnalysisMap,
 		codeStructsMap,
+		codeStructsName,
 		codeStructsTreeData,
 		codeStructsTreeSelectedKeys,
+		createServiceDataFromAnalysisConfig,
+		createServiceDataFromAnalysisMessage,
+		createServiceDataFromCodeFiles,
+		createServiceDataFromCodeStructs,
+		initAnalysisConfigFromService,
+		initCodeFilesFromFiles,
+		onAddNewCodeStruct,
 		selectedCodeFile,
 		selectedCodeStruct,
+		selectedCodeStructAnalysis,
+		setAnalysisConfig,
+		setCodeFilesTreeExpandedKeys,
+		setCodeFilesTreeSelectedKeys,
+		setCodeStructsTreeData,
+		setCodeStructsTreeSelectedKeys,
+		setSelectedCodeStruct,
+		setUsedCodeStructsTreeData,
+		useCodeStructsTreeData,
+		usedCodeStructsTreeData,
 	]);
 
+	// 请求 json 数据时需要的文件名
+	const analysisUrl = useMemo(() => {
+		return getQuery("analysis_url");
+	}, []);
+	const codeStructsUrl = useMemo(() => {
+		return `${analysisUrl}.json`;
+	}, [analysisUrl]);
+	const codeAnalysisUrl = useMemo(() => {
+		return `${analysisUrl}_analysis.json`;
+	}, [analysisUrl]);
 	/** 初始化请求分析数据 */
 	useEffect(() => {
-		const analysisUrl = getQuery("analysis_url");
-		if (analysisUrl) {
-			serviceGetServiceAnalysisResult(analysisUrl).then((res) => {
+		(async function () {
+			if (codeStructsUrl) {
+				const codeFilesRes = await serviceGetCodeFilesMessage(codeStructsUrl).catch((e) => {
+					console.error(e);
+					message.error(`代码结构信息加载失败: ${String(e)}`);
+				});
+				const analysisRes = await serviceGetAnalysisMessage(codeAnalysisUrl).catch((e) => {
+					console.error(e);
+					message.error(`代码分析信息加载失败: ${String(e)}`);
+				});
 				// 初始化 codeFiles
-				setCodeFilesMap(res.data.codeFilesMap ?? {});
-
-				setCodeFilesTreeData(res.data.codeFilesTree.treeData ?? []);
-				setCodeFilesTreeExpandedKeys(res.data.codeFilesTree.expandedKeys ?? []);
-				setCodeFilesTreeSelectedKeys(res.data.codeFilesTree.selectedKeys ?? []);
-
+				initCodeFilesFromService(codeFilesRes?.data?.codeFilesTree ?? {});
+				const _codeFileNames = Object.keys(codeFilesRes?.data?.codeFilesTree?.codeFilesMap ?? {});
 				// 初始化 codeStructs
-				_codeStructsMap_ = {};
-				_codeFileStructsMap_ = {};
-
-				for (let i = 0, len = res.data.codeFileStructs.codeFileNames.length; i < len; i++) {
-					_codeFileStructKey_ = res.data.codeFileStructs.codeFileNames[i];
-
-					_codeStructsMap_[_codeFileStructKey_] = getStructFromJSON(
-						res.data.codeFileStructs.codeFileStructsMap[_codeFileStructKey_],
-						_codeStructsMap_,
-						_codeFileStructsMap_
-					);
-				}
-				setCodeFileStructsMap(_codeFileStructsMap_);
-				setCodeStructsMap(_codeStructsMap_);
-
-				_codeStructsMap_ = null;
-				_codeFileStructsMap_ = null;
-				_codeFileStructKey_ = null;
-			});
-		}
-	}, []);
-
-	useEffect(() => {
-		if (selectedCodeFile === null) {
-			// 设置 CodeStructsTree 信息
-			setCodeStructsTreeData([]);
-			setCodeStructsTreeSelectedKeys([]);
-		} else {
-			// 设置 CodeStructsTree 信息
-			const codeFileKey = selectedCodeFile.key;
-			const filename = selectedCodeFile.name;
-			// codeFileStructsMap 创建新的 FileStruct
-			if (!codeFileStructsMap[codeFileKey]) {
-				codeFileStructsMap[codeFileKey] = new FileStruct(codeFileKey, filename, codeStructsMap);
+				const { codeStructsMap } = initCodeStructsFromService(
+					_codeFileNames,
+					codeFilesRes?.data?.codeFilesTree?.codeFilesMap ?? {},
+					codeFilesRes?.data?.codeFileStructs ?? {}
+				);
+				// 初始化 analysis config
+				initAnalysisConfigFromService(codeFilesRes?.data?.analysisConfig ?? {});
+				// 初始化 analysis message
+				initAnalysisMessageFromService(analysisRes?.data?.analysisMessage ?? {}, codeStructsMap);
 			}
-			setCodeStructsTreeData([codeStructsMap[codeFileKey]]);
-		}
-	}, [codeFileStructsMap, codeStructsMap, selectedCodeFile]);
+		})();
+	}, [
+		codeAnalysisUrl,
+		codeStructsUrl,
+		initAnalysisConfigFromService,
+		initAnalysisMessageFromService,
+		initCodeFilesFromService,
+		initCodeStructsFromService,
+	]);
 
 	return (
 		<AnalysisResultContext.Provider value={providerValue}>
