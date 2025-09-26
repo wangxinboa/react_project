@@ -6,19 +6,35 @@
 
 ## 脚手架自带依赖
 
-- @testing-library/dom: ^10.4.0
-- @testing-library/jest-dom: ^6.6.3
-- @testing-library/react: ^16.3.0
-- @testing-library/user-event: ^13.5.0
-- react: ^19.1.0
-- react-dom: ^19.1.0
-- react-scripts: 5.0.1
-- web-vitals: ^2.1.4
+### dependencies
+
+- "react": "^18.3.1",
+- "react-dom": "^18.3.1",
+
+### devDependencies
+
+- "@testing-library/dom": "^10.4.1",
+- "@testing-library/jest-dom": "^6.8.0",
+- "@testing-library/react": "^16.3.0",
+- "@testing-library/user-event": "^13.5.0",
+- "react-scripts": "5.0.1",
+- "web-vitals": "^2.1.4",
 
 ## 添加依赖
 
+### dependencies
+
+- "history": "^5.3.0",
+- "react-router-dom": "^6.23.1",
+- "antd": "^5.27.4",
+- "@babel/parser": "^7.27.5"
+
+### devDependencies
+
+- "sass": "^1.89.2"
+
 <!-- ```
-	npm install sass-loader node-sass redux react-redux react-router-dom history
+	npm install sass-loader node-sass redux react-redux react-router-dom history antd
 ```
 
 * redux: ^5.0.1
@@ -38,9 +54,6 @@
 
 * gh-pages: ^6.3.0
 	>将网站部署到 github 上 -->
-
-- react-split-pane: ^0.1.92
-- react-split-pane: ^0.1.92
 
 ## 内部添加(直接添加到代码中使用)的第三方框架
 

@@ -1,8 +1,8 @@
 import { parse } from "@babel/parser";
 
-export function getJsCodeAst(codeStr) {
+export default function createStructFromCodeString(codeString) {
 	try {
-		return parse(codeStr, {
+		const astNode = parse(codeString, {
 			sourceType: "module",
 			strictMode: false,
 			createParenthesizedExpressions: true,
@@ -30,23 +30,8 @@ export function getJsCodeAst(codeStr) {
 				// 'exportNamespaceFrom'
 			],
 		});
+		console.info("astNode:", astNode);
 	} catch (e) {
-		console.error("解析代码失败:", e, codeStr);
 		return null;
 	}
 }
-
-// export function isAstNode(data) {
-// 	if (data instanceof Node) {
-// 		return true;
-// 	} else if (data instanceof Object && typeof data.type === 'string') {
-// 		if ((data.type === 'CommentLine' || data.type === 'CommentBlock')) {
-// 			return true;
-// 		} else {
-// 			throw new Error(`isAstNode 函数 ast 节点判断，遇到特殊节点: ${JSON.stringify(data, null, 4)}`);
-// 		}
-// 	} else {
-
-// 		return false;
-// 	}
-// }

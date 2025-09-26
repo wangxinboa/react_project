@@ -1,6 +1,5 @@
 import { useContext, useCallback, useRef } from "react";
-import { Button } from "antd";
-import SplitPane from "react-split-pane";
+import { Button, Splitter } from "antd";
 
 import { AnalysisResultContext } from "../../analysis_result.jsx";
 import AddCodeStructUsed from "./add_code_struct_used.jsx";
@@ -97,16 +96,20 @@ const AnalysisMessage = () => {
 				) : null}
 			</div>
 			<div className={styles.analysis_message_body}>
-				<SplitPane split="horizontal" minSize={"50%"}>
-					<CodeStructsUsedTree
-						key={selectedCodeStructAnalysis?.key ?? 0}
-						treeData={usedCodeStructsTreeData}
-						openFileInVsCode={handleOnOpenFileInVsCode}
-						addNextUsedCodeStruct={handleOnAddNextUsedCodeStruct}
-						deleteUsedCodeStruct={handleOnDeleteUsedCodeStruct}
-					/>
-					<CodeStructsUseTree key={selectedCodeStructAnalysis?.key ?? 0} treeData={useCodeStructsTreeData} />
-				</SplitPane>
+				<Splitter layout="vertical">
+					<Splitter.Panel defaultSize="50%">
+						<CodeStructsUsedTree
+							key={selectedCodeStructAnalysis?.key ?? 0}
+							treeData={usedCodeStructsTreeData}
+							openFileInVsCode={handleOnOpenFileInVsCode}
+							addNextUsedCodeStruct={handleOnAddNextUsedCodeStruct}
+							deleteUsedCodeStruct={handleOnDeleteUsedCodeStruct}
+						/>
+					</Splitter.Panel>
+					<Splitter.Panel defaultSize="50%">
+						<CodeStructsUseTree key={selectedCodeStructAnalysis?.key ?? 0} treeData={useCodeStructsTreeData} />
+					</Splitter.Panel>
+				</Splitter>
 			</div>
 		</div>
 	);

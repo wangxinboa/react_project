@@ -1,6 +1,5 @@
 import { useCallback, useRef, useContext } from "react";
-import { Button } from "antd";
-import SplitPane from "react-split-pane";
+import { Button, Splitter } from "antd";
 
 import { AnalysisResultContext } from "./analysis_result.jsx";
 
@@ -78,18 +77,30 @@ export default function AnalysisResult() {
 					</Button>
 				</div>
 			</div>
-			<div className={styles.analysis_result_body}>
-				<SplitPane split="vertical" minSize={"400px"} primary="second">
-					<SplitPane split="vertical" minSize={"400px"}>
-						<SplitPane split="horizontal" minSize={"50%"}>
+			{/* <div className={styles.analysis_result_body}> */}
+			<Splitter className={styles.analysis_result_body}>
+				<Splitter.Panel defaultSize={400}>
+					{/* Panel 1 */}
+					<Splitter layout="vertical">
+						<Splitter.Panel defaultSize="50%">
+							{/* 文件代码 */}
 							<CodeFilesTree />
+						</Splitter.Panel>
+						<Splitter.Panel defaultSize="50%">
+							{/* 文件结构 */}
 							<CodeStructsTree />
-						</SplitPane>
-						<CodeEditor />
-					</SplitPane>
+						</Splitter.Panel>
+					</Splitter>
+				</Splitter.Panel>
+				<Splitter.Panel>
+					{/* Panel 2 代码编辑页面 */}
+					<CodeEditor />
+				</Splitter.Panel>
+				<Splitter.Panel defaultSize={400}>
+					{/* Panel 3 代码分析结果 */}
 					<AnalysisMessage />
-				</SplitPane>
-			</div>
+				</Splitter.Panel>
+			</Splitter>
 		</div>
 	);
 }

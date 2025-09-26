@@ -75,14 +75,3 @@ canvas {
 a {
 	text-decoration: none;
 }
-
-/*css 级通用样式*/
-
-/*文本溢出显示省略号*/
-.prevent_text_overflow {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	/*文本溢出显示省略号*/
-	white-space: nowrap;
-	/*文本不会换行*/
-}

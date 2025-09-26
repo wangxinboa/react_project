@@ -45,6 +45,8 @@ const CodeEditor = () => {
 		_editor_.session.setMode("ace/mode/javascript"); // 语言模式
 		_editor_.setFontSize(14); // 字体大小
 		_editor_.renderer.setShowPrintMargin(false); // 是否显示打印边距
+		// 设置只读模式
+		_editor_.setReadOnly(true);
 
 		editorRef.current.editor = _editor_;
 

@@ -4,6 +4,7 @@ import { message } from "antd";
 import FileStruct from "../../code_struct/file_struct.js";
 import { createStructSelectOption } from "../../code_struct/code_struct_utils/create_option.js";
 import createFileStructFromJSON from "../../code_struct/code_struct_utils/create_struct_from_json.js";
+import createStructFromCodeString from "../../code_struct/code_struct_utils/create_struct_from_code_string/create_struct_from_code_string.js";
 
 export default function useCodeStructsTree(selectedCodeFile) {
 	// 包含 codeFileStruct 的 map
@@ -25,14 +26,6 @@ export default function useCodeStructsTree(selectedCodeFile) {
 		},
 		[allCodeStructSelectOptions, setAllCodeStructSelectOptions]
 	);
-	/** 当删除旧的 code struct 时, 将 allCodeStructSelectOptions 中对应的 option 删除 */
-	// const onDeleteCodeStruct = useCallback(
-	// 	(codeStruct) => {
-	// 		setAllCodeStructSelectOptions([...allCodeStructSelectOptions]);
-	// 	},
-	// 	[allCodeStructSelectOptions]
-	// );
-
 	/** 根据接口信息初始化 code structs */
 	const initCodeStructsFromService = useCallback((codeFileKeys, codeFilesMap, serviceData) => {
 		// // 初始化 codeStructs
@@ -74,6 +67,7 @@ export default function useCodeStructsTree(selectedCodeFile) {
 			const _fileStructKey = selectedCodeFile.key;
 			// 如果 codeFileStructsMap 不存在代码文件对应的 FileStruct 的话, 就根据代码文件生成一个 FileStruct
 			if (!codeFileStructsMap[_fileStructKey]) {
+				createStructFromCodeString(selectedCodeFile?.aceMessage?.code);
 				message.info({
 					key: _fileStructKey,
 					content: `${_fileStructKey} 初始化 FileStruct`,
