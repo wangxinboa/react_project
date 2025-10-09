@@ -24,9 +24,9 @@ const AnalysisForm = forwardRef((props, ref) => {
 	const handleOnOk = useCallback(() => {
 		const formValues = form.getFieldsValue();
 		if (isAdd) {
-			onAddOk?.(formValues);
+			onAddOk(formValues);
 		} else if (isEdit) {
-			onEditOk?.(record, formValues);
+			onEditOk(record, formValues);
 		}
 		setVisible(false);
 	}, [form, isAdd, isEdit, onAddOk, onEditOk, record]);

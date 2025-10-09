@@ -14,7 +14,7 @@ export default class RootFolder extends Folder {
 		this._promiseThen = {};
 	}
 
-	saveFile(file) {
+	registerFile(file) {
 		this.allFiles.push(file);
 		return this;
 	}

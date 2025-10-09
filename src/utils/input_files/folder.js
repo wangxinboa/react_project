@@ -27,6 +27,7 @@ export default class Folder {
 		this.files = [];
 		this.filesMap = new Map();
 
+		this.parent = null;
 		this.children = [];
 	}
 	init(path, name) {
@@ -34,6 +35,10 @@ export default class Folder {
 		this.name = name;
 
 		return this;
+	}
+
+	setParent(parent) {
+		this.parent = parent;
 	}
 
 	hasFolder(name) {
@@ -46,7 +51,12 @@ export default class Folder {
 		this.folders.push(folder);
 		this.foldersMap.set(folder.name, folder);
 
+		folder.setParent(this);
 		this.children.push(folder);
+
+		this.sort();
+
+		return this;
 	}
 
 	hasFile(name) {
@@ -59,7 +69,10 @@ export default class Folder {
 		this.files.push(file);
 		this.filesMap.set(file.name, file);
 
+		file.setParent(this);
 		this.children.push(file);
+
+		this.sort();
 
 		return this;
 	}

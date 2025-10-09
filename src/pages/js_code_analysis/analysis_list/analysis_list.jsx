@@ -44,7 +44,7 @@ export default function AnalysisList() {
 	}, []);
 	/** 点击添加分析结果记录 */
 	const startAddAnalysisCode = useCallback(() => {
-		analysisFormRef.current?.startAddAnalysis();
+		analysisFormRef.current.startAddAnalysis();
 	}, []);
 	/** 完成添加分析结果记录 */
 	const handleOnAnalysisFormAddOk = useCallback(
@@ -62,7 +62,7 @@ export default function AnalysisList() {
 	);
 	/** 点击编辑分析结果记录 */
 	const handleEditAnalysisRecord = useCallback((record) => {
-		analysisFormRef.current?.startEditAnalysis(record);
+		analysisFormRef.current.startEditAnalysis(record);
 	}, []);
 	/** 跳转到分析页面 */
 	const handleAnalyseCodeRecord = useCallback((record) => {
