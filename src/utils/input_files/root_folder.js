@@ -1,10 +1,8 @@
-import Folder from "./folder.js";
+import BaseRootFolder from "./base_root_folder.js";
 
-export default class RootFolder extends Folder {
+export default class RootFolder extends BaseRootFolder {
 	constructor() {
 		super();
-		this.allFiles = [];
-
 		// readFile
 		this._readedFileIndex = 0;
 		this._readingFile = null;
@@ -14,9 +12,10 @@ export default class RootFolder extends Folder {
 		this._promiseThen = {};
 	}
 
-	registerFile(file) {
-		this.allFiles.push(file);
-		return this;
+	destroy() {
+		this._readedFileIndex = this._readingFile = this._fileReader = this._promiseThen = null;
+
+		super.destroy();
 	}
 
 	onReadFile() {}
@@ -27,6 +26,7 @@ export default class RootFolder extends Folder {
 	}
 	readFileAsText() {
 		if (this._readedFileIndex < this.allFiles.length) {
+			// 文件还没有读取完
 			this._readingFile = this.allFiles[this._readedFileIndex++];
 			this._fileReader.readAsText(this._readingFile.file);
 		} else {

@@ -1,3 +1,15 @@
 .configure_analysis {
 	width: 100%;
 }
+
+.configure_analysis_import_source_container {
+	display: flex;
+	gap: 20px;
+
+	> .configure_analysis_import_source {
+		width: 50%;
+	}
+	> .configure_analysis_import_source_path {
+		width: 50%;
+	}
+}

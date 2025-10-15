@@ -36,9 +36,7 @@ const UploadCodeFiles = forwardRef((props, ref) => {
 		setVisible(false);
 	}, []);
 
-	/** 上传文件 */
-	const handleOnInput = useCallback((e) => {
-		const files = e.target.files;
+	const onAddFiles = useCallback((files) => {
 		const filesSuffixes = [];
 		for (let i = 0, len = files.length; i < len; i++) {
 			const name = files[i].name;
@@ -56,8 +54,15 @@ const UploadCodeFiles = forwardRef((props, ref) => {
 			})
 		);
 		setNeedFiles([]);
-		setAllFiles([...e.target.files]);
+		setAllFiles([...files]);
 	}, []);
+	/** input 上传文件 */
+	const handleOnInput = useCallback(
+		(e) => {
+			onAddFiles(e.target.files);
+		},
+		[onAddFiles]
+	);
 	/** 选择指定后缀的文件数组 */
 	const onSetNeedFilesSuffixes = useCallback(
 		(needFilesSuffixes) => {

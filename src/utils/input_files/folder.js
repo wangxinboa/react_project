@@ -18,8 +18,8 @@ export default class Folder {
 		this.type = "folder";
 		this.isFolder = true;
 
-		this.key = void 0;
-		this.name = void 0;
+		// this.key = void 0;
+		// this.name = void 0;
 
 		this.folders = [];
 		this.foldersMap = new Map();
@@ -30,6 +30,28 @@ export default class Folder {
 		this.parent = null;
 		this.children = [];
 	}
+
+	destroy() {
+		this.foldersMap.clear();
+		this.filesMap.clear();
+
+		for (let i = 0, len = this.children.length; i < len; i++) {
+			this.children[i].destroy();
+		}
+
+		this.type =
+			this.isFolder =
+			this.folders =
+			this.foldersMap =
+			this.files =
+			this.filesMap =
+			this.parent =
+			this.children =
+			this.key =
+			this.name =
+				null;
+	}
+
 	init(path, name) {
 		this.key = path;
 		this.name = name;

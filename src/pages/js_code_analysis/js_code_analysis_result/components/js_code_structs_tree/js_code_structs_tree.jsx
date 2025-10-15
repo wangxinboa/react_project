@@ -7,17 +7,23 @@ import styles from "./js_code_structs_tree.module.scss";
 import JsCodeStructsTreeNode from "./js_code_structs_tree_node.jsx";
 
 const JsCodeStructsTree = () => {
-	const { codeStructsMap, codeStructsTreeData, codeStructsTreeSelectedKeys, onSetCodeStructsTreeSelectedKeys } =
-		useContext(JsCodeJsCodeAnalysisResultContext);
+	const {
+		codeStructsTreeContainerDomRef,
+		codeStructsTreeContainerDomHeight,
+		selectedCodeFile,
+		codeStructsTreeData,
+		codeStructsTreeSelectedKeys,
+		onSetCodeStructsTreeSelectedKeys,
+	} = useContext(JsCodeJsCodeAnalysisResultContext);
 
 	/** Tree 组件选择节点 */
 	const handleOnTreeSelect = useCallback(
 		(_selectedKeys) => {
 			if (_selectedKeys.length === 1) {
-				onSetCodeStructsTreeSelectedKeys(_selectedKeys, codeStructsMap);
+				onSetCodeStructsTreeSelectedKeys(_selectedKeys);
 			}
 		},
-		[codeStructsMap, onSetCodeStructsTreeSelectedKeys]
+		[onSetCodeStructsTreeSelectedKeys]
 	);
 	/** 自定义渲染 tree 节点 */
 	const titleRender = useCallback((node) => {
@@ -25,17 +31,19 @@ const JsCodeStructsTree = () => {
 	}, []);
 
 	return (
-		<div className={styles.js_code_structs_tree}>
+		<div className={styles.js_code_structs_tree} ref={codeStructsTreeContainerDomRef}>
 			{Array.isArray(codeStructsTreeData) && codeStructsTreeData.length > 0 ? (
 				<Tree
+					key={selectedCodeFile?.key}
 					multiple={false}
 					selectedKeys={codeStructsTreeSelectedKeys}
 					onSelect={handleOnTreeSelect}
 					blockNode
 					showLine
 					titleRender={titleRender}
-					// defaultExpandAll={true}
+					defaultExpandAll={true}
 					treeData={codeStructsTreeData}
+					height={codeStructsTreeContainerDomHeight}
 				/>
 			) : null}
 		</div>

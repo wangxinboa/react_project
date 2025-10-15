@@ -17,13 +17,18 @@
 			display: flex;
 			flex-direction: row;
 			gap: 10px;
+			width: 0;
+			flex: 1;
 
 			> .js_code_analysis_result_title {
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
+				width: 100%;
 				height: 100%;
+				line-height: 24px;
 				font-size: 14px;
+
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
 			}
 		}
 		> .js_code_analysis_result_header_right {

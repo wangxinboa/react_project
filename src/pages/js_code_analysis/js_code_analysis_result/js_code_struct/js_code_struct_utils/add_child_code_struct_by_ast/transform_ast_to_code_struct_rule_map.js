@@ -217,7 +217,7 @@ const TransformAstToCodeStructRuleMap = {
 	},
 	ExportNamedDeclaration: {
 		structClass: ExportNamedDeclarationStruct,
-		astProperties: ["specifiers", "source", "declaration", "assertions"],
+		astProperties: ["specifiers", "declaration", "assertions"],
 	},
 	ExportSpecifier: {
 		structClass: ExportSpecifierStruct,

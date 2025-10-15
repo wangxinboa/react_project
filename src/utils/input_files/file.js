@@ -6,11 +6,17 @@ export default class File {
 		this.parent = null;
 	}
 
-	initFile(file) {
-		this.key = file.webkitRelativePath;
-		this.name = file.name;
+	destroy() {
+		this.type = this.isFile = this.parent = this.file = this.key = this.name = this.suffix = null;
+	}
 
+	initFile(file) {
 		this.file = file;
+	}
+
+	init(key, name) {
+		this.key = key;
+		this.name = name;
 
 		this.suffix = this.name.substring(this.name.lastIndexOf("."));
 

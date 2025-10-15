@@ -23,7 +23,9 @@ export default class ImportDeclarationStruct extends BaseStructInFile {
 			);
 		}
 		this.source = getStringLiteralValue(ast.source);
-		this.exportKind = ast.exportKind;
+		this.importKind = ast.importKind;
+
+		this.importedFileStruct = null;
 
 		this.type = "ImportDeclaration";
 		this.title = `from ${this.source}`;
@@ -31,30 +33,17 @@ export default class ImportDeclarationStruct extends BaseStructInFile {
 	destroy() {
 		super.destroy();
 
-		this.isImportDeclarationStruct = this.source = this.exportKind = null;
+		this.isImportDeclarationStruct = this.source = this.importKind = this.importedFileStruct = null;
 	}
 
-	getSourceFilePath() {
-		const currentFilePath = this.fileStruct.codeFile.key;
-		const importPath = this.source;
+	getSourceCodeFile() {
+		return this.fileStruct.codeFile.getCodeFileByRelativePath(this.source);
+	}
+	getSourceCodeFilePath() {
+		return this.getSourceCodeFile().key;
+	}
 
-		if (importPath.startsWith("./") || importPath.startsWith("../")) {
-			const currentDir = currentFilePath.split("/").slice(0, -1);
-			const importParts = importPath.split("/");
-
-			for (const part of importParts) {
-				if (part === ".") {
-					continue;
-				} else if (part === "..") {
-					if (currentDir.length > 0) {
-						currentDir.pop();
-					}
-				} else {
-					currentDir.push(part);
-				}
-			}
-
-			return currentDir.join("/");
-		}
+	afterSetParentRelation() {
+		this.importedFileStruct = this.fileStruct.addImportFileStructBySource(this.source);
 	}
 }

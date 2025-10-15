@@ -21,21 +21,27 @@ const JsCodeAnalysisResult = () => {
 		initAnalysisConfigFromService,
 		createServiceDataFromAnalysisConfig,
 		analysisConfig,
-		setAnalysisConfig,
+		setAnalysisConfigFromFormData,
 		toVsCodeFile,
 	} = useConfigureAnalysis();
 	// js code structs
 	const {
-		codeStructsMap,
+		codeStructsTreeContainerDomRef,
+		setCodeStructsTreeContainerDomHeight,
+		codeStructsTreeContainerDomHeight,
 		codeStructsTreeData,
 		codeStructsTreeSelectedKeys,
 		onSetCodeStructsTreeSelectedKeys,
 
+		createAllStructsByAllCodeFiles,
 		setSelectedCodeStructByCodeFile,
 		selectedCodeStruct,
-	} = useJsCodeStructsTree();
+	} = useJsCodeStructsTree(analysisConfig);
 	// code files
 	const {
+		codeFilesTreeContainerDomRef,
+		setCodeFilesTreeContainerDomHeight,
+		codeFilesTreeContainerDomHeight,
 		codeFilesMap,
 		codeFilesTreeData,
 		codeFilesTreeExpandedKeys,
@@ -53,16 +59,22 @@ const JsCodeAnalysisResult = () => {
 			// analysis config
 			initAnalysisConfigFromService,
 			analysisConfig,
-			setAnalysisConfig,
+			setAnalysisConfigFromFormData,
 			toVsCodeFile,
 			// js code structs
-			codeStructsMap,
+			codeStructsTreeContainerDomRef,
+			setCodeStructsTreeContainerDomHeight,
+			codeStructsTreeContainerDomHeight,
 			codeStructsTreeData,
 			codeStructsTreeSelectedKeys,
 
+			createAllStructsByAllCodeFiles,
 			onSetCodeStructsTreeSelectedKeys,
 			selectedCodeStruct,
 			// code files
+			codeFilesTreeContainerDomRef,
+			setCodeFilesTreeContainerDomHeight,
+			codeFilesTreeContainerDomHeight,
 			codeFilesMap,
 
 			codeFilesTreeData,
@@ -91,12 +103,16 @@ const JsCodeAnalysisResult = () => {
 	}, [
 		analysisConfig,
 		codeFilesMap,
+		codeFilesTreeContainerDomHeight,
+		codeFilesTreeContainerDomRef,
 		codeFilesTreeData,
 		codeFilesTreeExpandedKeys,
 		codeFilesTreeSelectedKeys,
-		codeStructsMap,
+		codeStructsTreeContainerDomHeight,
+		codeStructsTreeContainerDomRef,
 		codeStructsTreeData,
 		codeStructsTreeSelectedKeys,
+		createAllStructsByAllCodeFiles,
 		createServiceDataByCodeFiles,
 		createServiceDataFromAnalysisConfig,
 		initAnalysisConfigFromService,
@@ -106,8 +122,10 @@ const JsCodeAnalysisResult = () => {
 		onSetCodeStructsTreeSelectedKeys,
 		selectedCodeFile,
 		selectedCodeStruct,
-		setAnalysisConfig,
+		setAnalysisConfigFromFormData,
+		setCodeFilesTreeContainerDomHeight,
 		setCodeFilesTreeExpandedKeys,
+		setCodeStructsTreeContainerDomHeight,
 		toVsCodeFile,
 	]);
 
@@ -116,15 +134,17 @@ const JsCodeAnalysisResult = () => {
 		// 请求保存代码信息的 json 数据
 		serviceGetCodeFilesMessage(`${getQuery("analysis_url")}.json`)
 			.then((res) => {
-				initCodeFilesByService(res.data.codeFilesTree ?? {});
 				// 初始化 analysis config
 				initAnalysisConfigFromService(res.data.analysisConfig ?? {});
+
+				const rootCodeFolder = initCodeFilesByService(res.data.codeFilesTree ?? {});
+				createAllStructsByAllCodeFiles(rootCodeFolder.allFiles);
 			})
 			.catch((e) => {
 				console.error(e);
 				message.error(`代码结构信息加载失败: ${String(e)}`);
 			});
-	}, [initAnalysisConfigFromService, initCodeFilesByService]);
+	}, [createAllStructsByAllCodeFiles, initAnalysisConfigFromService, initCodeFilesByService]);
 
 	return (
 		<JsCodeJsCodeAnalysisResultContext.Provider value={providerValue}>

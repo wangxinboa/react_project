@@ -4,9 +4,12 @@ import { Tree } from "antd";
 import { JsCodeJsCodeAnalysisResultContext } from "../../js_code_analysis_result.jsx";
 
 import styles from "./code_files_tree.module.scss";
+import CodeFilesTreeNode from "./code_files_tree_node.jsx";
 
 const CodeFilesTree = () => {
 	const {
+		codeFilesTreeContainerDomRef,
+		codeFilesTreeContainerDomHeight,
 		codeFilesMap,
 		codeFilesTreeData,
 
@@ -19,11 +22,7 @@ const CodeFilesTree = () => {
 
 	/** 自定义渲染 tree 节点 */
 	const titleRender = useCallback((node) => {
-		return (
-			<div className={styles.code_files_tree_node}>
-				<div className={styles.code_structs_tree_node_title}>{node.name}</div>
-			</div>
-		);
+		return <CodeFilesTreeNode codeFile={node} />;
 	}, []);
 	/** tree 展开/收起节点时 */
 	const handleOnTreeExpand = useCallback(
@@ -43,7 +42,7 @@ const CodeFilesTree = () => {
 	);
 
 	return (
-		<div className={styles.code_files}>
+		<div className={styles.code_files} ref={codeFilesTreeContainerDomRef}>
 			{Array.isArray(codeFilesTreeData) && codeFilesTreeData.length > 0 ? (
 				<Tree
 					multiple={false}
@@ -55,6 +54,7 @@ const CodeFilesTree = () => {
 					onSelect={handleOnTreeSelect}
 					onExpand={handleOnTreeExpand}
 					treeData={codeFilesTreeData}
+					height={codeFilesTreeContainerDomHeight}
 				/>
 			) : null}
 		</div>

@@ -5,5 +5,16 @@ export default class CallExpressionStruct extends BaseStructInFile {
 		super(ast, environmentStruct);
 
 		this.type = "CallExpression";
+
+		this.isCallExpressionStruct = true;
+	}
+	destroy() {
+		super.destroy();
+
+		this.isCallExpressionStruct = null;
+	}
+
+	getAstArguments() {
+		return this.ast.arguments;
 	}
 }

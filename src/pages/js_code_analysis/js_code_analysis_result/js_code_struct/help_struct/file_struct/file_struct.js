@@ -1,11 +1,11 @@
-import ScopeStruct from "../help_struct/scope_struct/scope_struct.js";
-import createAstByCodeFile from "../js_code_struct_utils/create_ast_by_code_file.js";
-import { isFileAst } from "../js_code_struct_utils/ast_types.js";
-import { addChildCodeStructByAst } from "../js_code_struct_utils/add_child_code_struct_by_ast/add_child_code_struct_by_ast.js";
+import ImportMap from "./import_map.js";
+import createAstByCodeFile from "../../js_code_struct_utils/create_ast_by_code_file.js";
+import { isFileAst } from "../../js_code_struct_utils/ast_types.js";
+import { addChildCodeStructByAst } from "../../js_code_struct_utils/add_child_code_struct_by_ast/add_child_code_struct_by_ast.js";
 
-export default class FileStruct extends ScopeStruct {
+export default class FileStruct extends ImportMap {
 	static type = "File";
-	constructor(key, codeFile, codeStructsMap) {
+	constructor(key, codeFile, codeStructsMap, analysisConfig) {
 		super(codeStructsMap);
 
 		this.key = key;
@@ -15,21 +15,33 @@ export default class FileStruct extends ScopeStruct {
 		this.type = FileStruct.type;
 		this.title = codeFile.name;
 
+		this.codeStructsMap[key] = this;
+
 		this.isFileStruct = true;
 		this.codeFile = codeFile;
 
-		this.codeStructsMap[key] = this;
+		this.analysisConfig = analysisConfig;
 	}
 
 	destroy() {
 		super.destroy();
 
-		this.isFileStruct = this.codeFile = null;
+		this.isFileStruct = this.codeFile = this.analysisConfig = null;
 	}
 
+	getCodeFileKey() {
+		return this.codeFile.key;
+	}
+	getImportPackageSourcePath(importSource) {
+		return this.analysisConfig.importPackageSourcePathsMap[importSource];
+	}
 	/** 根据 importDeclaration ast 添加变量 */
 	_addVariableByImportDeclarationAst(importDeclarationAst) {
 		// console.info("importDeclarationAst:", importDeclarationAst);
+	}
+
+	createFileStructByCodeFile(codeFile) {
+		return FileStruct.createByCodeFile(codeFile, this.codeStructsMap, this.analysisConfig);
 	}
 
 	/**
@@ -38,7 +50,7 @@ export default class FileStruct extends ScopeStruct {
 	 * @param {*} codeStructsMap
 	 * @returns
 	 */
-	static createByCodeFile(codeFile, codeStructsMap) {
+	static createByCodeFile(codeFile, codeStructsMap, analysisConfig) {
 		const key = `${FileStruct.type}:${codeFile.key}`;
 		if (key in codeStructsMap) {
 			return codeStructsMap[key];
@@ -46,7 +58,7 @@ export default class FileStruct extends ScopeStruct {
 			const fileAst = createAstByCodeFile(codeFile);
 
 			if (isFileAst(fileAst)) {
-				const fileStruct = new FileStruct(key, codeFile, codeStructsMap);
+				const fileStruct = new FileStruct(key, codeFile, codeStructsMap, analysisConfig);
 				const fileAstProgramBodyAsts = fileAst.program.body;
 				if (Array.isArray(fileAstProgramBodyAsts)) {
 					for (let i = 0, len = fileAstProgramBodyAsts.length; i < len; i++) {

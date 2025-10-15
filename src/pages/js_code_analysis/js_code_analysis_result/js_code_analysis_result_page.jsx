@@ -7,21 +7,22 @@ import ConfigureAnalysis from "./components/configure_analysis/configure_analysi
 import UploadCodeFiles from "./components/upload_code_files/upload_code_files.jsx";
 
 import CodeFilesTree from "./components/code_files_tree/code_files_tree.jsx";
-import CodeEditor from "./components/code_editor/code_editor.jsx";
+// import CodeEditor from "./components/code_editor/code_editor.jsx";
 import JsCodeStructsTree from "./components/js_code_structs_tree/js_code_structs_tree.jsx";
-// import CodeStructsTree from "./components/code_structs_tree/code_structs_tree.jsx";
-// import AnalysisMessage from "./components/analysis_message/analysis_message.jsx";
 
 import styles from "./js_code_analysis_result.module.scss";
+import JsCodeAnalysis from "./components/js_code_analysis/js_code_analysis.jsx";
 
 const JsCodeAnalysisResultPage = () => {
 	const {
+		selectedCodeFile,
+		setCodeFilesTreeContainerDomHeight,
+		setCodeStructsTreeContainerDomHeight,
+		createAllStructsByAllCodeFiles,
 		initCodeFilesByFiles,
 		downloadCodeFilesMessage,
-		// downloadCodeAnalysis,
-		// selectedCodeFile,
 		analysisConfig,
-		setAnalysisConfig,
+		setAnalysisConfigFromFormData,
 	} = useContext(JsCodeJsCodeAnalysisResultContext);
 
 	const configureAnalysisRef = useRef(null);
@@ -31,15 +32,13 @@ const JsCodeAnalysisResultPage = () => {
 	const startConfigureAnalysis = useCallback(() => {
 		configureAnalysisRef.current.startConfigure(analysisConfig);
 	}, [analysisConfig]);
-
 	/** 当 ConfigureAnalysis Modal 确认, 更新 filesTree, */
 	const handleOnConfigureAnalysisOk = useCallback(
 		(values) => {
-			setAnalysisConfig(values);
+			setAnalysisConfigFromFormData(values);
 		},
-		[setAnalysisConfig]
+		[setAnalysisConfigFromFormData]
 	);
-
 	/** 点击[上传代码文件], 弹出 UploadCodeFiles Modal */
 	const startUploadCodeFiles = useCallback(() => {
 		uploadCodeFilesRef.current.startUpload();
@@ -47,18 +46,24 @@ const JsCodeAnalysisResultPage = () => {
 	/** 当 UploadCodeFiles Modal 确认, 更新 filesTree, */
 	const handleOnUploadCodeFilesOk = useCallback(
 		(files) => {
-			initCodeFilesByFiles(files).then(() => {
+			initCodeFilesByFiles(files).then((rootCodeFolder) => {
+				createAllStructsByAllCodeFiles(rootCodeFolder.allFiles);
+
 				uploadCodeFilesRef.current.endUpload();
 			});
 		},
-		[initCodeFilesByFiles]
+		[createAllStructsByAllCodeFiles, initCodeFilesByFiles]
 	);
+	const onCodeSplitterResize = useCallback(() => {
+		setCodeFilesTreeContainerDomHeight();
+		setCodeStructsTreeContainerDomHeight();
+	}, [setCodeFilesTreeContainerDomHeight, setCodeStructsTreeContainerDomHeight]);
 
 	return (
 		<div className={styles.js_code_analysis_result}>
 			<div className={styles.js_code_analysis_result_header}>
 				<div className={styles.js_code_analysis_result_header_left}>
-					<div className={styles.js_code_analysis_result_title}>js_code_analysis_result_title</div>
+					<div className={styles.js_code_analysis_result_title}>{selectedCodeFile?.key ?? "请选择代码文件"}</div>
 				</div>
 				<div className={styles.js_code_analysis_result_header_right}>
 					<ConfigureAnalysis ref={configureAnalysisRef} onOk={handleOnConfigureAnalysisOk} />
@@ -82,7 +87,7 @@ const JsCodeAnalysisResultPage = () => {
 						size="small"
 						onClick={downloadCodeFilesMessage}
 					>
-						下载代码结构
+						下载代码信息
 					</Button>
 					<Button
 						className={styles.js_code_analysis_result_header_right_button}
@@ -95,9 +100,9 @@ const JsCodeAnalysisResultPage = () => {
 			</div>
 			{/* <div className={styles.js_code_analysis_result_body}> */}
 			<Splitter className={styles.js_code_analysis_result_body}>
-				<Splitter.Panel defaultSize={400}>
+				<Splitter.Panel defaultSize={"50%"}>
 					{/* Panel 1 */}
-					<Splitter layout="vertical">
+					<Splitter layout="vertical" onResize={onCodeSplitterResize}>
 						<Splitter.Panel defaultSize="50%">
 							{/* 代码文件 */}
 							<CodeFilesTree />
@@ -108,14 +113,13 @@ const JsCodeAnalysisResultPage = () => {
 						</Splitter.Panel>
 					</Splitter>
 				</Splitter.Panel>
-				<Splitter.Panel>
-					{/* Panel 2 代码编辑页面 */}
+				{/* <Splitter.Panel>
+					Panel 2 代码编辑页面
 					<CodeEditor />
-				</Splitter.Panel>
-				{/* <Splitter.Panel defaultSize={400}>
-					Panel 3 代码分析结果
-					<AnalysisMessage />
 				</Splitter.Panel> */}
+				<Splitter.Panel>
+					<JsCodeAnalysis />
+				</Splitter.Panel>
 			</Splitter>
 		</div>
 	);
