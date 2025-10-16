@@ -56,6 +56,8 @@ export default class BaseStruct {
 		this.parentRelation = "";
 	}
 	afterSetParentRelation() {}
+	afterAddChildrenCodeStructs() {}
+
 	// children parent 相关
 	removeSelf() {
 		if (this.parentStruct) {
@@ -83,11 +85,8 @@ export default class BaseStruct {
 
 		struct._setParentRelation(parentRelation);
 
-		this.afterAddChildStruct(struct);
-
 		return this;
 	}
-	afterAddChildStruct() {}
 
 	getValue() {
 		console.error("code struct", this, "执行 getValue, 但是 code struct 未声明, 只有基类的 getValue, 待完善");

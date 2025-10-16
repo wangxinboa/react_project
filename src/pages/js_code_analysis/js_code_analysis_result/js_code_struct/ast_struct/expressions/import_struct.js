@@ -15,6 +15,7 @@ export default class ImportStruct extends BaseStructInFile {
 	}
 
 	afterSetParentRelation() {
+		// 检查父结构类型
 		if (this.parentStruct.isCallExpressionStruct) {
 			const parentStructAstArguments = this.parentStruct.getAstArguments();
 			if (parentStructAstArguments.length === 1 && isStringLiteralAst(parentStructAstArguments[0])) {

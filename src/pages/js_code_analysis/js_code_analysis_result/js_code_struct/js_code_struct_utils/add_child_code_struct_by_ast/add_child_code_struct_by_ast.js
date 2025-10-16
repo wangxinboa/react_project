@@ -11,6 +11,7 @@ export function addChildCodeStructByAst(parentStruct, ast, environmentStruct, pa
 			codeStruct = new TransformAstToCodeStructRule.structClass(ast, environmentStruct);
 			parentStruct.addChildStruct(codeStruct, parentRelation);
 		} catch (e) {
+			console.error(e);
 			console.error(
 				"执行 addChildCodeStructByAst, 根据 ast",
 				ast,
@@ -26,12 +27,14 @@ export function addChildCodeStructByAst(parentStruct, ast, environmentStruct, pa
 				astChildAstProperties,
 				"TransformAstToCodeStructRule.Class",
 				TransformAstToCodeStructRule.Class,
-				"获取 CodeStruct"
+				"获取 CodeStruct 出问题"
 			);
-			console.error(e);
+			throw new Error(
+				"执行 addChildCodeStructByAst, 根据 ast 环境结构 environmentStruct 父级结构 parentStruct 父级关系 parentRelation TransformAstToCodeStructRule astChildAstProperties: TransformAstToCodeStructRule.Class 获取 CodeStruct 出问题"
+			);
 		}
 	} else {
-		console.warn(
+		console.error(
 			"执行 addChildCodeStructByAst, 根据 ast",
 			ast,
 			"环境结构 environmentStruct",
@@ -46,9 +49,9 @@ export function addChildCodeStructByAst(parentStruct, ast, environmentStruct, pa
 			ast.type,
 			"待完善"
 		);
-		// throw new Error(
-		// 	"执行 addChildCodeStructByAst, 根据 ast 环境结构 environmentStruct, 父级结构 parentStruct, 父级关系 parentRelation 获取 CodeStruct, 但是 ast 是未处理的 ast 类型, 待完善"
-		// );
+		throw new Error(
+			"执行 addChildCodeStructByAst, 根据 ast 环境结构 environmentStruct, 父级结构 parentStruct, 父级关系 parentRelation 获取 CodeStruct, 但是 ast 是未处理的 ast 类型, 待完善"
+		);
 	}
 
 	if (Array.isArray(astChildAstProperties)) {
@@ -66,4 +69,6 @@ export function addChildCodeStructByAst(parentStruct, ast, environmentStruct, pa
 			}
 		}
 	}
+
+	codeStruct.afterAddChildrenCodeStructs();
 }

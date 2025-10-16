@@ -1,6 +1,6 @@
-import BaseVariableName from "./base_variable_name.js";
+import BaseVariableStruct from "./base_variable_struct.js";
 
-export default class PropertyName extends BaseVariableName {
+export default class PropertyName extends BaseVariableStruct {
 	constructor(name, environmentStruct) {
 		super(name, environmentStruct);
 

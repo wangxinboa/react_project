@@ -1,4 +1,5 @@
 import BaseStructInFile from "../../../help_struct/base_struct/base_struct_in_file.js";
+import ImportVariableStruct from "../../../help_struct/variable_struct/import_variable_struct.js";
 import { isIdentifierAst } from "../../../js_code_struct_utils/ast_types.js";
 import { getIdentifierName } from "../../../js_code_struct_utils/get_ast_attribute_value.js";
 import { checkImportSpecifierAfterSetParentRelation } from "./check_import_specifier.js";
@@ -54,5 +55,13 @@ export default class ImportSpecifierStruct extends BaseStructInFile {
 
 	afterSetParentRelation() {
 		checkImportSpecifierAfterSetParentRelation(this);
+
+		this.environmentStruct.addVariable(
+			ImportVariableStruct.createKindNameByLocalImportedFileStruct(
+				this.local,
+				this.imported,
+				this.parentStruct.importedFileStruct
+			)
+		);
 	}
 }

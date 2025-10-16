@@ -4,15 +4,16 @@ export default class VariableDeclarationStruct extends BaseStructInFile {
 	constructor(ast, environmentStruct) {
 		super(ast, environmentStruct);
 
-		this.type = "VariableDeclaration";
-		this.title = `${ast.kind}`;
-
+		this.isVariableDeclaratorStruct = true;
 		this.kind = ast.kind;
+
+		this.type = "VariableDeclaration";
+		this.title = `${this.kind}`;
 	}
 
 	destroy() {
 		super.destroy();
 
-		this.kind = null;
+		this.isVariableDeclaratorStruct = this.kind = null;
 	}
 }

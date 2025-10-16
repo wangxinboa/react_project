@@ -13,7 +13,7 @@ const JsCodeAnalysis = () => {
 	return (
 		<div className={styles.js_code_analysis_container}>
 			<div className={styles.js_code_analysis_title}>
-				{selectedCodeStruct.type}-{selectedCodeStruct.title}
+				代码结构: {selectedCodeStruct.type}-{selectedCodeStruct.title}
 			</div>
 			<div className={styles.js_code_analysis_content}>
 				{selectedCodeStruct.isFileStruct ? <FileStructAnalysis codeStruct={selectedCodeStruct} /> : null}
