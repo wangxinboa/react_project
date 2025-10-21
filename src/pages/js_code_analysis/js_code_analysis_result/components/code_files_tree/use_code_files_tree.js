@@ -1,12 +1,10 @@
 import { useState, useCallback } from "react";
 import { message } from "antd";
 
-import useGetDomHeight from "../../../../../hooks/use_get_dom_height.js";
 import createCodeFilesTreeByFileList from "../../code_files/create_code_files_tree_by_file_list.js";
 import RootCodeFolder from "../../code_files/root_code_folder.js";
 
 export default function useCodeFilesTree(setSelectedCodeStructByCodeFile) {
-	const { domRef, setHeightByDom, height } = useGetDomHeight();
 	// code file
 	const [rootCodeFolder, setRootCodeFolder] = useState(null);
 	const [codeFilesMap, setCodeFilesMap] = useState({});
@@ -79,10 +77,6 @@ export default function useCodeFilesTree(setSelectedCodeStructByCodeFile) {
 	}, [rootCodeFolder, codeFilesTreeExpandedKeys, codeFilesTreeSelectedKeys]);
 
 	return {
-		codeFilesTreeContainerDomRef: domRef,
-		setCodeFilesTreeContainerDomHeight: setHeightByDom,
-		codeFilesTreeContainerDomHeight: height,
-
 		codeFilesMap,
 		codeFilesTreeData,
 		codeFilesTreeExpandedKeys,

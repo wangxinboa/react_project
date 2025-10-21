@@ -1,14 +1,15 @@
 export default class BaseVariableStruct {
-	constructor(name) {
+	constructor(name, environmentStruct) {
 		this.isBaseVariableStruct = true;
 		this.name = name;
+		this.environmentStruct = environmentStruct;
 		this.values = [];
 	}
 
 	destroy() {
 		super.destroy();
 
-		this.isBaseVariableStruct = this.name = this.values = this.type = null;
+		this.isBaseVariableStruct = this.name = this.environmentStruct = this.values = this.type = null;
 	}
 
 	assignValue(struct) {

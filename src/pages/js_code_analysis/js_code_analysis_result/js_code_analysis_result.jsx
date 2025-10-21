@@ -3,11 +3,8 @@ import { message } from "antd";
 
 import JsCodeAnalysisResultPage from "./js_code_analysis_result_page.jsx";
 
-import useJsCodeStructsTree from "./components/js_code_structs_tree/use_js_code_structs_tree.js";
+import useJsCodeAnalysis from "./components/js_code_analysis/use_js_code_analysis.js";
 import useCodeFilesTree from "./components/code_files_tree/use_code_files_tree.js";
-// import useCodeStructsTree from "./components/code_structs_tree/use_code_structs_tree.js";
-// import useConfigureAnalysis from "./components/configure_analysis/use_configure_analysis.js";
-// import useAnalysisMessage from "./components/analysis_message/use_analysis_message.js";
 
 import { getQuery, downloadJSON } from "../../../utils/utils.js";
 import { serviceGetCodeFilesMessage } from "../../../service/service_analysis_result.js";
@@ -26,22 +23,14 @@ const JsCodeAnalysisResult = () => {
 	} = useConfigureAnalysis();
 	// js code structs
 	const {
-		codeStructsTreeContainerDomRef,
-		setCodeStructsTreeContainerDomHeight,
-		codeStructsTreeContainerDomHeight,
 		codeStructsTreeData,
-		codeStructsTreeSelectedKeys,
-		onSetCodeStructsTreeSelectedKeys,
 
 		createAllStructsByAllCodeFiles,
 		setSelectedCodeStructByCodeFile,
-		selectedCodeStruct,
-	} = useJsCodeStructsTree(analysisConfig);
+		selectedCodeFileStruct,
+	} = useJsCodeAnalysis(analysisConfig);
 	// code files
 	const {
-		codeFilesTreeContainerDomRef,
-		setCodeFilesTreeContainerDomHeight,
-		codeFilesTreeContainerDomHeight,
 		codeFilesMap,
 		codeFilesTreeData,
 		codeFilesTreeExpandedKeys,
@@ -62,19 +51,11 @@ const JsCodeAnalysisResult = () => {
 			setAnalysisConfigFromFormData,
 			toVsCodeFile,
 			// js code structs
-			codeStructsTreeContainerDomRef,
-			setCodeStructsTreeContainerDomHeight,
-			codeStructsTreeContainerDomHeight,
 			codeStructsTreeData,
-			codeStructsTreeSelectedKeys,
 
 			createAllStructsByAllCodeFiles,
-			onSetCodeStructsTreeSelectedKeys,
-			selectedCodeStruct,
+			selectedCodeFileStruct,
 			// code files
-			codeFilesTreeContainerDomRef,
-			setCodeFilesTreeContainerDomHeight,
-			codeFilesTreeContainerDomHeight,
 			codeFilesMap,
 
 			codeFilesTreeData,
@@ -103,15 +84,10 @@ const JsCodeAnalysisResult = () => {
 	}, [
 		analysisConfig,
 		codeFilesMap,
-		codeFilesTreeContainerDomHeight,
-		codeFilesTreeContainerDomRef,
 		codeFilesTreeData,
 		codeFilesTreeExpandedKeys,
 		codeFilesTreeSelectedKeys,
-		codeStructsTreeContainerDomHeight,
-		codeStructsTreeContainerDomRef,
 		codeStructsTreeData,
-		codeStructsTreeSelectedKeys,
 		createAllStructsByAllCodeFiles,
 		createServiceDataByCodeFiles,
 		createServiceDataFromAnalysisConfig,
@@ -119,13 +95,10 @@ const JsCodeAnalysisResult = () => {
 		initCodeFilesByFiles,
 		initCodeFilesByService,
 		onSetCodeFilesTreeSelectedKeys,
-		onSetCodeStructsTreeSelectedKeys,
 		selectedCodeFile,
-		selectedCodeStruct,
+		selectedCodeFileStruct,
 		setAnalysisConfigFromFormData,
-		setCodeFilesTreeContainerDomHeight,
 		setCodeFilesTreeExpandedKeys,
-		setCodeStructsTreeContainerDomHeight,
 		toVsCodeFile,
 	]);
 

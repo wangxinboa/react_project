@@ -16,16 +16,17 @@ export default class ImportMap extends ScopeStruct {
 
 		this.importMap = this.importedMap = null;
 	}
-
-	isRelativePath(path) {
-		return path.startsWith("./") || path.startsWith("../");
-	}
-
+	// importMap
 	hasImportFileStruct(importedFileStructKey) {
 		return this.importMap.has(importedFileStructKey);
 	}
 	addImportFileStruct(importFileStruct) {
-		this.importMap.add(importFileStruct.getCodeFileKey(), importFileStruct);
+		const key = importFileStruct.getCodeFileKey();
+		if (this.hasImportFileStruct(key)) {
+			console.warn("ImportMap.addImportFileStruct:已经存在相同名称的变量", key);
+		} else {
+			this.importMap.add(key, importFileStruct);
+		}
 	}
 	getImportFileStruct(importedFileStructKey) {
 		return this.importMap.get(importedFileStructKey);
@@ -33,12 +34,17 @@ export default class ImportMap extends ScopeStruct {
 	getImportFileStructs() {
 		return this.importMap.cacheArray;
 	}
-
+	// importedMap
 	hasImportedFileStruct(localFileStructKey) {
 		return this.importedMap.has(localFileStructKey);
 	}
 	addImportedFileStruct(importedFileStruct) {
-		this.importedMap.add(importedFileStruct.getCodeFileKey(), importedFileStruct);
+		const key = importedFileStruct.getCodeFileKey();
+		if (this.hasImportedFileStruct(key)) {
+			console.warn("ImportMap.addImportedFileStruct:已经存在相同名称的变量", key);
+		} else {
+			this.importedMap.add(importedFileStruct.getCodeFileKey(), importedFileStruct);
+		}
 	}
 	getImportedFileStruct(localFileStructKey) {
 		return this.importedMap.get(localFileStructKey);
@@ -47,7 +53,11 @@ export default class ImportMap extends ScopeStruct {
 		return this.importedMap.cacheArray;
 	}
 
-	addImportFileStructBySource(source) {
+	isRelativePath(path) {
+		return path.startsWith("./") || path.startsWith("../");
+	}
+
+	getCodeFileBySource(source) {
 		let codeFile;
 		if (this.isRelativePath(source)) {
 			codeFile = this.codeFile.getCodeFileByRelativePath(source);
@@ -60,13 +70,17 @@ export default class ImportMap extends ScopeStruct {
 				this,
 				"执行 addImportFileStructBySource 时, 根据传入 import source",
 				source,
-				"未找到对应的 codeFile, 执行逻辑有误"
+				"未找到对应的 codeFile, 代码执行逻辑有误"
 			);
 			throw new Error(
-				"ImportMap 实例执行 addImportFileStructBySource 时, 根据传入 import source 未找到对应的 codeFile, 执行逻辑有误"
+				"ImportMap 实例执行 addImportFileStructBySource 时, 根据传入 import source 未找到对应的 codeFile, 代码执行逻辑有误"
 			);
 		}
 
+		return codeFile;
+	}
+
+	addImportFileStructByCodeFile(codeFile) {
 		const importedFileStruct = this.createFileStructByCodeFile(codeFile);
 		const importedFileStructKey = importedFileStruct.getCodeFileKey();
 		if (!this.hasImportFileStruct(importedFileStructKey)) {
@@ -78,5 +92,9 @@ export default class ImportMap extends ScopeStruct {
 		}
 
 		return this.getImportFileStruct(importedFileStructKey);
+	}
+
+	addImportFileStructBySource(source) {
+		return this.addImportFileStructByCodeFile(this.getCodeFileBySource(source));
 	}
 }

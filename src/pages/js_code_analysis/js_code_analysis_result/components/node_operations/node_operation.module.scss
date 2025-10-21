@@ -7,6 +7,10 @@
 	font-size: 12px;
 	border-radius: 4px;
 	transition: background-color 0.3s;
+	cursor: pointer;
+	background-color: #cbcbcb;
+	text-align: center;
+
 	&:hover {
 		background-color: #a8a8a8;
 	}

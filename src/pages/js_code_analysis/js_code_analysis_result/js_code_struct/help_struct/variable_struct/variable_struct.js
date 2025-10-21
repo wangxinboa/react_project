@@ -11,12 +11,13 @@ export const VariableStructKindTypesEnum = {
 export default class VariableStruct extends BaseVariableStruct {
 	static type = "Variable";
 
-	constructor(name, kind) {
-		super(name);
+	constructor(name, kind, environmentStruct) {
+		super(name, environmentStruct);
 
 		this.type = VariableStruct.type;
 		this.title = `${kind} ${name}`;
 
+		this.isVariableStruct = true;
 		this.kind = kind;
 
 		if (!(this.kind in VariableStructKindTypesEnum)) {
@@ -34,7 +35,7 @@ export default class VariableStruct extends BaseVariableStruct {
 	destroy() {
 		super.destroy();
 
-		this.kind = null;
+		this.isVariableStruct = this.kind = null;
 	}
 
 	isConst() {

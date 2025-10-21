@@ -2,14 +2,13 @@ import { useContext, useCallback } from "react";
 import { Tree } from "antd";
 
 import { JsCodeJsCodeAnalysisResultContext } from "../../js_code_analysis_result.jsx";
+import CodeFilesTreeNode from "./code_files_tree_node.jsx";
+import useGetDomHeight from "../../../../../hooks/use_get_dom_height.js";
 
 import styles from "./code_files_tree.module.scss";
-import CodeFilesTreeNode from "./code_files_tree_node.jsx";
 
 const CodeFilesTree = () => {
 	const {
-		codeFilesTreeContainerDomRef,
-		codeFilesTreeContainerDomHeight,
 		codeFilesMap,
 		codeFilesTreeData,
 
@@ -19,6 +18,8 @@ const CodeFilesTree = () => {
 		codeFilesTreeSelectedKeys,
 		onSetCodeFilesTreeSelectedKeys,
 	} = useContext(JsCodeJsCodeAnalysisResultContext);
+
+	const { domRef: codeFilesTreeContainerDomRef, height: codeFilesTreeContainerDomHeight } = useGetDomHeight();
 
 	/** 自定义渲染 tree 节点 */
 	const titleRender = useCallback((node) => {

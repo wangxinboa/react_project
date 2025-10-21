@@ -5,6 +5,7 @@ export default class IdentifierStruct extends BaseStructInFile {
 	constructor(ast, environmentStruct) {
 		super(ast, environmentStruct);
 
+		this.isIdentifierStruct = true;
 		this.name = getIdentifierName(ast);
 
 		this.type = "Identifier";
@@ -13,6 +14,6 @@ export default class IdentifierStruct extends BaseStructInFile {
 	destroy() {
 		super.destroy();
 
-		this.name = null;
+		this.isIdentifierStruct = this.name = null;
 	}
 }

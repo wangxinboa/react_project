@@ -1,5 +1,4 @@
 import BaseStructInFile from "../../../help_struct/base_struct/base_struct_in_file.js";
-import ImportVariableStruct from "../../../help_struct/variable_struct/import_variable_struct.js";
 import { isIdentifierAst } from "../../../js_code_struct_utils/ast_types.js";
 import { getIdentifierName } from "../../../js_code_struct_utils/get_ast_attribute_value.js";
 import { checkImportSpecifierAfterSetParentRelation } from "./check_import_specifier.js";
@@ -7,6 +6,8 @@ import { checkImportSpecifierAfterSetParentRelation } from "./check_import_speci
 export default class ImportDefaultSpecifierStruct extends BaseStructInFile {
 	constructor(ast, environmentStruct) {
 		super(ast, environmentStruct);
+
+		this.isImportDefaultSpecifier = true;
 
 		if (!isIdentifierAst(ast.local)) {
 			console.error(
@@ -30,14 +31,10 @@ export default class ImportDefaultSpecifierStruct extends BaseStructInFile {
 	destroy() {
 		super.destroy();
 
-		this.local = null;
+		this.isImportDefaultSpecifier = this.local = null;
 	}
 
 	afterSetParentRelation() {
 		checkImportSpecifierAfterSetParentRelation(this);
-
-		this.environmentStruct.addVariable(
-			ImportVariableStruct.createKindDefaultByLocalFileStruct(this.local, this.parentStruct.importedFileStruct)
-		);
 	}
 }

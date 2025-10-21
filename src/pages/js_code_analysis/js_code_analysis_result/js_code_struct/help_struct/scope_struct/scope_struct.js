@@ -1,8 +1,9 @@
-import BaseStruct from "../base_struct/base_struct.js";
+import OperationRecordStruct from "./operation_record_struct.js";
 import { getIdentifierName } from "../../js_code_struct_utils/get_ast_attribute_value.js";
 import CacheMap from "../../../../../../utils/cache_map/cache_map.js";
+import ImportVariableStruct from "../variable_struct/import_variable_struct.js";
 
-export default class ScopeStruct extends BaseStruct {
+export default class ScopeStruct extends OperationRecordStruct {
 	constructor(codeStructsMap) {
 		super(codeStructsMap);
 
@@ -25,7 +26,7 @@ export default class ScopeStruct extends BaseStruct {
 	}
 	getVariable(variableName) {
 		if (this.hasVariable(variableName)) {
-			return this.variablesMap[variableName];
+			return this.variablesMap.get(variableName);
 		} else if (this.environmentStruct) {
 			return this.environmentStruct.getVariable(variableName);
 		} else {
@@ -43,7 +44,7 @@ export default class ScopeStruct extends BaseStruct {
 	addVariable(variableStruct) {
 		if (variableStruct.isBaseVariableStruct || variableStruct.isImportVariableStruct) {
 			if (this.hasVariable(variableStruct.name)) {
-				console.warn("VariableMap:已经存在相同名称的变量", variableStruct);
+				console.warn("ScopeStruct.addVariable:已经存在相同名称的变量", variableStruct);
 			} else {
 				this.variablesMap.add(variableStruct.name, variableStruct);
 			}
@@ -60,6 +61,27 @@ export default class ScopeStruct extends BaseStruct {
 			);
 		}
 	}
+
+	addVariableByImportSpecifierStruct(importSpecifierStruct, importedFileStruct) {
+		this.addVariable(
+			ImportVariableStruct.createKindNameByLocalImportedFileStruct(
+				importSpecifierStruct.local,
+				importSpecifierStruct.imported,
+				importedFileStruct
+			)
+		);
+	}
+	addVariableByImportDefaultSpecifierStruct(importDefaultSpecifierStruct, importedFileStruct) {
+		this.environmentStruct.addVariable(
+			ImportVariableStruct.createKindDefaultByLocalFileStruct(importDefaultSpecifierStruct.local, importedFileStruct)
+		);
+	}
+	addVariableByImportNamespaceSpecifierStruct(importNamespaceSpecifierStruct, importedFileStruct) {
+		this.environmentStruct.addVariable(
+			ImportVariableStruct.createKindAllByLocalFileStruct(importNamespaceSpecifierStruct.local, importedFileStruct)
+		);
+	}
+
 	removeVariable(variableStruct) {
 		this.variablesMap.remove(variableStruct.name);
 	}

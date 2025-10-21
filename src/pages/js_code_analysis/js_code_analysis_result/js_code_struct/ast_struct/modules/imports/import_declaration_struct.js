@@ -1,6 +1,7 @@
 import BaseStructInFile from "../../../help_struct/base_struct/base_struct_in_file.js";
 import { isStringLiteralAst } from "../../../js_code_struct_utils/ast_types.js";
 import { getStringLiteralValue } from "../../../js_code_struct_utils/get_ast_attribute_value.js";
+import { checkImportDeclarationStructAfterAddChildrenCodeStructs } from "./check_import_specifier.js";
 
 export default class ImportDeclarationStruct extends BaseStructInFile {
 	constructor(ast, environmentStruct) {
@@ -25,25 +26,25 @@ export default class ImportDeclarationStruct extends BaseStructInFile {
 		this.source = getStringLiteralValue(ast.source);
 		this.importKind = ast.importKind;
 
-		this.importedFileStruct = null;
-
 		this.type = "ImportDeclaration";
 		this.title = `from ${this.source}`;
 	}
 	destroy() {
 		super.destroy();
 
-		this.isImportDeclarationStruct = this.source = this.importKind = this.importedFileStruct = null;
+		this.isImportDeclarationStruct = this.source = this.importKind = null;
 	}
 
 	getSourceCodeFile() {
-		return this.fileStruct.codeFile.getCodeFileByRelativePath(this.source);
+		return this.fileStruct.getCodeFileBySource(this.source);
 	}
 	getSourceCodeFilePath() {
 		return this.getSourceCodeFile().key;
 	}
 
-	afterSetParentRelation() {
-		this.importedFileStruct = this.fileStruct.addImportFileStructBySource(this.source);
+	afterAddChildrenCodeStructs() {
+		checkImportDeclarationStructAfterAddChildrenCodeStructs(this);
+		/** 添加对应的操作记录 */
+		this.environmentStruct.addImportDeclarationOperation(this);
 	}
 }

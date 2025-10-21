@@ -27,7 +27,9 @@ export default class VariableDeclaratorStruct extends BaseStructInFile {
 		const kind = this.parentStruct.kind;
 
 		if (isIdentifierAst(this.ast.id)) {
-			this.environmentStruct.addVariable(new VariableStruct(getIdentifierName(this.ast.id), kind));
+			this.environmentStruct.addVariable(
+				new VariableStruct(getIdentifierName(this.ast.id), kind, this.environmentStruct)
+			);
 		} else {
 			console.error(
 				"VariableDeclaratorStruct class 实例",

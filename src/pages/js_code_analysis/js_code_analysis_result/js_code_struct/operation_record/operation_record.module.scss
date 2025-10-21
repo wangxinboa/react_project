@@ -1,0 +1,48 @@
+.operation_record_tree_node_container {
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	line-height: 24px;
+
+	> .operation_record_tree_node_title {
+		display: block;
+		width: 0;
+		font-size: 14px;
+		flex: 1;
+		word-wrap: break-word;
+		word-break: normal;
+		overflow: hidden;
+	}
+}
+
+.key_point_text {
+	display: inline;
+	margin: 0 2px;
+	padding: 2px 4px;
+	border-radius: 4px;
+	line-height: 24px;
+	font-size: 14px;
+	font-weight: bold;
+
+	&:hover {
+		background-color: #cbcbcb;
+	}
+}
+
+.key_point_text_popover_content {
+	display: flex;
+	flex-direction: column;
+	gap: 6px 0;
+	width: 100%;
+	height: 100%;
+}
+
+.normal_text {
+	display: inline;
+	font-weight: normal;
+	line-height: 24px;
+	font-size: 14px;
+}

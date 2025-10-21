@@ -6,8 +6,9 @@ export default class ExportNamedDeclarationStruct extends BaseStructInFile {
 	constructor(ast, environmentStruct) {
 		super(ast, environmentStruct);
 
-		this.type = "ExportNamedDeclaration";
+		this.isExportNamedDeclarationStruct = true;
 
+		this.type = "ExportNamedDeclaration";
 		this.exportKind = ast.exportKind;
 
 		if (ast.source === null) {
@@ -32,11 +33,13 @@ export default class ExportNamedDeclarationStruct extends BaseStructInFile {
 	destroy() {
 		super.destroy();
 
-		this.exportKind = this.source = this.importedFileStruct = null;
+		this.isExportNamedDeclarationStruct = this.exportKind = this.source = this.importedFileStruct = null;
 	}
 
 	afterSetParentRelation() {
-		if (this.source !== null) {
+		if (this.source === null) {
+			this.importedFileStruct = null;
+		} else {
 			this.importedFileStruct = this.fileStruct.addImportFileStructBySource(this.source);
 		}
 	}

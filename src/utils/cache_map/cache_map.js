@@ -2,6 +2,7 @@ export default class CacheMap {
 	constructor() {
 		this.cacheArray = [];
 		this.cacheObject = {};
+		this.cacheKeysArray = [];
 	}
 	destroy() {
 		this.cacheArray = this.cacheObject = null;
@@ -17,11 +18,11 @@ export default class CacheMap {
 		// 判断是否存在就交给外面继承的类了
 		this.cacheObject[key] = value;
 		this.cacheArray.push(value);
+		this.cacheKeysArray.push(key);
 	}
 	replace(key, value) {
 		this.remove(key);
-		this.cacheObject[key] = value;
-		this.cacheArray.push(value);
+		this.add(key, value);
 	}
 	remove(key) {
 		if (this.has(key)) {
@@ -29,7 +30,11 @@ export default class CacheMap {
 			const _index = this.cacheArray.indexOf(_value);
 
 			this.cacheArray.splice(_index, 1);
+			this.cacheKeysArray.splice(_index, 1);
 			delete this.cacheObject[key];
 		}
+	}
+	getKeys() {
+		return this.cacheKeysArray;
 	}
 }

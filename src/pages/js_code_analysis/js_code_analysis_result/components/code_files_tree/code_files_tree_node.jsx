@@ -1,29 +1,17 @@
-import { useCallback, useContext } from "react";
-import { JsCodeJsCodeAnalysisResultContext } from "../../js_code_analysis_result.jsx";
+import ConsoleMessageButton from "../node_operations/console_message.jsx";
+import ToFileVsCodeButton from "../node_operations/to_file_vs_code.jsx";
 
 import styles from "./code_files_tree.module.scss";
 
 const CodeFilesTreeNode = (props) => {
-	const { toVsCodeFile } = useContext(JsCodeJsCodeAnalysisResultContext);
-
 	const { codeFile } = props;
 
-	const onClickToVsCodeFile = useCallback(
-		(e) => {
-			e.stopPropagation();
-			toVsCodeFile(codeFile.key);
-		},
-		[codeFile, toVsCodeFile]
-	);
 	return (
 		<div className={styles.code_files_tree_node}>
 			<div className={styles.code_files_tree_node_title}>{codeFile.name}</div>
 			<div className={styles.code_files_tree_node_operations}>
-				{codeFile.isFile ? (
-					<div className={styles.code_files_tree_node_operation} onClick={onClickToVsCodeFile}>
-						跳转 vscode
-					</div>
-				) : null}
+				{codeFile.isFile ? <ConsoleMessageButton title="打印代码" message={codeFile.codeMessage.codeString} /> : null}
+				{codeFile.isFile ? <ToFileVsCodeButton title="跳转 vscode" codeFile={codeFile} /> : null}
 			</div>
 		</div>
 	);

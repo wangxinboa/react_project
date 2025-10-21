@@ -8,7 +8,6 @@ import UploadCodeFiles from "./components/upload_code_files/upload_code_files.js
 
 import CodeFilesTree from "./components/code_files_tree/code_files_tree.jsx";
 // import CodeEditor from "./components/code_editor/code_editor.jsx";
-import JsCodeStructsTree from "./components/js_code_structs_tree/js_code_structs_tree.jsx";
 
 import styles from "./js_code_analysis_result.module.scss";
 import JsCodeAnalysis from "./components/js_code_analysis/js_code_analysis.jsx";
@@ -16,8 +15,6 @@ import JsCodeAnalysis from "./components/js_code_analysis/js_code_analysis.jsx";
 const JsCodeAnalysisResultPage = () => {
 	const {
 		selectedCodeFile,
-		setCodeFilesTreeContainerDomHeight,
-		setCodeStructsTreeContainerDomHeight,
 		createAllStructsByAllCodeFiles,
 		initCodeFilesByFiles,
 		downloadCodeFilesMessage,
@@ -54,10 +51,6 @@ const JsCodeAnalysisResultPage = () => {
 		},
 		[createAllStructsByAllCodeFiles, initCodeFilesByFiles]
 	);
-	const onCodeSplitterResize = useCallback(() => {
-		setCodeFilesTreeContainerDomHeight();
-		setCodeStructsTreeContainerDomHeight();
-	}, [setCodeFilesTreeContainerDomHeight, setCodeStructsTreeContainerDomHeight]);
 
 	return (
 		<div className={styles.js_code_analysis_result}>
@@ -89,29 +82,12 @@ const JsCodeAnalysisResultPage = () => {
 					>
 						下载代码信息
 					</Button>
-					<Button
-						className={styles.js_code_analysis_result_header_right_button}
-						size="small"
-						// onClick={downloadCodeAnalysis}
-					>
-						下载分析结果
-					</Button>
 				</div>
 			</div>
 			{/* <div className={styles.js_code_analysis_result_body}> */}
 			<Splitter className={styles.js_code_analysis_result_body}>
-				<Splitter.Panel defaultSize={"50%"}>
-					{/* Panel 1 */}
-					<Splitter layout="vertical" onResize={onCodeSplitterResize}>
-						<Splitter.Panel defaultSize="50%">
-							{/* 代码文件 */}
-							<CodeFilesTree />
-						</Splitter.Panel>
-						<Splitter.Panel defaultSize="50%">
-							{/* 代码结构 */}
-							<JsCodeStructsTree />
-						</Splitter.Panel>
-					</Splitter>
+				<Splitter.Panel defaultSize={450}>
+					<CodeFilesTree />
 				</Splitter.Panel>
 				{/* <Splitter.Panel>
 					Panel 2 代码编辑页面

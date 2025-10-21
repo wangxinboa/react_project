@@ -1,9 +1,9 @@
-import ImportMap from "./import_map.js";
+import ExportMap from "./export_map.js";
 import createAstByCodeFile from "../../js_code_struct_utils/create_ast_by_code_file.js";
 import { isFileAst } from "../../js_code_struct_utils/ast_types.js";
 import { addChildCodeStructByAst } from "../../js_code_struct_utils/add_child_code_struct_by_ast/add_child_code_struct_by_ast.js";
 
-export default class FileStruct extends ImportMap {
+export default class FileStruct extends ExportMap {
 	static type = "File";
 	constructor(key, codeFile, codeStructsMap, analysisConfig) {
 		super(codeStructsMap);
@@ -32,16 +32,20 @@ export default class FileStruct extends ImportMap {
 	getCodeFileKey() {
 		return this.codeFile.key;
 	}
+	getCodeFileName() {
+		return this.codeFile.name;
+	}
 	getImportPackageSourcePath(importSource) {
 		return this.analysisConfig.importPackageSourcePathsMap[importSource];
 	}
-	/** 根据 importDeclaration ast 添加变量 */
-	_addVariableByImportDeclarationAst(importDeclarationAst) {
-		// console.info("importDeclarationAst:", importDeclarationAst);
-	}
-
+	/** 根据传入的 codeFile 结合自身的 codeStructsMap, analysisConfig 创建 FileStruct */
 	createFileStructByCodeFile(codeFile) {
 		return FileStruct.createByCodeFile(codeFile, this.codeStructsMap, this.analysisConfig);
+	}
+	/** codeStructsMap 是否已存在 codeFile 对应的 fileStruct */
+	hasCodeFileStruct(codeFile) {
+		const key = `${FileStruct.type}:${codeFile.key}`;
+		return key in this.codeStructsMap;
 	}
 
 	/**

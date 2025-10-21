@@ -17,17 +17,6 @@ export default class ImportVariableStruct {
 		this.kind = "import";
 		this.type = type;
 
-		if (!(this.type in ImportVariableStructTypeEnum)) {
-			console.error(
-				"初始化 ImportVariableStruct 时, type",
-				type,
-				"类型不在枚举范围",
-				ImportVariableStructTypeEnum,
-				"内, 待完善"
-			);
-			throw new Error("初始化 ImportVariableStruct 时, type 类型不在枚举范围内, 待完善");
-		}
-
 		if (this.kind === ImportVariableStruct.name) {
 			this.imported = imported;
 		}

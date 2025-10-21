@@ -1,30 +1,16 @@
 import { useCallback, useContext } from "react";
 import { Tree } from "antd";
 
-import { JsCodeJsCodeAnalysisResultContext } from "../../js_code_analysis_result.jsx";
+import JsCodeStructsTreeNode from "./js_code_structs_tree_node.jsx";
+import useGetDomHeight from "../../../../../../hooks/use_get_dom_height.js";
+import { JsCodeJsCodeAnalysisResultContext } from "../../../js_code_analysis_result.jsx";
 
 import styles from "./js_code_structs_tree.module.scss";
-import JsCodeStructsTreeNode from "./js_code_structs_tree_node.jsx";
 
 const JsCodeStructsTree = () => {
-	const {
-		codeStructsTreeContainerDomRef,
-		codeStructsTreeContainerDomHeight,
-		selectedCodeFile,
-		codeStructsTreeData,
-		codeStructsTreeSelectedKeys,
-		onSetCodeStructsTreeSelectedKeys,
-	} = useContext(JsCodeJsCodeAnalysisResultContext);
+	const { selectedCodeFile, codeStructsTreeData } = useContext(JsCodeJsCodeAnalysisResultContext);
+	const { domRef: codeStructsTreeContainerDomRef, height: codeStructsTreeContainerDomHeight } = useGetDomHeight();
 
-	/** Tree 组件选择节点 */
-	const handleOnTreeSelect = useCallback(
-		(_selectedKeys) => {
-			if (_selectedKeys.length === 1) {
-				onSetCodeStructsTreeSelectedKeys(_selectedKeys);
-			}
-		},
-		[onSetCodeStructsTreeSelectedKeys]
-	);
 	/** 自定义渲染 tree 节点 */
 	const titleRender = useCallback((node) => {
 		return <JsCodeStructsTreeNode codeStruct={node} />;
@@ -36,8 +22,6 @@ const JsCodeStructsTree = () => {
 				<Tree
 					key={selectedCodeFile?.key}
 					multiple={false}
-					selectedKeys={codeStructsTreeSelectedKeys}
-					onSelect={handleOnTreeSelect}
 					blockNode
 					showLine
 					titleRender={titleRender}

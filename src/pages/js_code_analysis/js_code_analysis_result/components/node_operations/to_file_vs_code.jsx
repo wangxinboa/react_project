@@ -1,18 +1,19 @@
 import { useContext, useCallback } from "react";
-import styles from "./node_operation.module.scss";
 import { JsCodeJsCodeAnalysisResultContext } from "../../js_code_analysis_result.jsx";
+
+import styles from "./node_operation.module.scss";
 
 const ToFileVsCodeButton = (props) => {
 	const { toVsCodeFile } = useContext(JsCodeJsCodeAnalysisResultContext);
 
-	const { codeStruct, title } = props;
+	const { codeFile, title } = props;
 
 	const onClickToVsCodeFile = useCallback(
 		(e) => {
 			e.stopPropagation();
-			toVsCodeFile(codeStruct.codeFile.key);
+			toVsCodeFile(codeFile.key);
 		},
-		[codeStruct.codeFile.key, toVsCodeFile]
+		[codeFile.key, toVsCodeFile]
 	);
 
 	return (

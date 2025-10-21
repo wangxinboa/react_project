@@ -1,6 +1,8 @@
 export default class BaseStruct {
 	constructor(codeStructsMap) {
+		/** @type {import('../file_struct/file_struct.js').default} */
 		this.environmentStruct = null;
+		/** @type {import('../file_struct/file_struct.js').default} */
 		this.fileStruct = null;
 		this.structPathSegments = null;
 
