@@ -38,7 +38,7 @@ const ImportDeclarationOperationTreeNode = (props) => {
 		<div className={styles.operation_record_tree_node_container}>
 			<div className={styles.operation_record_tree_node_title}>
 				{operationRecord.isFirstImported ? "首次导入" : "导入"}
-				<Popover content={<FileStructPopoverContent fileStruct={importedFileStruct} />}>
+				<Popover trigger="click" content={<FileStructPopoverContent fileStruct={importedFileStruct} />}>
 					<span className={styles.key_point_text} title={importedFileStruct.getCodeFileKey()}>
 						{importedFileStruct.getCodeFileName()}
 					</span>
@@ -48,7 +48,10 @@ const ImportDeclarationOperationTreeNode = (props) => {
 					? ", improt"
 					: null}
 				{hasImportDefaultSpecifierStruct ? (
-					<Popover content={<ImportSpecifierPopoverContent importSpecifier={importDefaultSpecifierStruct} />}>
+					<Popover
+						trigger="click"
+						content={<ImportSpecifierPopoverContent importSpecifier={importDefaultSpecifierStruct} />}
+					>
 						<span className={styles.key_point_text}>{importDefaultSpecifierStruct.local}</span>
 					</Popover>
 				) : null}
@@ -59,7 +62,10 @@ const ImportDeclarationOperationTreeNode = (props) => {
 							return (
 								<span key={importSpecifierStruct.local} className={styles.normal_text}>
 									{index > 0 ? "," : null}
-									<Popover content={<ImportSpecifierPopoverContent importSpecifier={importSpecifierStruct} />}>
+									<Popover
+										trigger="click"
+										content={<ImportSpecifierPopoverContent importSpecifier={importSpecifierStruct} />}
+									>
 										<span className={styles.key_point_text}>
 											{importSpecifierStruct.isSameNameLocalAndImported ? null : `${importSpecifierStruct.imported}`}
 											{importSpecifierStruct.isSameNameLocalAndImported ? null : (
@@ -75,7 +81,10 @@ const ImportDeclarationOperationTreeNode = (props) => {
 				{hasImportSpecifierStruct ? "}" : null}
 
 				{hasImportNamespaceSpecifierStruct ? (
-					<Popover content={<ImportSpecifierPopoverContent importSpecifier={importNamespaceSpecifierStruct} />}>
+					<Popover
+						trigger="click"
+						content={<ImportSpecifierPopoverContent importSpecifier={importNamespaceSpecifierStruct} />}
+					>
 						<span className={styles.key_point_text}>* as {importNamespaceSpecifierStruct.local}</span>
 					</Popover>
 				) : null}

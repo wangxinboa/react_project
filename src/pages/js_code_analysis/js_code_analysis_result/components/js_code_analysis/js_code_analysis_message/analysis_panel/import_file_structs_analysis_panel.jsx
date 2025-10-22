@@ -28,9 +28,9 @@ const ImportFileStructsAnalysisPanel = (props) => {
 									{index + 1}. {importFileStruct.getCodeFileKey()}
 								</div>
 								<div className={styles.analysis_panel_analysis_operations}>
-									<ConsoleMessageButton message={importFileStruct} title="打印信息" />
-									<SelectCodeFileButton codeFile={importFileStruct.codeFile} title="选择文件" />
-									<ToFileVsCodeButton codeFile={importFileStruct.codeFile} title="跳转 vscode" />
+									<ConsoleMessageButton message={importFileStruct} title="打印 fileStruct" />
+									<ToFileVsCodeButton title="跳转 vscode" codeFile={importFileStruct.codeFile} />
+									<SelectCodeFileButton title="选择文件" codeFile={importFileStruct.codeFile} />
 								</div>
 							</div>
 						);

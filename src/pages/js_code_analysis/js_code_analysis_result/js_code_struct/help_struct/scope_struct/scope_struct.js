@@ -4,8 +4,8 @@ import CacheMap from "../../../../../../utils/cache_map/cache_map.js";
 import ImportVariableStruct from "../variable_struct/import_variable_struct.js";
 
 export default class ScopeStruct extends OperationRecordStruct {
-	constructor(codeStructsMap) {
-		super(codeStructsMap);
+	constructor(codeStructsMessage) {
+		super(codeStructsMessage);
 
 		this.isScopeStruct = true;
 

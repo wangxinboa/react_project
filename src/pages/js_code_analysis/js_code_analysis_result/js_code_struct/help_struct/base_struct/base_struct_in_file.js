@@ -3,17 +3,19 @@ import BaseStruct from "./base_struct.js";
 
 export default class BaseStructInFile extends BaseStruct {
 	constructor(ast, environmentStruct) {
-		super(environmentStruct.codeStructsMap);
+		super(environmentStruct.codeStructsMessage);
 		this.initByEnvironmentStruct(environmentStruct);
 
 		this.key = getCodeStructKey();
-		this.codeStructsMap[this.key] = this;
-
 		this.ast = ast;
+
+		this.codeStructsMessage.codeStructsMap[this.key] = this;
 	}
 	destroy() {
-		super.destroy();
+		delete this.codeStructsMessage.codeStructsMap[this.key];
 
-		this.ast = null;
+		this.key = this.ast = null;
+
+		super.destroy();
 	}
 }

@@ -5,28 +5,31 @@ import { addChildCodeStructByAst } from "../../js_code_struct_utils/add_child_co
 
 export default class FileStruct extends ExportMap {
 	static type = "File";
-	constructor(key, codeFile, codeStructsMap, analysisConfig) {
-		super(codeStructsMap);
+	constructor(key, codeFile, codeStructsMessage, analysisConfig) {
+		super(codeStructsMessage);
 
 		this.key = key;
+
+		this.isFileStruct = true;
+		this.codeFile = codeFile;
+
+		this.analysisConfig = analysisConfig;
 
 		this.fileStruct = this;
 		this.structPathSegments = [this];
 		this.type = FileStruct.type;
 		this.title = codeFile.name;
 
-		this.codeStructsMap[key] = this;
-
-		this.isFileStruct = true;
-		this.codeFile = codeFile;
-
-		this.analysisConfig = analysisConfig;
+		this.codeStructsMessage.fileStructs.push(this);
+		this.codeStructsMessage.codeStructsMap[key] = this;
 	}
 
 	destroy() {
-		super.destroy();
+		delete this.codeStructsMessage.codeStructsMap[this.key];
 
-		this.isFileStruct = this.codeFile = this.analysisConfig = null;
+		this.key = this.isFileStruct = this.codeFile = this.analysisConfig = null;
+
+		super.destroy();
 	}
 
 	getCodeFileKey() {
@@ -35,34 +38,33 @@ export default class FileStruct extends ExportMap {
 	getCodeFileName() {
 		return this.codeFile.name;
 	}
+	getCodeString() {
+		return this.codeFile.codeMessage.codeString;
+	}
 	getImportPackageSourcePath(importSource) {
 		return this.analysisConfig.importPackageSourcePathsMap[importSource];
 	}
-	/** 根据传入的 codeFile 结合自身的 codeStructsMap, analysisConfig 创建 FileStruct */
+	/** 根据传入的 codeFile 结合自身的 codeStructsMessage, analysisConfig 创建 FileStruct */
 	createFileStructByCodeFile(codeFile) {
-		return FileStruct.createByCodeFile(codeFile, this.codeStructsMap, this.analysisConfig);
+		return FileStruct.createByCodeFile(codeFile, this.codeStructsMessage, this.analysisConfig);
 	}
 	/** codeStructsMap 是否已存在 codeFile 对应的 fileStruct */
 	hasCodeFileStruct(codeFile) {
 		const key = `${FileStruct.type}:${codeFile.key}`;
-		return key in this.codeStructsMap;
+		return key in this.codeStructsMessage.codeStructsMap;
 	}
 
-	/**
-	 * 根据 CodeFile 相关的信息, 生成 ast, 并对应的创建返回 codeFileStructsMap 中的 FileStruct 以及对应 ast 的孩子 codeStruct
-	 * @param codeFile
-	 * @param {*} codeStructsMap
-	 * @returns
-	 */
-	static createByCodeFile(codeFile, codeStructsMap, analysisConfig) {
+	/** 根据 CodeFile 相关的信息, 生成 ast, 并对应的创建返回 codeFileStructsMap 中的 FileStruct 以及对应 ast 的孩子 codeStruct */
+	static createByCodeFile(codeFile, codeStructsMessage, analysisConfig) {
 		const key = `${FileStruct.type}:${codeFile.key}`;
+		const codeStructsMap = codeStructsMessage.codeStructsMap;
 		if (key in codeStructsMap) {
 			return codeStructsMap[key];
 		} else {
 			const fileAst = createAstByCodeFile(codeFile);
 
 			if (isFileAst(fileAst)) {
-				const fileStruct = new FileStruct(key, codeFile, codeStructsMap, analysisConfig);
+				const fileStruct = new FileStruct(key, codeFile, codeStructsMessage, analysisConfig);
 				const fileAstProgramBodyAsts = fileAst.program.body;
 				if (Array.isArray(fileAstProgramBodyAsts)) {
 					for (let i = 0, len = fileAstProgramBodyAsts.length; i < len; i++) {

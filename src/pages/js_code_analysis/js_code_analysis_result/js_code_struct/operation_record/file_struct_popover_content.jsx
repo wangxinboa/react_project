@@ -8,9 +8,9 @@ const FileStructPopoverContent = (props) => {
 
 	return (
 		<div className={styles.key_point_text_popover_content}>
-			<ConsoleMessageButton title={`打印 ${fileStruct.getCodeFileName()} 信息`} message={fileStruct} />
-			<SelectCodeFileButton title="选择文件" codeFile={fileStruct.codeFile} />
+			<ConsoleMessageButton title={`打印 ${fileStruct.getCodeFileName()} fileStruct 信息`} message={fileStruct} />
 			<ToFileVsCodeButton title="跳转 vscode" codeFile={fileStruct.codeFile} />
+			<SelectCodeFileButton title="选择文件" codeFile={fileStruct.codeFile} />
 		</div>
 	);
 };

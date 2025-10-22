@@ -4,6 +4,7 @@ export default class ImportDeclarationOperation extends BaseOperationRecord {
 	constructor(importDeclarationStruct) {
 		super();
 
+		this.title = "ImportDeclarationOperation";
 		this.isImportDeclarationOperation = true;
 
 		this.importDeclarationStruct = importDeclarationStruct;
@@ -62,7 +63,8 @@ export default class ImportDeclarationOperation extends BaseOperationRecord {
 	destroy() {
 		super.destroy();
 
-		this.isImportDeclarationOperation =
+		this.title =
+			this.isImportDeclarationOperation =
 			this.importDeclarationStruct =
 			this.codeFile =
 			this.isFirstImported =

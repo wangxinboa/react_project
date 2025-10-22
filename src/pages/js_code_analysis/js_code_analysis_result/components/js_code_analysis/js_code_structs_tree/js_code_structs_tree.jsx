@@ -17,7 +17,7 @@ const JsCodeStructsTree = () => {
 	}, []);
 
 	return (
-		<div className={styles.js_code_structs_tree} ref={codeStructsTreeContainerDomRef}>
+		<div className={styles.js_code_structs_tree_container} ref={codeStructsTreeContainerDomRef}>
 			{Array.isArray(codeStructsTreeData) && codeStructsTreeData.length > 0 ? (
 				<Tree
 					key={selectedCodeFile?.key}

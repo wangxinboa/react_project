@@ -1,5 +1,5 @@
 export default class BaseStruct {
-	constructor(codeStructsMap) {
+	constructor(codeStructsMessage) {
 		/** @type {import('../file_struct/file_struct.js').default} */
 		this.environmentStruct = null;
 		/** @type {import('../file_struct/file_struct.js').default} */
@@ -11,18 +11,24 @@ export default class BaseStruct {
 		this.children = [];
 		this.parentStruct = null;
 
-		this.codeStructsMap = codeStructsMap;
+		this.codeStructsMessage = codeStructsMessage;
 
 		this.title = "";
 	}
 	destroy() {
+		for (let i = this.children.length - 1; i >= 0; i--) {
+			this.children[i].destroy();
+		}
+
 		this.removeSelf();
-		this.key =
-			this.environmentStruct =
+
+		this.environmentStruct =
 			this.fileStruct =
 			this.structPathSegments =
+			this.parentRelation =
 			this.children =
 			this.parentStruct =
+			this.codeStructsMessage =
 			// common
 			this.type =
 			this.title =

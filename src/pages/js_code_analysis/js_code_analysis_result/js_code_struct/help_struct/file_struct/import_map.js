@@ -2,8 +2,8 @@ import CacheMap from "../../../../../../utils/cache_map/cache_map.js";
 import ScopeStruct from "../scope_struct/scope_struct.js";
 
 export default class ImportMap extends ScopeStruct {
-	constructor(codeStructsMap) {
-		super(codeStructsMap);
+	constructor(codeStructsMessage) {
+		super(codeStructsMessage);
 
 		this.importMap = new CacheMap();
 		this.importedMap = new CacheMap();

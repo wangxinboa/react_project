@@ -2,8 +2,8 @@ import ImportMap from "./import_map.js";
 import CacheMap from "../../../../../../utils/cache_map/cache_map.js";
 
 export default class ExportMap extends ImportMap {
-	constructor(codeStructsMap) {
-		super(codeStructsMap);
+	constructor(codeStructsMessage) {
+		super(codeStructsMessage);
 
 		this.exportDefault = null;
 		this.exportMap = new CacheMap();

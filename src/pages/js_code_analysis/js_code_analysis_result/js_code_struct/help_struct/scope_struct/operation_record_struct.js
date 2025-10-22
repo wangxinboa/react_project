@@ -2,8 +2,8 @@ import ImportDeclarationOperation from "../../operation_record/import_declaratio
 import BaseStruct from "../base_struct/base_struct.js";
 
 export default class OperationRecordStruct extends BaseStruct {
-	constructor(codeStructsMap) {
-		super(codeStructsMap);
+	constructor(codeStructsMessage) {
+		super(codeStructsMessage);
 
 		this.operationRecords = [];
 	}

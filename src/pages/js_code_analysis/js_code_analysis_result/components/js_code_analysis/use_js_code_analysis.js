@@ -2,22 +2,35 @@ import { useState, useCallback, useMemo } from "react";
 import FileStruct from "../../js_code_struct/help_struct/file_struct/file_struct.js";
 
 export default function useJsCodeAnalysis(analysisConfig) {
-	// 包含所有 codeStruct 的 map
-	const codeStructsMap = useMemo(() => {
-		window.codeStructsMap = {};
-		return window.codeStructsMap;
+	const codeStructsMessage = useMemo(() => {
+		window.codeStructsMessage = {
+			codeStructsMap: {},
+			fileStructs: [],
+		};
+		return window.codeStructsMessage;
 	}, []);
 
 	const [codeStructsTreeData, setCodeStructsTreeData] = useState(null);
 
 	const [selectedCodeFileStruct, setSelectedCodeFileStruct] = useState(null);
 
+	const clearCodeStructsMap = useCallback(() => {
+		for (let i = 0, len = codeStructsMessage.fileStructs.length; i < len; i++) {
+			const fileStruct = codeStructsMessage.fileStructs[i];
+			fileStruct.destroy();
+		}
+		codeStructsMessage.fileStructs = [];
+		setCodeStructsTreeData([]);
+		setSelectedCodeFileStruct(null);
+	}, [codeStructsMessage]);
+	window.clearCodeStructsMap = clearCodeStructsMap;
+
 	/** 根据代码文件创建代码结构 */
 	const createFileStructByCodeFile = useCallback(
 		(codeFile) => {
-			return FileStruct.createByCodeFile(codeFile, codeStructsMap, analysisConfig);
+			return FileStruct.createByCodeFile(codeFile, codeStructsMessage, analysisConfig);
 		},
-		[codeStructsMap, analysisConfig]
+		[codeStructsMessage, analysisConfig]
 	);
 	/** 直接初始化所有 code files 的 ast */
 	const createAllStructsByAllCodeFiles = useCallback((allFiles, analysisConfig) => {

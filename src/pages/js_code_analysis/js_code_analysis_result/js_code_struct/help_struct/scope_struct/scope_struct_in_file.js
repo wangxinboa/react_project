@@ -1,15 +1,20 @@
 import ScopeStruct from "./scope_struct.js";
+import getCodeStructKey from "../../js_code_struct_utils/get_code_struct_key.js";
 
 export default class ScopeStructInFile extends ScopeStruct {
 	constructor(ast, environmentStruct) {
-		super(environmentStruct.codeStructsMap);
+		super(environmentStruct.codeStructsMessage);
 		this.initByEnvironmentStruct(environmentStruct);
 
+		this.key = getCodeStructKey();
 		this.ast = ast;
+
+		this.codeStructsMessage.codeStructsMap[this.key] = this;
 	}
 	destroy() {
 		super.destroy();
 
-		this.ast = null;
+		delete this.codeStructsMessage.codeStructsMap[this.key];
+		this.key = this.ast = null;
 	}
 }
