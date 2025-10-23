@@ -1,11 +1,10 @@
 import { useCallback } from "react";
-
-import styles from "./node_operation.module.scss";
+import NodeOperationButton from "./node_operation_button.jsx";
 
 const ConsoleMessageButton = (props) => {
 	const { message, title = "打印信息" } = props;
 
-	const onClickToVsCodeFile = useCallback(
+	const consoleMessage = useCallback(
 		(e) => {
 			e.stopPropagation();
 			console.info(message);
@@ -13,11 +12,7 @@ const ConsoleMessageButton = (props) => {
 		[message]
 	);
 
-	return (
-		<div className={styles.node_operation} onClick={onClickToVsCodeFile}>
-			{title}
-		</div>
-	);
+	return <NodeOperationButton title={title} onClick={consoleMessage} />;
 };
 
 export default ConsoleMessageButton;

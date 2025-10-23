@@ -6,6 +6,7 @@
 	overflow: auto;
 
 	.code_files_tree_node {
+		position: relative;
 		display: flex;
 		flex-direction: row;
 		align-items: center;

@@ -21,8 +21,9 @@ const JsCodeAnalysisResult = () => {
 		setAnalysisConfigFromFormData,
 		toVsCodeFile,
 	} = useConfigureAnalysis();
-	// js code structs
+	// js code analysis
 	const {
+		astRelationManager,
 		codeStructsTreeData,
 
 		createAllStructsByAllCodeFiles,
@@ -50,7 +51,8 @@ const JsCodeAnalysisResult = () => {
 			analysisConfig,
 			setAnalysisConfigFromFormData,
 			toVsCodeFile,
-			// js code structs
+			// js code analysis
+			astRelationManager,
 			codeStructsTreeData,
 
 			createAllStructsByAllCodeFiles,
@@ -83,6 +85,7 @@ const JsCodeAnalysisResult = () => {
 		};
 	}, [
 		analysisConfig,
+		astRelationManager,
 		codeFilesMap,
 		codeFilesTreeData,
 		codeFilesTreeExpandedKeys,

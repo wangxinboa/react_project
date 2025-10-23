@@ -6,7 +6,7 @@ export default class MemberExpressionStruct extends BaseStructInFile {
 
 		this.computed = ast.computed;
 
-		this.type = " MemberExpression";
+		this.type = "MemberExpression";
 	}
 	destroy() {
 		super.destroy();

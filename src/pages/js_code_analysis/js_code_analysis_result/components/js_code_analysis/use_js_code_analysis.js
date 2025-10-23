@@ -1,11 +1,13 @@
 import { useState, useCallback, useMemo } from "react";
 import FileStruct from "../../js_code_struct/help_struct/file_struct/file_struct.js";
+import AstRelationManager from "../../js_code_struct/ast_relation_manager/ast_relation_manager.js";
 
 export default function useJsCodeAnalysis(analysisConfig) {
 	const codeStructsMessage = useMemo(() => {
 		window.codeStructsMessage = {
 			codeStructsMap: {},
 			fileStructs: [],
+			astRelationManager: new AstRelationManager(),
 		};
 		return window.codeStructsMessage;
 	}, []);
@@ -20,6 +22,8 @@ export default function useJsCodeAnalysis(analysisConfig) {
 			fileStruct.destroy();
 		}
 		codeStructsMessage.fileStructs = [];
+		codeStructsMessage.astRelationManager.clear();
+
 		setCodeStructsTreeData([]);
 		setSelectedCodeFileStruct(null);
 	}, [codeStructsMessage]);
@@ -52,6 +56,7 @@ export default function useJsCodeAnalysis(analysisConfig) {
 	);
 
 	return {
+		astRelationManager: codeStructsMessage.astRelationManager,
 		codeStructsTreeData,
 
 		createAllStructsByAllCodeFiles,

@@ -1,0 +1,157 @@
+.ast_relations_drawer_body {
+	padding: 0 !important;
+	display: flex;
+	flex-direction: row;
+}
+
+.ast_relations_collapse_header {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start !important;
+	align-items: center !important;
+	padding: 0 0 0 6px !important;
+	height: 30px;
+	line-height: 30px;
+	font-size: 14px;
+	font-weight: bolder;
+}
+.ast_relations_collapse_body {
+	padding: 0 !important;
+}
+
+.ast_relations_container {
+	width: 400px;
+	height: 100%;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.ast_relations_examples_container {
+	display: flex;
+	flex-direction: column;
+	width: 0;
+	flex: 1;
+	height: 100%;
+
+	> .ast_relations_examples_title {
+		padding: 0 0 0 6px;
+		line-height: 30px;
+		font-weight: bolder;
+		font-size: 16px;
+		border-bottom: 1px solid rgba(5, 5, 5, 0.06);
+	}
+
+	> .ast_relations_examples_content {
+		height: 0;
+		flex: 1;
+		overflow: auto;
+		border-bottom: 1px solid rgba(5, 5, 5, 0.06);
+
+		> .ast_relations_example {
+			position: relative;
+			> .ast_relations_example_title {
+				position: sticky;
+				top: 0;
+				padding: 0 12px;
+				line-height: 24px;
+				font-size: 14px;
+				font-weight: bolder;
+				word-wrap: break-word;
+				word-break: normal;
+				overflow: hidden;
+				background-color: #ffffff;
+				border-bottom: 1px solid rgba(5, 5, 5, 0.06);
+
+				&:hover {
+					> .ast_relations_example_operations {
+						opacity: 1;
+					}
+				}
+				> .ast_relations_example_operations {
+					opacity: 0;
+					position: absolute;
+					top: 0;
+					right: 0;
+					height: 100%;
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					gap: 8px;
+					border-radius: 4px;
+				}
+			}
+			> .ast_relations_example_code_string {
+				padding: 0 12px 6px 12px;
+				width: 100%;
+				white-space: pre-wrap;
+				border-bottom: 1px solid rgba(5, 5, 5, 0.06);
+			}
+		}
+	}
+}
+
+// ast_relation_panel.jsx
+.ast_relation_panel {
+	width: 100%;
+
+	> .ast_relation_panel_title {
+		padding: 0 0 0 6px;
+		width: 100%;
+		height: 30px;
+		line-height: 30px;
+		font-size: 16px;
+		font-weight: bolder;
+		border-bottom: 1px solid rgba(5, 5, 5, 0.06);
+	}
+	> .ast_relation_panel_cases {
+		> .ast_relation_cases_title {
+			padding: 0 0 0 16px;
+			height: 24px;
+			line-height: 24px;
+			font-size: 14px;
+			font-weight: bolder;
+			border-bottom: 1px solid rgba(5, 5, 5, 0.06);
+		}
+
+		> .ast_relation_cases_content {
+			width: 100%;
+			> .ast_relation_case_container {
+				position: relative;
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				padding: 0 0 0 24px;
+				width: 100%;
+				line-height: 24px;
+
+				> .ast_relation_case_title {
+					width: 100%;
+				}
+
+				> .ast_relation_case_operations {
+					opacity: 0;
+					position: absolute;
+					top: 0;
+					right: 0;
+					height: 100%;
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					gap: 8px;
+					background-color: #cbcbcb;
+					border-radius: 4px;
+					transition: opacity 0.3s;
+				}
+
+				&:hover {
+					background-color: rgba(0, 0, 0, 0.04);
+
+					> .ast_relation_case_operations {
+						opacity: 1;
+					}
+				}
+			}
+		}
+	}
+}

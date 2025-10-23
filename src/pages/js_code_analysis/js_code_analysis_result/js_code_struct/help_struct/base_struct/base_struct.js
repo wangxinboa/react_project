@@ -93,7 +93,13 @@ export default class BaseStruct {
 
 		struct._setParentRelation(parentRelation);
 
+		this.codeStructsMessage.astRelationManager.addAstRelation(this, struct, parentRelation);
+
 		return this;
+	}
+
+	getCodeFile() {
+		return this.fileStruct.codeFile;
 	}
 
 	getValue() {

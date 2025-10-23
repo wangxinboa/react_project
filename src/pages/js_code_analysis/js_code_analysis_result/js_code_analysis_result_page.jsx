@@ -5,12 +5,13 @@ import { JsCodeJsCodeAnalysisResultContext } from "./js_code_analysis_result.jsx
 
 import ConfigureAnalysis from "./components/configure_analysis/configure_analysis.jsx";
 import UploadCodeFiles from "./components/upload_code_files/upload_code_files.jsx";
+import AstRelationsDrawer from "./components/js_code_analysis/ast_relations_drawer/ast_relations_drawer.jsx";
 
 import CodeFilesTree from "./components/code_files_tree/code_files_tree.jsx";
 // import CodeEditor from "./components/code_editor/code_editor.jsx";
+import JsCodeAnalysis from "./components/js_code_analysis/js_code_analysis.jsx";
 
 import styles from "./js_code_analysis_result.module.scss";
-import JsCodeAnalysis from "./components/js_code_analysis/js_code_analysis.jsx";
 
 const JsCodeAnalysisResultPage = () => {
 	const {
@@ -23,8 +24,6 @@ const JsCodeAnalysisResultPage = () => {
 	} = useContext(JsCodeJsCodeAnalysisResultContext);
 
 	const configureAnalysisRef = useRef(null);
-	const uploadCodeFilesRef = useRef(null);
-
 	/** 点击[分析配置], 弹出 ConfigureAnalysis Modal */
 	const startConfigureAnalysis = useCallback(() => {
 		configureAnalysisRef.current.startConfigure(analysisConfig);
@@ -36,6 +35,8 @@ const JsCodeAnalysisResultPage = () => {
 		},
 		[setAnalysisConfigFromFormData]
 	);
+
+	const uploadCodeFilesRef = useRef(null);
 	/** 点击[上传代码文件], 弹出 UploadCodeFiles Modal */
 	const startUploadCodeFiles = useCallback(() => {
 		uploadCodeFilesRef.current.startUpload();
@@ -51,6 +52,11 @@ const JsCodeAnalysisResultPage = () => {
 		},
 		[createAllStructsByAllCodeFiles, initCodeFilesByFiles]
 	);
+
+	const astRelationsDrawerRef = useRef(null);
+	const startShowAstRelations = useCallback(() => {
+		astRelationsDrawerRef.current.show();
+	}, []);
 
 	return (
 		<div className={styles.js_code_analysis_result}>
@@ -73,6 +79,14 @@ const JsCodeAnalysisResultPage = () => {
 						onClick={startUploadCodeFiles}
 					>
 						上传代码文件
+					</Button>
+					<AstRelationsDrawer ref={astRelationsDrawerRef} />
+					<Button
+						className={styles.js_code_analysis_result_header_right_button}
+						size="small"
+						onClick={startShowAstRelations}
+					>
+						ast 关系展示
 					</Button>
 					<UploadCodeFiles ref={uploadCodeFilesRef} onOk={handleOnUploadCodeFilesOk} autoCloseOnOk={false} />
 					<Button

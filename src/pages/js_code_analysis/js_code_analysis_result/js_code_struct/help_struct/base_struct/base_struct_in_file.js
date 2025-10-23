@@ -11,6 +11,11 @@ export default class BaseStructInFile extends BaseStruct {
 
 		this.codeStructsMessage.codeStructsMap[this.key] = this;
 	}
+
+	getCodeString() {
+		return this.fileStruct.getCodeString().slice(this.ast.start, this.ast.end);
+	}
+
 	destroy() {
 		delete this.codeStructsMessage.codeStructsMap[this.key];
 

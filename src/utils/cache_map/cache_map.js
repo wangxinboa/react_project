@@ -37,4 +37,10 @@ export default class CacheMap {
 	getKeys() {
 		return this.cacheKeysArray;
 	}
+
+	clear() {
+		this.cacheArray = [];
+		this.cacheObject = {};
+		this.cacheKeysArray = [];
+	}
 }

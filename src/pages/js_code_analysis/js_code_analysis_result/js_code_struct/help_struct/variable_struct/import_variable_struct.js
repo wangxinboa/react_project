@@ -1,4 +1,4 @@
-const ImportVariableStructTypeEnum = {
+const ImportVariableStructTypesEnum = {
 	default: "default",
 	all: "all",
 	name: "name",
@@ -22,10 +22,10 @@ export default class ImportVariableStruct {
 		}
 
 		switch (this.type) {
-			case ImportVariableStructTypeEnum.default:
+			case ImportVariableStructTypesEnum.default:
 				this.title = `import ${this.local} from ${fileStruct.getCodeFileKey()};`;
 				break;
-			case ImportVariableStructTypeEnum.name:
+			case ImportVariableStructTypesEnum.name:
 				if (this.imported && this.local !== this.imported) {
 					this.title = `import { ${this.imported} ${
 						this.local !== this.imported ? `as ${this.local}` : ""
@@ -34,7 +34,7 @@ export default class ImportVariableStruct {
 					this.title = `import { ${this.local} } from ${fileStruct.getCodeFileKey()};`;
 				}
 				break;
-			case ImportVariableStructTypeEnum.all:
+			case ImportVariableStructTypesEnum.all:
 				this.title = `import * as ${this.local} from ${fileStruct.getCodeFileKey()};`;
 				break;
 			default:
@@ -42,7 +42,7 @@ export default class ImportVariableStruct {
 					"初始化 ImportVariableStruct 时, this.type",
 					this.type,
 					"类型不在枚举范围",
-					ImportVariableStructTypeEnum,
+					ImportVariableStructTypesEnum,
 					"内, 待完善"
 				);
 				throw new Error("初始化 ImportVariableStruct 时, this.type 类型不在枚举范围内, 待完善");
@@ -62,12 +62,12 @@ export default class ImportVariableStruct {
 	}
 
 	static createKindDefaultByLocalFileStruct(local, fileStruct) {
-		return new ImportVariableStruct(local, ImportVariableStructTypeEnum.default, fileStruct);
+		return new ImportVariableStruct(local, ImportVariableStructTypesEnum.default, fileStruct);
 	}
 	static createKindAllByLocalFileStruct(local, fileStruct) {
-		return new ImportVariableStruct(local, ImportVariableStructTypeEnum.all, fileStruct);
+		return new ImportVariableStruct(local, ImportVariableStructTypesEnum.all, fileStruct);
 	}
 	static createKindNameByLocalImportedFileStruct(local, imported, fileStruct) {
-		return new ImportVariableStruct(local, ImportVariableStructTypeEnum.name, fileStruct, imported);
+		return new ImportVariableStruct(local, ImportVariableStructTypesEnum.name, fileStruct, imported);
 	}
 }

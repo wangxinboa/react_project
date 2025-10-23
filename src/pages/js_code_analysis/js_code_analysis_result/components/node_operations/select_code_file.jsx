@@ -1,14 +1,13 @@
 import { useContext, useCallback } from "react";
 import { JsCodeJsCodeAnalysisResultContext } from "../../js_code_analysis_result.jsx";
-
-import styles from "./node_operation.module.scss";
+import NodeOperationButton from "./node_operation_button.jsx";
 
 const SelectCodeFileButton = (props) => {
 	const { onSetCodeFilesTreeSelectedKeys, codeFilesMap } = useContext(JsCodeJsCodeAnalysisResultContext);
 
 	const { codeFile, title } = props;
 
-	const onClickToVsCodeFile = useCallback(
+	const selectCodeFile = useCallback(
 		(e) => {
 			e.stopPropagation();
 			onSetCodeFilesTreeSelectedKeys([codeFile.key], codeFilesMap);
@@ -16,11 +15,7 @@ const SelectCodeFileButton = (props) => {
 		[codeFile.key, codeFilesMap, onSetCodeFilesTreeSelectedKeys]
 	);
 
-	return (
-		<div className={styles.node_operation} onClick={onClickToVsCodeFile}>
-			{title}
-		</div>
-	);
+	return <NodeOperationButton title={title} onClick={selectCodeFile} />;
 };
 
 export default SelectCodeFileButton;

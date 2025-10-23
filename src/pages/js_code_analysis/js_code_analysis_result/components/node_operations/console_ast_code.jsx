@@ -1,11 +1,10 @@
 import { useCallback } from "react";
-
-import styles from "./node_operation.module.scss";
+import NodeOperationButton from "./node_operation_button.jsx";
 
 const ConsoleAstCodeButton = (props) => {
 	const { codeStruct, title = "打印 ast 代码" } = props;
 
-	const onClickToVsCodeFile = useCallback(
+	const consoleAstCode = useCallback(
 		(e) => {
 			e.stopPropagation();
 			const ast = codeStruct.ast;
@@ -16,11 +15,7 @@ const ConsoleAstCodeButton = (props) => {
 		[codeStruct]
 	);
 
-	return (
-		<div className={styles.node_operation} onClick={onClickToVsCodeFile}>
-			{title}
-		</div>
-	);
+	return <NodeOperationButton title={title} onClick={consoleAstCode} />;
 };
 
 export default ConsoleAstCodeButton;

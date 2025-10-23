@@ -1,7 +1,6 @@
 import { useContext, useCallback } from "react";
 import { JsCodeJsCodeAnalysisResultContext } from "../../js_code_analysis_result.jsx";
-
-import styles from "./node_operation.module.scss";
+import NodeOperationButton from "./node_operation_button.jsx";
 
 const ToFileVsCodeButton = (props) => {
 	const { toVsCodeFile } = useContext(JsCodeJsCodeAnalysisResultContext);
@@ -16,11 +15,7 @@ const ToFileVsCodeButton = (props) => {
 		[codeFile.key, toVsCodeFile]
 	);
 
-	return (
-		<div className={styles.node_operation} onClick={onClickToVsCodeFile}>
-			{title}
-		</div>
-	);
+	return <NodeOperationButton title={title} onClick={onClickToVsCodeFile} />;
 };
 
 export default ToFileVsCodeButton;
