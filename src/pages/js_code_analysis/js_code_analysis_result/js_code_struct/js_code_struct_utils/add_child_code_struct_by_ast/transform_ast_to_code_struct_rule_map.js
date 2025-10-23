@@ -82,13 +82,13 @@ const TransformAstToCodeStructRuleMap = {
 	ClassMethod: {
 		structClass: ClassMethodStruct,
 		astProperties: ["params"],
-		// body 等到函数执行的时候再解析
+		executeProperty: "body",
 	},
 	// declarations
 	FunctionDeclaration: {
 		structClass: FunctionDeclarationStruct,
 		astProperties: ["params"],
-		// body 等到函数执行的时候再解析
+		executeProperty: "body",
 	},
 	VariableDeclaration: {
 		structClass: VariableDeclarationStruct,
@@ -137,7 +137,7 @@ const TransformAstToCodeStructRuleMap = {
 	ObjectMethod: {
 		structClass: ObjectMethodStruct,
 		astProperties: ["params"],
-		// body 等到函数执行的时候再解析
+		executeProperty: "body",
 	},
 	// unary_operations
 	UnaryExpression: {
@@ -155,7 +155,7 @@ const TransformAstToCodeStructRuleMap = {
 	ArrowFunctionExpression: {
 		structClass: ArrowFunctionExpressionStruct,
 		astProperties: ["params"],
-		// body 等到函数执行的时候再解析
+		executeProperty: "body",
 	},
 	AwaitExpression: {
 		structClass: AwaitExpressionStruct,
@@ -176,7 +176,7 @@ const TransformAstToCodeStructRuleMap = {
 	FunctionExpression: {
 		structClass: FunctionExpressionStruct,
 		astProperties: ["params"],
-		// body 等到函数执行的时候再解析
+		executeProperty: "body",
 	},
 	Super: {
 		structClass: SuperStruct,

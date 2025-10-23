@@ -12,7 +12,7 @@ const ExampleTypesEnum = {
 const AstRelationsExamples = forwardRef((props, ref) => {
 	const [astRelation, setAstRelation] = useState(null);
 	const [caseKey, setCaseKey] = useState(null);
-	const [astRelationParentCases, setAstRelationParentCases] = useState(null);
+	const [astRelationCases, setAstRelationCases] = useState(null);
 
 	const [examplesType, setExamplesType] = useState(null);
 	const isParent = useMemo(() => {
@@ -29,23 +29,23 @@ const AstRelationsExamples = forwardRef((props, ref) => {
 				showParentExamples(astRelation, parentCaseKey, astRelationParentCases) {
 					setAstRelation(astRelation);
 					setCaseKey(parentCaseKey);
-					setAstRelationParentCases(astRelationParentCases);
+					setAstRelationCases(astRelationParentCases);
 
 					setExamplesType(ExampleTypesEnum.parent);
 				},
 				showChildrenExamples(astRelation, childCaseKey, astRelationChildrenCases) {
 					setAstRelation(astRelation);
 					setCaseKey(childCaseKey);
-					setAstRelationParentCases(astRelationParentCases);
+					setAstRelationCases(astRelationChildrenCases);
 
 					setExamplesType(ExampleTypesEnum.children);
 				},
 			};
 		},
-		[astRelationParentCases]
+		[]
 	);
 
-	if (astRelation === null) {
+	if (astRelation === null || caseKey === null || astRelationCases === null || examplesType === null) {
 		return null;
 	}
 
@@ -55,7 +55,7 @@ const AstRelationsExamples = forwardRef((props, ref) => {
 				{astRelation.type} {isChildren ? "子节点" : ""} {isParent ? "父节点" : ""} {caseKey} ast 案例
 			</div>
 			<div className={styles.ast_relations_examples_content}>
-				{astRelationParentCases.map((astRelationParentCase, index) => {
+				{astRelationCases.map((astRelationParentCase, index) => {
 					return (
 						<AstRelationsExample
 							key={astRelationParentCase.key}
