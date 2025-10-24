@@ -1,52 +1,55 @@
 import CacheMap from "../../../../../utils/cache_map/cache_map.js";
+import AstRelationCases from "./ast_relation_cases.js";
 
 export default class AstRelation {
 	constructor(type) {
 		this.type = type;
-		this.childrenCasesMap = new CacheMap();
-		this.parentCasesMap = new CacheMap();
+		this.childrenRelationsMap = new CacheMap();
+		this.parentRelationsMap = new CacheMap();
 	}
 
-	addChildCase(codeStruct, parentRelation) {
+	addChildCase(codeStruct, relation) {
 		const type = codeStruct.type;
-		const key = `${parentRelation}-${type}`;
-		if (this.childrenCasesMap.has(key)) {
-			this.childrenCasesMap.get(key).push(codeStruct);
-		} else {
-			this.childrenCasesMap.add(key, [codeStruct]);
+
+		if (!this.childrenRelationsMap.has(relation)) {
+			this.childrenRelationsMap.add(relation, new AstRelationCases());
 		}
+		this.childrenRelationsMap.get(relation).addCase(type, codeStruct);
 	}
-	getChildCase(childCaseKey) {
-		return this.childrenCasesMap.get(childCaseKey);
+	getChildrenRelations() {
+		return this.childrenRelationsMap.cacheArray;
 	}
-	getChildrenCases() {
-		return this.childrenCasesMap.cacheArray;
-	}
-	getChildrenCaseKeys() {
-		return this.childrenCasesMap.cacheKeysArray;
+	getChildrenRelationKeys() {
+		return this.childrenRelationsMap.cacheKeysArray;
 	}
 
-	addParentCase(codeStruct, parentRelation) {
-		const type = codeStruct.type;
-		const key = `${type}.${parentRelation}`;
-		if (this.parentCasesMap.has(key)) {
-			this.parentCasesMap.get(key).push(codeStruct);
-		} else {
-			this.parentCasesMap.add(key, [codeStruct]);
+	addParentCase(parentCodeStruct, codeStruct, relation) {
+		const type = parentCodeStruct.type;
+
+		if (!this.parentRelationsMap.has(type)) {
+			this.parentRelationsMap.add(type, new AstRelationCases());
 		}
+		this.parentRelationsMap.get(type).addCase(relation, codeStruct);
 	}
-	getParentCase(parentCaseKey) {
-		return this.parentCasesMap.get(parentCaseKey);
+	getParentRelations() {
+		return this.parentRelationsMap.cacheArray;
 	}
-	getParentCases() {
-		return this.parentCasesMap.cacheArray;
-	}
-	getParentCaseKeys() {
-		return this.parentCasesMap.cacheKeysArray;
+	getParentRelationKeys() {
+		return this.parentRelationsMap.cacheKeysArray;
 	}
 
 	clear() {
-		this.parentCasesMap.clear();
-		this.childrenCasesMap.clear();
+		const childrenRelations = this.getChildrenRelations();
+		for (let i = 0, len = childrenRelations.length; i < len; i++) {
+			childrenRelations[i].clear();
+		}
+
+		const parentRelations = this.getParentRelations();
+		for (let i = 0, len = parentRelations.length; i < len; i++) {
+			parentRelations[i].clear();
+		}
+
+		this.parentRelationsMap.clear();
+		this.childrenRelationsMap.clear();
 	}
 }

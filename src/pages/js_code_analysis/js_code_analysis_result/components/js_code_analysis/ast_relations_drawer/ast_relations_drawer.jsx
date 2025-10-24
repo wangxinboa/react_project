@@ -1,9 +1,9 @@
 import { useRef, useContext, useMemo, useState, useCallback, forwardRef, useImperativeHandle } from "react";
-import { Collapse, Drawer } from "antd";
+import { Drawer } from "antd";
 
 import { JsCodeJsCodeAnalysisResultContext } from "../../../js_code_analysis_result.jsx";
-import AstRelationPanel from "./ast_relation_panel.jsx";
-import AstRelationsExamples from "./ast_relations_examples.jsx";
+import AstRelation from "./ast_relation.jsx";
+import AstRelationsExamples from "./ast_relation_examples.jsx";
 
 import styles from "./ast_relations_drawer.module.scss";
 
@@ -22,17 +22,21 @@ const AstRelationsDrawer = forwardRef((props, ref) => {
 		setVisible(false);
 	}, []);
 
-	const handleOnShowParentExamples = useCallback((astRelation, parentCaseKey, astRelationParentCases) => {
-		astRelationsExamplesRef.current.showParentExamples(astRelation, parentCaseKey, astRelationParentCases);
+	const handleOnShowParentExamples = useCallback((astRelation, relationKey, parentCaseKey, astRelationParentCases) => {
+		astRelationsExamplesRef.current.showParentExamples(astRelation, relationKey, parentCaseKey, astRelationParentCases);
 	}, []);
 
-	const handleOnShowChildrenExamples = useCallback((astRelation, childCaseKey, astRelationChildrenCases) => {
-		console.info("astRelation:", astRelation);
-		console.info("childCaseKey:", childCaseKey);
-		console.info("astRelationChildrenCases:", astRelationChildrenCases);
-
-		astRelationsExamplesRef.current.showChildrenExamples(astRelation, childCaseKey, astRelationChildrenCases);
-	}, []);
+	const handleOnShowChildrenExamples = useCallback(
+		(astRelation, relationKey, childCaseKey, astRelationChildrenCases) => {
+			astRelationsExamplesRef.current.showChildrenExamples(
+				astRelation,
+				relationKey,
+				childCaseKey,
+				astRelationChildrenCases
+			);
+		},
+		[]
+	);
 
 	useImperativeHandle(
 		ref,
@@ -61,28 +65,17 @@ const AstRelationsDrawer = forwardRef((props, ref) => {
 			onClose={handleOnDrawerClose}
 		>
 			<div className={styles.ast_relations_container}>
-				<Collapse
-					size="middle"
-					bordered={false}
-					items={astRelations.map((astRelation, index) => {
-						return {
-							key: astRelation.type,
-							classNames: {
-								header: styles.ast_relations_collapse_header,
-								body: styles.ast_relations_collapse_body,
-							},
-							label: `${index + 1}. ${astRelation.type}`,
-							children: (
-								<AstRelationPanel
-									key={astRelation.type}
-									astRelation={astRelation}
-									showParentExamples={handleOnShowParentExamples}
-									showChildrenExamples={handleOnShowChildrenExamples}
-								/>
-							),
-						};
-					})}
-				/>
+				{astRelations.map((astRelation, index) => {
+					return (
+						<AstRelation
+							key={astRelation.type}
+							index={index}
+							astRelation={astRelation}
+							showParentExamples={handleOnShowParentExamples}
+							showChildrenExamples={handleOnShowChildrenExamples}
+						/>
+					);
+				})}
 			</div>
 			<AstRelationsExamples ref={astRelationsExamplesRef} />
 		</Drawer>

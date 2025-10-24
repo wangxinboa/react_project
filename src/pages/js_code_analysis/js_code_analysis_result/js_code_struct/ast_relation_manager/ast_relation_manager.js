@@ -28,7 +28,7 @@ export default class AstRelationManager {
 			childAstRelation = new AstRelation(childType);
 			this.astRelationsMap.add(childType, childAstRelation);
 		}
-		childAstRelation.addParentCase(parentCodeStruct, parentRelation);
+		childAstRelation.addParentCase(parentCodeStruct, childCodeStruct, parentRelation);
 	}
 
 	getAstRelations() {
