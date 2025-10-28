@@ -40,7 +40,6 @@ export default class ExportSpecifierStruct extends BaseStructInFile {
 
 		this.isExportSpecifierStruct = true;
 
-		this.type = "ExportSpecifier";
 		if (this.local === this.exported) {
 			this.title = `export ${this.local}`;
 		} else {
@@ -48,16 +47,13 @@ export default class ExportSpecifierStruct extends BaseStructInFile {
 		}
 
 		this.isExportFromOtherFile = false;
+
+		this.type = "ExportSpecifier";
 	}
 	destroy() {
 		super.destroy();
 
-		this.isExportSpecifierStruct =
-			this.importedFileStruct =
-			this.exported =
-			this.local =
-			this.isExportFromOtherFile =
-				null;
+		this.isExportSpecifierStruct = this.exported = this.local = this.isExportFromOtherFile = null;
 	}
 
 	afterSetParentRelation() {
@@ -72,23 +68,6 @@ export default class ExportSpecifierStruct extends BaseStructInFile {
 			throw new Error(
 				"ExportSpecifierStruct class 实例 执行 afterSetParentRelation, this.parentStruct 不是 ExportNamedDeclarationStruct 数据类型有误"
 			);
-		}
-
-		if (this.parentStruct.importedFileStruct === null) {
-			const variable = this.environmentStruct.getVariable(this.local);
-
-			if (!variable?.isVariableStruct && !variable?.isImportVariableStruct) {
-				// console.error(
-				// 	"ExportSpecifierStruct class 实例",
-				// 	this,
-				// 	"执行 afterSetParentRelation 获取 variable",
-				// 	variable,
-				// 	"变量类型有误"
-				// );
-				// throw new Error("ExportSpecifierStruct class 实例执行 afterSetParentRelation 获取 variable, 变量类型有误");
-			}
-		} else {
-			this.isExportFromOtherFile = true;
 		}
 	}
 }

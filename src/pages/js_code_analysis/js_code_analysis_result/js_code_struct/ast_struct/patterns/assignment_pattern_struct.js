@@ -5,12 +5,5 @@ export default class AssignmentPatternStruct extends BaseStructInFile {
 		super(ast, environmentStruct);
 
 		this.type = "AssignmentPattern";
-		this.title = this.left;
-	}
-
-	destroy() {
-		super.destroy();
-
-		this.left = null;
 	}
 }

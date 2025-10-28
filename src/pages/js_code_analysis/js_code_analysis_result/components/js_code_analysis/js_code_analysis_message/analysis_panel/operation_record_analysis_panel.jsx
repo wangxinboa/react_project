@@ -1,7 +1,9 @@
 import { useCallback } from "react";
 import { Tree } from "antd";
 
-import ImportDeclarationOperationTreeNode from "../../../../js_code_struct/operation_record/import_declaration_operation/import_declaration_operation_tree_node.jsx";
+import ImportDeclarationOperationTreeNode from "../operation_record/import_declaration/import_declaration_operation_tree_node.jsx";
+import UnknowOperationTreeNode from "../operation_record/unknow_operation/unknow_operation_tree_node.jsx";
+
 import useGetDomHeight from "../../../../../../../hooks/use_get_dom_height.js";
 
 import styles from "../js_code_analysis_message.module.scss";
@@ -15,6 +17,8 @@ const OperationRecordAnalysisPanel = (props) => {
 	const titleRender = useCallback((node) => {
 		if (node.isImportDeclarationOperation) {
 			return <ImportDeclarationOperationTreeNode operationRecord={node} />;
+		} else if (node.isUnknowOperation) {
+			return <UnknowOperationTreeNode operationRecord={node} />;
 		} else {
 			console.error(
 				"OperationRecordAnalysisPanel 根据节点 node",

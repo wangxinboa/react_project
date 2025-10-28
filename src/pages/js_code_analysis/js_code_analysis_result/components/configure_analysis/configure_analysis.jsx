@@ -11,6 +11,9 @@ const ConfigureAnalysis = forwardRef((props, ref) => {
 
 	const formItemsMessage = useMemo(() => {
 		return {
+			entryExecutionFileName: "entryExecutionFileKey",
+			entryExecutionFileLabel: "入口执行文件",
+
 			vsCodeUrlPrefixItemName: "vsCodeUriPrefix",
 			vsCodeUrlPrefixItemLabel: "vscode 代码文件前缀",
 
@@ -74,6 +77,9 @@ const ConfigureAnalysis = forwardRef((props, ref) => {
 		>
 			<div className={styles.configure_analysis}>
 				<Form form={form}>
+					<Form.Item name={formItemsMessage.entryExecutionFileName} label={formItemsMessage.entryExecutionFileLabel}>
+						<Input disabled />
+					</Form.Item>
 					<Form.Item
 						name={formItemsMessage.vsCodeUrlPrefixItemName}
 						label={formItemsMessage.vsCodeUrlPrefixItemLabel}

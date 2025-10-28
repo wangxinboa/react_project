@@ -63,23 +63,23 @@ export default class ScopeStruct extends OperationRecordStruct {
 	}
 
 	addVariableByImportSpecifierStruct(importSpecifierStruct, importedFileStruct) {
-		this.addVariable(
-			ImportVariableStruct.createKindNameByLocalImportedFileStruct(
-				importSpecifierStruct.local,
-				importSpecifierStruct.imported,
-				importedFileStruct
-			)
-		);
-	}
-	addVariableByImportDefaultSpecifierStruct(importDefaultSpecifierStruct, importedFileStruct) {
-		this.environmentStruct.addVariable(
-			ImportVariableStruct.createKindDefaultByLocalFileStruct(importDefaultSpecifierStruct.local, importedFileStruct)
-		);
-	}
-	addVariableByImportNamespaceSpecifierStruct(importNamespaceSpecifierStruct, importedFileStruct) {
-		this.environmentStruct.addVariable(
-			ImportVariableStruct.createKindAllByLocalFileStruct(importNamespaceSpecifierStruct.local, importedFileStruct)
-		);
+		if (importSpecifierStruct.isImportSpecifier) {
+			this.addVariable(
+				ImportVariableStruct.createKindNameByLocalImportedFileStruct(
+					importSpecifierStruct.local,
+					importSpecifierStruct.imported,
+					importedFileStruct
+				)
+			);
+		} else if (importSpecifierStruct.isImportDefaultSpecifier) {
+			this.addVariable(
+				ImportVariableStruct.createKindDefaultByLocalFileStruct(importSpecifierStruct.local, importedFileStruct)
+			);
+		} else if (importSpecifierStruct.isImportNamespaceSpecifier) {
+			this.addVariable(
+				ImportVariableStruct.createKindAllByLocalFileStruct(importSpecifierStruct.local, importedFileStruct)
+			);
+		}
 	}
 
 	removeVariable(variableStruct) {

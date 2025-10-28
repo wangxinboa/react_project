@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useRef, useState, useCallback, useMemo } from "react";
 import FileStruct from "../../js_code_struct/help_struct/file_struct/file_struct.js";
 import AstRelationManager from "../../js_code_struct/ast_relation_manager/ast_relation_manager.js";
 
@@ -11,6 +11,10 @@ export default function useJsCodeAnalysis(analysisConfig) {
 		};
 		return window.codeStructsMessage;
 	}, []);
+
+	const codeStructsMap = useMemo(() => {
+		return codeStructsMessage.codeStructsMap;
+	}, [codeStructsMessage]);
 
 	const [codeStructsTreeData, setCodeStructsTreeData] = useState(null);
 
@@ -37,12 +41,15 @@ export default function useJsCodeAnalysis(analysisConfig) {
 		[codeStructsMessage, analysisConfig]
 	);
 	/** 直接初始化所有 code files 的 ast */
-	const createAllStructsByAllCodeFiles = useCallback((allFiles, analysisConfig) => {
-		// 直接初始化所有 code files 的 ast
-		// for (let i = 0, len = allFiles.length; i < len; i++) {
-		// 	createFileStructByCodeFile(allFiles[i], analysisConfig);
-		// }
-	}, []);
+	const createAllStructsByAllCodeFiles = useCallback(
+		(allFiles, analysisConfig) => {
+			// 直接初始化所有 code files 的 ast
+			for (let i = 0, len = allFiles.length; i < len; i++) {
+				createFileStructByCodeFile(allFiles[i], analysisConfig);
+			}
+		},
+		[createFileStructByCodeFile]
+	);
 	/** 根据选择的代码文件, 展示代码结构 */
 	const setSelectedCodeStructByCodeFile = useCallback(
 		(codeFile) => {
@@ -54,13 +61,30 @@ export default function useJsCodeAnalysis(analysisConfig) {
 		},
 		[createFileStructByCodeFile]
 	);
+	/** 是否执行过代码文件 */
+	const hasExecutedCodeFileRef = useRef(false);
+	/** 执行代码文件 */
+	const executeCodeFile = useCallback(
+		async (codeFile) => {
+			if (!hasExecutedCodeFileRef.current) {
+				const fileStruct = FileStruct.getByCodeFile(codeFile, codeStructsMap);
+				await fileStruct.execute();
+
+				hasExecutedCodeFileRef.current = true;
+				return true;
+			}
+			return false;
+		},
+		[codeStructsMap]
+	);
 
 	return {
 		astRelationManager: codeStructsMessage.astRelationManager,
 		codeStructsTreeData,
+		selectedCodeFileStruct,
 
 		createAllStructsByAllCodeFiles,
 		setSelectedCodeStructByCodeFile,
-		selectedCodeFileStruct,
+		executeCodeFile,
 	};
 }

@@ -8,6 +8,8 @@ export default function useConfigureAnalysis() {
 	/** 根据 configure_analysis 表单数据生成对应 analysis config */
 	const setAnalysisConfigFromFormData = useCallback(
 		(formData) => {
+			// 入口执行文件
+			analysisConfig.entryExecutionFileKey = formData.entryExecutionFileKey;
 			// vscode 代码文件前缀
 			analysisConfig.vsCodeUriPrefix = formData.vsCodeUriPrefix;
 			//import source 包对应的路径
@@ -28,6 +30,7 @@ export default function useConfigureAnalysis() {
 	/** 根据 analysis config 生成对应 service 接口数据格式 */
 	const createServiceDataFromAnalysisConfig = useCallback(() => {
 		return {
+			entryExecutionFileKey: analysisConfig.entryExecutionFileKey,
 			vsCodeUriPrefix: analysisConfig.vsCodeUriPrefix,
 			importPackageSourcePaths: analysisConfig.importPackageSourcePaths,
 			importPackageSourcePathsMap: analysisConfig.importPackageSourcePathsMap,
@@ -48,6 +51,17 @@ export default function useConfigureAnalysis() {
 		},
 		[analysisConfig.vsCodeUriPrefix]
 	);
+	/** 设置入口执行文件的 key */
+	const setEntryExecutionFileKey = useCallback(
+		(codeFile) => {
+			if (analysisConfig.entryExecutionFileKey !== codeFile.key) {
+				analysisConfig.entryExecutionFileKey = codeFile.key;
+				return true;
+			}
+			return false;
+		},
+		[analysisConfig]
+	);
 
 	return {
 		initAnalysisConfigFromService,
@@ -55,5 +69,6 @@ export default function useConfigureAnalysis() {
 		analysisConfig,
 		setAnalysisConfigFromFormData,
 		toVsCodeFile,
+		setEntryExecutionFileKey,
 	};
 }

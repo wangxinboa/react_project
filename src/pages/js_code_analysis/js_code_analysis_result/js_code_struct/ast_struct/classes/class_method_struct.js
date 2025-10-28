@@ -46,6 +46,6 @@ export default class ClassMethodStruct extends BaseStructInFile {
 	destroy() {
 		super.destroy();
 
-		this.classMethodKey = this.computed = this.kind = this.generator = this.async = this.type = null;
+		this.classMethodKey = this.computed = this.kind = this.generator = this.async = null;
 	}
 }

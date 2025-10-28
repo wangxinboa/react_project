@@ -7,8 +7,7 @@ export default class FunctionExpressionStruct extends BaseStructInFile {
 		super(ast, environmentStruct);
 
 		if (isIdentifierAst(ast.id)) {
-			this.name = getIdentifierName(ast.id);
-			this.title = this.name;
+			this.title = getIdentifierName(ast.id);
 		} else if (ast.id !== null) {
 			console.error(
 				"初始化 FunctionExpressionStruct 根据 ast",

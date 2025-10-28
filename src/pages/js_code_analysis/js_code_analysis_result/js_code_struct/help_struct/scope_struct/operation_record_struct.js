@@ -1,4 +1,5 @@
-import ImportDeclarationOperation from "../../operation_record/import_declaration_operation/import_declaration_operation.js";
+import ImportDeclarationOperation from "../../../components/js_code_analysis/js_code_analysis_message/operation_record/import_declaration/import_declaration_operation.js";
+import UnknowOperation from "../../../components/js_code_analysis/js_code_analysis_message/operation_record/unknow_operation/unknow_operation.js";
 import BaseStruct from "../base_struct/base_struct.js";
 
 export default class OperationRecordStruct extends BaseStruct {
@@ -6,10 +7,31 @@ export default class OperationRecordStruct extends BaseStruct {
 		super(codeStructsMessage);
 
 		this.operationRecords = [];
+
+		this.executed = false;
 	}
 
-	addImportDeclarationOperation(importDeclarationStruct) {
-		this.operationRecords.push(ImportDeclarationOperation.createByImportDeclarationStruct(importDeclarationStruct));
+	addVariableDeclaratorOperation(variableDeclaratorStruct) {}
+
+	async execute() {
+		if (!this.executed) {
+			this.executed = true;
+
+			for (let i = 0, len = this.children.length; i < len; i++) {
+				const childStruct = this.children[i];
+
+				if (childStruct.isImportDeclarationStruct) {
+					const importDeclarationOperation = ImportDeclarationOperation.createByImportDeclarationStruct(childStruct);
+					await importDeclarationOperation.executeFirstImportedFileStruct();
+
+					this.operationRecords.push(importDeclarationOperation);
+				} else {
+					this.operationRecords.push(new UnknowOperation(childStruct));
+				}
+			}
+		}
+
+		return this;
 	}
 
 	destroy() {
@@ -19,6 +41,6 @@ export default class OperationRecordStruct extends BaseStruct {
 			this.operationRecords[i].destroy();
 		}
 
-		this.operationRecords = null;
+		this.operationRecords = this.executed = null;
 	}
 }

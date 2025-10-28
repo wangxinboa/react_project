@@ -1,6 +1,5 @@
 import BaseStructInFile from "../../help_struct/base_struct/base_struct_in_file.js";
 import { isStringLiteralAst } from "../../js_code_struct_utils/ast_types.js";
-import { getStringLiteralValue } from "../../js_code_struct_utils/get_ast_attribute_value.js";
 
 export default class ImportStruct extends BaseStructInFile {
 	constructor(ast, environmentStruct) {
@@ -19,11 +18,8 @@ export default class ImportStruct extends BaseStructInFile {
 		if (this.parentStruct.isCallExpressionStruct) {
 			const parentStructAstArguments = this.parentStruct.getAstArguments();
 			if (parentStructAstArguments.length === 1 && isStringLiteralAst(parentStructAstArguments[0])) {
-				this.importedFileStruct = this.fileStruct.addImportFileStructBySource(
-					getStringLiteralValue(parentStructAstArguments[0])
-				);
 			} else {
-				console.warn(
+				console.error(
 					"ImportStruct class 实例",
 					this,
 					"执行 afterSetParentRelation, this.parentStruct",
@@ -31,6 +27,9 @@ export default class ImportStruct extends BaseStructInFile {
 					"ast 属性 arguments 属性",
 					parentStructAstArguments,
 					"的判定未过"
+				);
+				throw new Error(
+					"ImportStruct class 实例执行 afterSetParentRelation, this.parentStruct ast 属性 arguments 属性 的判定未过"
 				);
 			}
 		} else {

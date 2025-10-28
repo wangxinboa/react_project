@@ -16,6 +16,33 @@
 		word-break: normal;
 		overflow: hidden;
 	}
+	> .operation_record_tree_node_operations {
+		opacity: 0;
+		position: absolute;
+		top: 0;
+		right: 0;
+		height: 100%;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 8px;
+		border-radius: 4px;
+		transition: opacity 0.3s;
+	}
+
+	&:hover {
+		> .operation_record_tree_node_operations {
+			opacity: 1;
+		}
+	}
+}
+
+.bold_text {
+	display: inline;
+	border-radius: 4px;
+	line-height: 24px;
+	font-size: 14px;
+	font-weight: bold;
 }
 
 .key_point_text {

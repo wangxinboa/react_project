@@ -1,6 +1,6 @@
-import ConsoleMessageButton from "../../components/node_operations/console_message.jsx";
-import SelectCodeFileButton from "../../components/node_operations/select_code_file.jsx";
-import ToFileVsCodeButton from "../../components/node_operations/to_file_vs_code.jsx";
+import ConsoleMessageButton from "../../../node_operations/console_message.jsx";
+import SelectCodeFileButton from "../../../node_operations/select_code_file.jsx";
+import ToFileVsCodeButton from "../../../node_operations/to_file_vs_code.jsx";
 import styles from "./operation_record.module.scss";
 
 const FileStructPopoverContent = (props) => {

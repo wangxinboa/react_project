@@ -20,15 +20,17 @@ const JsCodeAnalysisResult = () => {
 		analysisConfig,
 		setAnalysisConfigFromFormData,
 		toVsCodeFile,
+		setEntryExecutionFileKey,
 	} = useConfigureAnalysis();
 	// js code analysis
 	const {
 		astRelationManager,
 		codeStructsTreeData,
+		selectedCodeFileStruct,
 
 		createAllStructsByAllCodeFiles,
 		setSelectedCodeStructByCodeFile,
-		selectedCodeFileStruct,
+		executeCodeFile,
 	} = useJsCodeAnalysis(analysisConfig);
 	// code files
 	const {
@@ -51,12 +53,14 @@ const JsCodeAnalysisResult = () => {
 			analysisConfig,
 			setAnalysisConfigFromFormData,
 			toVsCodeFile,
+			setEntryExecutionFileKey,
 			// js code analysis
 			astRelationManager,
 			codeStructsTreeData,
+			selectedCodeFileStruct,
 
 			createAllStructsByAllCodeFiles,
-			selectedCodeFileStruct,
+			executeCodeFile,
 			// code files
 			codeFilesMap,
 
@@ -92,6 +96,7 @@ const JsCodeAnalysisResult = () => {
 		codeFilesTreeSelectedKeys,
 		codeStructsTreeData,
 		createAllStructsByAllCodeFiles,
+		executeCodeFile,
 		createServiceDataByCodeFiles,
 		createServiceDataFromAnalysisConfig,
 		initAnalysisConfigFromService,
@@ -102,6 +107,7 @@ const JsCodeAnalysisResult = () => {
 		selectedCodeFileStruct,
 		setAnalysisConfigFromFormData,
 		setCodeFilesTreeExpandedKeys,
+		setEntryExecutionFileKey,
 		toVsCodeFile,
 	]);
 
@@ -109,18 +115,23 @@ const JsCodeAnalysisResult = () => {
 	useEffect(() => {
 		// 请求保存代码信息的 json 数据
 		serviceGetCodeFilesMessage(`${getQuery("analysis_url")}.json`)
-			.then((res) => {
+			.then(async (res) => {
 				// 初始化 analysis config
 				initAnalysisConfigFromService(res.data.analysisConfig ?? {});
 
 				const rootCodeFolder = initCodeFilesByService(res.data.codeFilesTree ?? {});
 				createAllStructsByAllCodeFiles(rootCodeFolder.allFiles);
+
+				const entryExecutionFile = rootCodeFolder.codeFilesMap[res.data.analysisConfig.entryExecutionFileKey];
+				if (entryExecutionFile) {
+					await executeCodeFile(entryExecutionFile);
+				}
 			})
 			.catch((e) => {
 				console.error(e);
 				message.error(`代码结构信息加载失败: ${String(e)}`);
 			});
-	}, [createAllStructsByAllCodeFiles, initAnalysisConfigFromService, initCodeFilesByService]);
+	}, [createAllStructsByAllCodeFiles, executeCodeFile, initAnalysisConfigFromService, initCodeFilesByService]);
 
 	return (
 		<JsCodeJsCodeAnalysisResultContext.Provider value={providerValue}>

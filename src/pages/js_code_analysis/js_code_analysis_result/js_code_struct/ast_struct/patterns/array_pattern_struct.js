@@ -5,5 +5,12 @@ export default class ArrayPatternStruct extends BaseStructInFile {
 		super(ast, environmentStruct);
 
 		this.type = "ArrayPattern";
+
+		this.isArrayPatternStruct = true;
+	}
+	destroy() {
+		super.destroy();
+
+		this.isArrayPatternStruct = null;
 	}
 }

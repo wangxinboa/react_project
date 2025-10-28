@@ -54,6 +54,15 @@ export default class FileStruct extends ExportMap {
 		return key in this.codeStructsMessage.codeStructsMap;
 	}
 
+	/** 根据传入的 codeFile 和 codeStructsMap, 返回 codeStructsMap 中的 fileStruct */
+	static getByCodeFile(codeFile, codeStructsMap) {
+		const key = `${FileStruct.type}:${codeFile.key}`;
+		if (key in codeStructsMap) {
+			return codeStructsMap[key];
+		}
+		return null;
+	}
+
 	/** 根据 CodeFile 相关的信息, 生成 ast, 并对应的创建返回 codeFileStructsMap 中的 FileStruct 以及对应 ast 的孩子 codeStruct */
 	static createByCodeFile(codeFile, codeStructsMessage, analysisConfig) {
 		const key = `${FileStruct.type}:${codeFile.key}`;

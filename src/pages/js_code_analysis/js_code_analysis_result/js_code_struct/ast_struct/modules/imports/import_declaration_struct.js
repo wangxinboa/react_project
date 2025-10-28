@@ -44,7 +44,5 @@ export default class ImportDeclarationStruct extends BaseStructInFile {
 
 	afterAddChildrenCodeStructs() {
 		checkImportDeclarationStructAfterAddChildrenCodeStructs(this);
-		/** 添加对应的操作记录 */
-		this.environmentStruct.addImportDeclarationOperation(this);
 	}
 }

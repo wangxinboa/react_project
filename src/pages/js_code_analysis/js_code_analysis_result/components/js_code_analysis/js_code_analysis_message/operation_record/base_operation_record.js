@@ -1,4 +1,4 @@
-import getOperationRecordKey from "../js_code_struct_utils/get_operation_record_key.js";
+import getOperationRecordKey from "./operation_record_utils/get_operation_record_key.js";
 
 export default class BaseOperationRecord {
 	constructor() {

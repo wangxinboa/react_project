@@ -58,6 +58,6 @@ export default class ObjectMethodStruct extends BaseStructInFile {
 	destroy() {
 		super.destroy();
 
-		this.objectKey = this.method = this.computed = this.shorthand = null;
+		this.objectKey = this.method = this.computed = this.shorthand = this.kind = this.generator = this.async = null;
 	}
 }

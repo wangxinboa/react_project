@@ -10,9 +10,9 @@ export default class ImportDeclarationOperation extends BaseOperationRecord {
 		this.importDeclarationStruct = importDeclarationStruct;
 
 		this.codeFile = importDeclarationStruct.getSourceCodeFile();
-		this.isFirstImported = !importDeclarationStruct.fileStruct.hasCodeFileStruct(this.codeFile);
 		/** 初始化导入的 fileStruct */
 		this.importedFileStruct = importDeclarationStruct.fileStruct.addImportFileStructByCodeFile(this.codeFile);
+		this.isFirstImported = !this.importedFileStruct.executed;
 
 		// 如果导入文件是第一次导入的话, 就会添加对应的操作作为孩子节点
 		if (this.isFirstImported) {
@@ -28,26 +28,16 @@ export default class ImportDeclarationOperation extends BaseOperationRecord {
 		for (let i = 0, len = importDeclarationStruct.children.length; i < len; i++) {
 			const specifierStruct = importDeclarationStruct.children[i];
 
-			if (specifierStruct.isImportSpecifier) {
-				importDeclarationStruct.environmentStruct.addVariableByImportSpecifierStruct(
-					specifierStruct,
-					this.importedFileStruct
-				);
+			importDeclarationStruct.environmentStruct.addVariableByImportSpecifierStruct(
+				specifierStruct,
+				this.importedFileStruct
+			);
 
+			if (specifierStruct.isImportSpecifier) {
 				this.importSpecifierStructs.push(specifierStruct);
 			} else if (specifierStruct.isImportDefaultSpecifier) {
-				importDeclarationStruct.environmentStruct.addVariableByImportSpecifierStruct(
-					specifierStruct,
-					this.importedFileStruct
-				);
-
 				this.importDefaultSpecifierStruct = specifierStruct;
 			} else if (specifierStruct.isImportNamespaceSpecifier) {
-				importDeclarationStruct.environmentStruct.addVariableByImportSpecifierStruct(
-					specifierStruct,
-					this.importedFileStruct
-				);
-
 				this.importNamespaceSpecifierStruct = specifierStruct;
 			} else {
 				console.error(
@@ -57,6 +47,12 @@ export default class ImportDeclarationOperation extends BaseOperationRecord {
 				);
 				throw new Error("初始化 ImportDeclarationOperation, specifierStruct 是不应该存在的未处理的类型");
 			}
+		}
+	}
+
+	async executeFirstImportedFileStruct() {
+		if (this.isFirstImported) {
+			await this.importedFileStruct.execute();
 		}
 	}
 

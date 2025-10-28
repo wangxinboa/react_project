@@ -3,7 +3,7 @@ import { Popover } from "antd";
 
 import FileStructPopoverContent from "../file_struct_popover_content.jsx";
 import ImportSpecifierPopoverContent from "./import_specifier_popover_content.jsx";
-import { isNonEmptyArray } from "../../../../../../utils/data_type/is_type.js";
+import { isNonEmptyArray } from "../../../../../../../../utils/data_type/is_type.js";
 
 import styles from "../operation_record.module.scss";
 
@@ -37,7 +37,7 @@ const ImportDeclarationOperationTreeNode = (props) => {
 	return (
 		<div className={styles.operation_record_tree_node_container}>
 			<div className={styles.operation_record_tree_node_title}>
-				{operationRecord.isFirstImported ? "首次导入" : "导入"}
+				{operationRecord.isFirstImported ? "首次导入执行" : "导入"}
 				<Popover trigger="click" content={<FileStructPopoverContent fileStruct={importedFileStruct} />}>
 					<span className={styles.key_point_text} title={importedFileStruct.getCodeFileKey()}>
 						{importedFileStruct.getCodeFileName()}

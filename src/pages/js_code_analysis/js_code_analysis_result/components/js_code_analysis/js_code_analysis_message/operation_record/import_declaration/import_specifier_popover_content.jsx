@@ -1,4 +1,4 @@
-import ConsoleMessageButton from "../../../components/node_operations/console_message.jsx";
+import ConsoleMessageButton from "../../../../node_operations/console_message.jsx";
 import styles from "../operation_record.module.scss";
 
 const ImportSpecifierPopoverContent = (props) => {

@@ -48,12 +48,14 @@ const AstRelation = (props) => {
 			</div>
 			{showCase && isNonEmptyArray(parentRelationKeys) ? (
 				<div className={styles.ast_relation_cases_container}>
-					<div className={styles.ast_relation_cases_container_title}>父节点 code struct</div>
+					<div className={styles.ast_relation_cases_container_title}>
+						父节点 code struct ({parentRelationKeys.length})
+					</div>
 					{parentRelationKeys.map((parentRelationKey, index) => {
 						return (
 							<AstRelationCases
 								key={parentRelationKey}
-								title={`父节点类型 ${parentRelationKey}`}
+								title={`${index + 1}. 父节点类型 ${parentRelationKey}`}
 								relationKey={parentRelationKey}
 								astRelationCases={parentRelations[index]}
 								showExamples={handleOnShowParentExamples}
@@ -65,12 +67,14 @@ const AstRelation = (props) => {
 
 			{showCase && isNonEmptyArray(childrenRelationKeys) ? (
 				<div className={styles.ast_relation_cases_container}>
-					<div className={styles.ast_relation_cases_container_title}>子节点 code struct</div>
+					<div className={styles.ast_relation_cases_container_title}>
+						子节点 code struct ({childrenRelationKeys.length})
+					</div>
 					{childrenRelationKeys.map((childrenRelationKey, index) => {
 						return (
 							<AstRelationCases
 								key={childrenRelationKey}
-								title={`子节点所在属性 ${childrenRelationKey}`}
+								title={`${index + 1}. 子节点所在属性 ${astRelation.type}.${childrenRelationKey}`}
 								relationKey={childrenRelationKey}
 								astRelationCases={childrenRelations[index]}
 								showExamples={handleOnShowChildrenExamples}

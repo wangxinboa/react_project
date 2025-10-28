@@ -38,23 +38,8 @@
 			flex-direction: row;
 			align-items: center;
 			gap: 8px;
-			background-color: #cbcbcb;
 			border-radius: 4px;
 			transition: opacity 0.3s;
-
-			> .code_files_tree_node_operation {
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				height: 24px;
-				padding: 0 8px;
-				font-size: 12px;
-				border-radius: 4px;
-				transition: background-color 0.3s;
-				&:hover {
-					background-color: #a8a8a8;
-				}
-			}
 		}
 
 		&:hover {
