@@ -5,6 +5,7 @@ export default class BooleanLiteralStruct extends BaseStructInFile {
 	constructor(ast, environmentStruct) {
 		super(ast, environmentStruct);
 
+		this.isBooleanLiteralStruct = true;
 		this.value = getBooleanLiteralValue(ast);
 
 		this.type = "BooleanLiteral";
@@ -13,6 +14,6 @@ export default class BooleanLiteralStruct extends BaseStructInFile {
 	destroy() {
 		super.destroy();
 
-		this.value = null;
+		this.isBooleanLiteralStruct = this.value = null;
 	}
 }

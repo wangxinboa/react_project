@@ -1,7 +1,6 @@
 import OperationRecordStruct from "./operation_record_struct.js";
 import { getIdentifierName } from "../../js_code_struct_utils/get_ast_attribute_value.js";
 import CacheMap from "../../../../../../utils/cache_map/cache_map.js";
-import ImportVariableStruct from "../variable_struct/import_variable_struct.js";
 
 export default class ScopeStruct extends OperationRecordStruct {
 	constructor(codeStructsMessage) {
@@ -58,26 +57,6 @@ export default class ScopeStruct extends OperationRecordStruct {
 			);
 			throw new Error(
 				"variable map 执行 addVariable, 将传入 variableStruct 添加作为变量名, 但是 variableStruct 是未处理的类型, 待完善"
-			);
-		}
-	}
-
-	addVariableByImportSpecifierStruct(importSpecifierStruct, importedFileStruct) {
-		if (importSpecifierStruct.isImportSpecifier) {
-			this.addVariable(
-				ImportVariableStruct.createKindNameByLocalImportedFileStruct(
-					importSpecifierStruct.local,
-					importSpecifierStruct.imported,
-					importedFileStruct
-				)
-			);
-		} else if (importSpecifierStruct.isImportDefaultSpecifier) {
-			this.addVariable(
-				ImportVariableStruct.createKindDefaultByLocalFileStruct(importSpecifierStruct.local, importedFileStruct)
-			);
-		} else if (importSpecifierStruct.isImportNamespaceSpecifier) {
-			this.addVariable(
-				ImportVariableStruct.createKindAllByLocalFileStruct(importSpecifierStruct.local, importedFileStruct)
 			);
 		}
 	}

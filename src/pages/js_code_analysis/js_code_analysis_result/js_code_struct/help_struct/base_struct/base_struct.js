@@ -65,6 +65,7 @@ export default class BaseStruct {
 	}
 	afterSetParentRelation() {}
 	afterAddChildrenCodeStructs() {}
+	afterAddChildCodeStruct() {}
 
 	// children parent 相关
 	removeSelf() {
@@ -91,6 +92,7 @@ export default class BaseStruct {
 		this.children.push(struct);
 		struct.parentStruct = this;
 
+		this.afterAddChildCodeStruct(struct, parentRelation);
 		struct._setParentRelation(parentRelation);
 
 		this.codeStructsMessage.astRelationManager.addAstRelation(this, struct, parentRelation);

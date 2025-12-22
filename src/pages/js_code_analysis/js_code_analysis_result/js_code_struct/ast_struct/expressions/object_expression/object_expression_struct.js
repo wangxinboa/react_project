@@ -1,6 +1,6 @@
-import PropertyMap from "../../../help_struct/property/property_map.js";
+import BaseStructInFile from "../../../help_struct/base_struct/base_struct_in_file.js";
 
-export default class ObjectExpressionStruct extends PropertyMap {
+export default class ObjectExpressionStruct extends BaseStructInFile {
 	constructor(ast, environmentStruct) {
 		super(ast, environmentStruct);
 

@@ -2,7 +2,7 @@ import BaseStructInFile from "../../../help_struct/base_struct/base_struct_in_fi
 import { isIdentifierAst, isStringLiteralAst } from "../../../js_code_struct_utils/ast_types.js";
 import { getIdentifierName, getStringLiteralValue } from "../../../js_code_struct_utils/get_ast_attribute_value.js";
 
-const ObjectMethodTypesEnum = {
+const ObjectMethodStructMethodTypesEnum = {
 	get: "get",
 	set: "set",
 	method: "method",
@@ -30,7 +30,7 @@ export default class ObjectMethodStruct extends BaseStructInFile {
 				"初始化 ObjectMethodStruct 根据 ast, 环境结构 environmentStruct 创建 ObjectMethodStruct 时, 根据属性 ast.key 获取对象属性名, 但是 ast.key 不是 IdentifierAst 也不是 StringLiteralAst, 数据类型有误"
 			);
 		}
-		if (ast.method !== true && ast.kind === ObjectMethodTypesEnum.method) {
+		if (ast.method !== true && ast.kind === ObjectMethodStructMethodTypesEnum.method) {
 			console.error(
 				"初始化 ObjectMethodStruct 根据 ast",
 				ast,

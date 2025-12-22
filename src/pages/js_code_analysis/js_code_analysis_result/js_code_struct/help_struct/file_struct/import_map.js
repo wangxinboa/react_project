@@ -5,52 +5,52 @@ export default class ImportMap extends ScopeStruct {
 	constructor(codeStructsMessage) {
 		super(codeStructsMessage);
 
-		this.importMap = new CacheMap();
-		this.importedMap = new CacheMap();
+		this.importFileStructsMap = new CacheMap();
+		this.importedFileStructsMap = new CacheMap();
 	}
 	destroy() {
 		super.destroy();
 
-		this.importMap.destroy();
-		this.importedMap.destroy();
+		this.importFileStructsMap.destroy();
+		this.importedFileStructsMap.destroy();
 
-		this.importMap = this.importedMap = null;
+		this.importFileStructsMap = this.importedFileStructsMap = null;
 	}
-	// importMap
+	// importFileStructsMap
 	hasImportFileStruct(importedFileStructKey) {
-		return this.importMap.has(importedFileStructKey);
+		return this.importFileStructsMap.has(importedFileStructKey);
 	}
 	addImportFileStruct(importFileStruct) {
 		const key = importFileStruct.getCodeFileKey();
 		if (this.hasImportFileStruct(key)) {
 			console.warn("ImportMap.addImportFileStruct:已经存在相同名称的变量", key);
 		} else {
-			this.importMap.add(key, importFileStruct);
+			this.importFileStructsMap.add(key, importFileStruct);
 		}
 	}
 	getImportFileStruct(importedFileStructKey) {
-		return this.importMap.get(importedFileStructKey);
+		return this.importFileStructsMap.get(importedFileStructKey);
 	}
 	getImportFileStructs() {
-		return this.importMap.cacheArray;
+		return this.importFileStructsMap.cacheArray;
 	}
-	// importedMap
+	// importedFileStructsMap
 	hasImportedFileStruct(localFileStructKey) {
-		return this.importedMap.has(localFileStructKey);
+		return this.importedFileStructsMap.has(localFileStructKey);
 	}
 	addImportedFileStruct(importedFileStruct) {
 		const key = importedFileStruct.getCodeFileKey();
 		if (this.hasImportedFileStruct(key)) {
 			console.warn("ImportMap.addImportedFileStruct:已经存在相同名称的变量", key);
 		} else {
-			this.importedMap.add(importedFileStruct.getCodeFileKey(), importedFileStruct);
+			this.importedFileStructsMap.add(importedFileStruct.getCodeFileKey(), importedFileStruct);
 		}
 	}
 	getImportedFileStruct(localFileStructKey) {
-		return this.importedMap.get(localFileStructKey);
+		return this.importedFileStructsMap.get(localFileStructKey);
 	}
 	getImportedFileStructs() {
-		return this.importedMap.cacheArray;
+		return this.importedFileStructsMap.cacheArray;
 	}
 
 	isRelativePath(path) {

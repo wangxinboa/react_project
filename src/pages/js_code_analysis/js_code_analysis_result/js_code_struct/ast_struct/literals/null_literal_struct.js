@@ -5,5 +5,11 @@ export default class NullLiteralStruct extends BaseStructInFile {
 		super(ast, environmentStruct);
 
 		this.type = "NullLiteral";
+
+		this.isNullLiteralStruct = true;
+	}
+
+	destroy() {
+		this.isNullLiteralStruct = null;
 	}
 }

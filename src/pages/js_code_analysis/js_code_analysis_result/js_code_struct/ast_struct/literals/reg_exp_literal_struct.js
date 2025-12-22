@@ -4,6 +4,7 @@ export default class RegExpLiteralStruct extends BaseStructInFile {
 	constructor(ast, environmentStruct) {
 		super(ast, environmentStruct);
 
+		this.isRegExpLiteralStruct = true;
 		this.pattern = ast.pattern;
 		this.flags = ast.flags;
 
@@ -13,6 +14,6 @@ export default class RegExpLiteralStruct extends BaseStructInFile {
 	destroy() {
 		super.destroy();
 
-		this.pattern = this.flags = null;
+		this.isRegExpLiteralStruct = this.pattern = this.flags = null;
 	}
 }

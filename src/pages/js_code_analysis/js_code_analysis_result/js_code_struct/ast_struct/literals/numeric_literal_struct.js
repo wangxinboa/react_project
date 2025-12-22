@@ -5,6 +5,7 @@ export default class NumericLiteralStruct extends BaseStructInFile {
 	constructor(ast, environmentStruct) {
 		super(ast, environmentStruct);
 
+		this.isNumericLiteralStruct = true;
 		this.value = getNumericLiteralValue(ast);
 
 		this.type = "NumericLiteral";
@@ -13,6 +14,6 @@ export default class NumericLiteralStruct extends BaseStructInFile {
 	destroy() {
 		super.destroy();
 
-		this.value = null;
+		this.isNumericLiteralStruct = this.value = null;
 	}
 }

@@ -4,6 +4,14 @@ export default class AwaitExpressionStruct extends BaseStructInFile {
 	constructor(ast, environmentStruct) {
 		super(ast, environmentStruct);
 
+		this.isAwaitExpression = true;
+
 		this.type = "AwaitExpression";
+	}
+
+	destroy() {
+		super.destroy();
+
+		this.isAwaitExpression = null;
 	}
 }

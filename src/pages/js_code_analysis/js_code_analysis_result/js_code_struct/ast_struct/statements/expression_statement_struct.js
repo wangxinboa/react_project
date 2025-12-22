@@ -5,5 +5,10 @@ export default class ExpressionStatementStruct extends BaseStructInFile {
 		super(ast, environmentStruct);
 
 		this.type = "ExpressionStatement";
+
+		this.isExpressionStatementStruct = true;
+	}
+	destroy() {
+		this.isExpressionStatementStruct = null;
 	}
 }

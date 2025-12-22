@@ -15,6 +15,9 @@ export default class FileStruct extends ExportMap {
 
 		this.analysisConfig = analysisConfig;
 
+		this.importDeclarationStructs = [];
+		this.normalStructs = [];
+
 		this.fileStruct = this;
 		this.structPathSegments = [this];
 		this.type = FileStruct.type;
@@ -27,7 +30,13 @@ export default class FileStruct extends ExportMap {
 	destroy() {
 		delete this.codeStructsMessage.codeStructsMap[this.key];
 
-		this.key = this.isFileStruct = this.codeFile = this.analysisConfig = null;
+		this.key =
+			this.isFileStruct =
+			this.codeFile =
+			this.analysisConfig =
+			this.importDeclarationStructs =
+			this.normalStructs =
+				null;
 
 		super.destroy();
 	}
@@ -52,6 +61,14 @@ export default class FileStruct extends ExportMap {
 	hasCodeFileStruct(codeFile) {
 		const key = `${FileStruct.type}:${codeFile.key}`;
 		return key in this.codeStructsMessage.codeStructsMap;
+	}
+
+	afterAddChildCodeStruct(childCodeStruct) {
+		if (childCodeStruct.isImportDeclarationStruct) {
+			this.importDeclarationStructs.push(childCodeStruct);
+		} else {
+			this.normalStructs.push(childCodeStruct);
+		}
 	}
 
 	/** 根据传入的 codeFile 和 codeStructsMap, 返回 codeStructsMap 中的 fileStruct */

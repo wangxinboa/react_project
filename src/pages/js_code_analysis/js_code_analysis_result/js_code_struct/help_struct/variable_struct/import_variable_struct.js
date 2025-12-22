@@ -1,73 +1,43 @@
 const ImportVariableStructTypesEnum = {
 	default: "default",
-	all: "all",
-	name: "name",
+	normal: "normal",
+	namespace: "namespace",
 };
 
 export default class ImportVariableStruct {
 	constructor(local, type, fileStruct, imported) {
 		this.isImportVariableStruct = true;
-
+		/** name 会作为 ScopeStruct 中的 key */
 		this.name = local;
 		this.local = local;
-		this.values = null;
 
 		this.fileStruct = fileStruct;
 
-		this.kind = "import";
 		this.type = type;
 
-		if (this.kind === ImportVariableStruct.name) {
+		if (this.type === ImportVariableStructTypesEnum.normal) {
 			this.imported = imported;
 		}
-
-		switch (this.type) {
-			case ImportVariableStructTypesEnum.default:
-				this.title = `import ${this.local} from ${fileStruct.getCodeFileKey()};`;
-				break;
-			case ImportVariableStructTypesEnum.name:
-				if (this.imported && this.local !== this.imported) {
-					this.title = `import { ${this.imported} ${
-						this.local !== this.imported ? `as ${this.local}` : ""
-					} } from ${fileStruct.getCodeFileKey()};`;
-				} else {
-					this.title = `import { ${this.local} } from ${fileStruct.getCodeFileKey()};`;
-				}
-				break;
-			case ImportVariableStructTypesEnum.all:
-				this.title = `import * as ${this.local} from ${fileStruct.getCodeFileKey()};`;
-				break;
-			default:
-				console.error(
-					"初始化 ImportVariableStruct 时, this.type",
-					this.type,
-					"类型不在枚举范围",
-					ImportVariableStructTypesEnum,
-					"内, 待完善"
-				);
-				throw new Error("初始化 ImportVariableStruct 时, this.type 类型不在枚举范围内, 待完善");
-		}
+		this.isSameNameLocalAndImported = local === imported;
 	}
 	destroy() {
 		this.isImportVariableStruct =
 			this.name =
 			this.local =
-			this.values =
 			this.fileStruct =
-			this.kind =
 			this.type =
 			this.imported =
-			this.title =
+			this.isSameNameLocalAndImported =
 				null;
 	}
 
-	static createKindDefaultByLocalFileStruct(local, fileStruct) {
+	static createNormal(local, imported, fileStruct) {
+		return new ImportVariableStruct(local, ImportVariableStructTypesEnum.normal, fileStruct, imported);
+	}
+	static createDefault(local, fileStruct) {
 		return new ImportVariableStruct(local, ImportVariableStructTypesEnum.default, fileStruct);
 	}
-	static createKindAllByLocalFileStruct(local, fileStruct) {
-		return new ImportVariableStruct(local, ImportVariableStructTypesEnum.all, fileStruct);
-	}
-	static createKindNameByLocalImportedFileStruct(local, imported, fileStruct) {
-		return new ImportVariableStruct(local, ImportVariableStructTypesEnum.name, fileStruct, imported);
+	static createNamespace(local, fileStruct) {
+		return new ImportVariableStruct(local, ImportVariableStructTypesEnum.namespace, fileStruct);
 	}
 }

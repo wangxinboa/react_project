@@ -4,8 +4,6 @@ export const VariableStructKindTypesEnum = {
 	var: "var",
 	let: "let",
 	const: "const",
-	// 函数参数
-	param: "param",
 };
 
 export default class VariableStruct extends BaseVariableStruct {

@@ -6,7 +6,13 @@ export function addChildCodeStructByAst(parentStruct, ast, environmentStruct, pa
 	if (astType in TransformAstToCodeStructRuleMap) {
 		try {
 			TransformAstToCodeStructRule = TransformAstToCodeStructRuleMap[astType];
-			astChildAstProperties = TransformAstToCodeStructRule.astProperties;
+			if (Array.isArray(TransformAstToCodeStructRule.astProperties)) {
+				astChildAstProperties = [...TransformAstToCodeStructRule.astProperties];
+			}
+
+			if (Array.isArray(astChildAstProperties) && TransformAstToCodeStructRule.executeProperty) {
+				astChildAstProperties.push(TransformAstToCodeStructRule.executeProperty);
+			}
 
 			codeStruct = new TransformAstToCodeStructRule.structClass(ast, environmentStruct);
 			parentStruct.addChildStruct(codeStruct, parentRelation);

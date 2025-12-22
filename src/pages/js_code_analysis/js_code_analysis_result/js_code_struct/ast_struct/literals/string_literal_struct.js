@@ -5,6 +5,7 @@ export default class StringLiteralStruct extends BaseStructInFile {
 	constructor(ast, environmentStruct) {
 		super(ast, environmentStruct);
 
+		this.isStringLiteralStruct = true;
 		this.value = getStringLiteralValue(ast);
 
 		this.type = "StringLiteral";
@@ -13,6 +14,6 @@ export default class StringLiteralStruct extends BaseStructInFile {
 	destroy() {
 		super.destroy();
 
-		this.value = null;
+		this.isStringLiteralStruct = this.value = null;
 	}
 }

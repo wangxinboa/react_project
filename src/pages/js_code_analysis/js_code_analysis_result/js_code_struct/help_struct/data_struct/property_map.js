@@ -1,10 +1,7 @@
-import BaseStructInFile from "../base_struct/base_struct_in_file.js";
 import PropertyName from "../variable_struct/property_name.js";
 
-export default class PropertyMap extends BaseStructInFile {
-	constructor(ast, environmentStruct) {
-		super(ast, environmentStruct);
-
+export default class PropertyMap {
+	constructor() {
 		this.isPropertyMap = true;
 		this.propertiesMap = {};
 		this.properties = [];

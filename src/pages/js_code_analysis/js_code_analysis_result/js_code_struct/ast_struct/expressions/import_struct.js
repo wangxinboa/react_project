@@ -1,24 +1,24 @@
 import BaseStructInFile from "../../help_struct/base_struct/base_struct_in_file.js";
-import { isStringLiteralAst } from "../../js_code_struct_utils/ast_types.js";
 
 export default class ImportStruct extends BaseStructInFile {
 	constructor(ast, environmentStruct) {
 		super(ast, environmentStruct);
 
 		this.type = "Import";
+
+		this.isImportedFileStruct = true;
 	}
 	destroy() {
 		super.destroy();
 
-		this.importedFileStruct = null;
+		this.isImportedFileStruct = null;
 	}
 
 	afterSetParentRelation() {
 		// 检查父结构类型
 		if (this.parentStruct.isCallExpressionStruct) {
-			const parentStructAstArguments = this.parentStruct.getAstArguments();
-			if (parentStructAstArguments.length === 1 && isStringLiteralAst(parentStructAstArguments[0])) {
-			} else {
+			const parentStructAstArguments = this.parentStruct.isImport();
+			if (!this.parentStruct.isImport()) {
 				console.error(
 					"ImportStruct class 实例",
 					this,
