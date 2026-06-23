@@ -2,6 +2,7 @@
 	display: flex;
 	flex-direction: column;
 	width: 100%;
+	gap: 12px;
 
 	> .upload_code_files_header {
 		display: flex;
@@ -9,18 +10,22 @@
 		width: 100%;
 	}
 
-	> .upload_code_files_list {
-		display: flex;
-		flex-direction: column;
+	> .upload_code_files_tree {
 		width: 100%;
-		height: 260px;
+		height: 320px;
 		overflow: auto;
+		border: 1px solid #d9d9d9;
+		border-radius: 6px;
+	}
 
-		> .upload_code_files_file {
-			width: 100%;
-			height: 28px;
-			line-height: 28px;
-			font-size: 16px;
+	> .upload_code_files_footer {
+		text-align: right;
+		font-size: 14px;
+		color: #666;
+
+		.selected_count {
+			color: #1677ff;
+			font-weight: 500;
 		}
 	}
 }

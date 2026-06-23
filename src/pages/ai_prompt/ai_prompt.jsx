@@ -17,35 +17,42 @@ export function AIPrompt() {
 	const startUploadCodeFiles = useCallback(() => {
 		uploadCodeFilesRef.current.startUpload();
 	}, []);
+
 	const consoleAIPrompt = useCallback(() => {
-		console.info("codeFilesTreeCheckedKeys:", codeFilesTreeCheckedKeys);
 		let promptString = "";
 		for (let i = 0, len = codeFilesTreeCheckedKeys.length; i < len; i++) {
 			const codeFile = codeFilesMap[codeFilesTreeCheckedKeys[i]];
 			if (codeFile) {
-				promptString += codeFile.key + "\n";
-				promptString += codeFile.codeMessage.codeString + "\n";
+				promptString += `// ${codeFile.key}\n`;
+				promptString += `${codeFile.codeMessage.codeString}\n\n`;
 			}
 		}
 		console.info(promptString);
+		// 可选：自动复制到剪贴板
+		navigator.clipboard.writeText(promptString);
 	}, [codeFilesMap, codeFilesTreeCheckedKeys]);
 
-	/** 当 UploadCodeFiles Modal 确认, 更新 filesTree, */
-	const handleOnUploadCodeFilesOk = useCallback(async (files) => {
+	/**
+	 * 组件内部已完成文件读取和代码树生成，直接使用返回结果即可
+	 */
+	const handleOnUploadCodeFilesOk = useCallback(async ({ files, rootCodeFolder }) => {
 		const _rootCodeFolder = await createCodeFilesTreeByFileList(files).readFilesAsText();
-
+		// 直接使用组件返回的已处理好的代码树对象
 		setCodeFilesMap(_rootCodeFolder.codeFilesMap);
 		setCodeFilesTreeData(_rootCodeFolder.children);
 		setCodeFilesTreeExpandedKeys([]);
 		setCodeFilesTreeSelectedKeys([]);
+		setCodeFilesTreeCheckedKeys([]);
 	}, []);
 
 	const handleOnTreeExpand = useCallback((expandedKeys) => {
 		setCodeFilesTreeExpandedKeys(expandedKeys);
 	}, []);
+
 	const handleOnTreeSelect = useCallback((selectedKeys) => {
-		setCodeFilesTreeExpandedKeys(selectedKeys);
+		setCodeFilesTreeSelectedKeys(selectedKeys);
 	}, []);
+
 	const handleOnTreeCheck = useCallback((checkedKeys) => {
 		setCodeFilesTreeCheckedKeys(checkedKeys);
 	}, []);
