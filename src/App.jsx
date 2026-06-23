@@ -1,11 +1,12 @@
 import { unstable_HistoryRouter as HistoryRouter, Route, Routes } from "react-router-dom";
 import { Menu } from "antd";
-import { Pages, PagesItems, history } from "./router/router.js";
-import style from "./App.module.scss";
+import { PageItems, MenuItems, history } from "./router/router.js";
+import styles from "./App.module.scss";
+import { useCallback } from "react";
 
 function renderRoute(Page) {
 	return (
-		<Route key={Page.key} path={Page.path} element={Page.Com ? <Page.Com /> : undefined}>
+		<Route key={Page.path} path={Page.path} element={Page.Component ? <Page.Component /> : undefined}>
 			{Page.children?.map((childPage) => {
 				return renderRoute(childPage);
 			})}
@@ -14,12 +15,16 @@ function renderRoute(Page) {
 }
 
 export default function App() {
+	const handleOnClickMenu = useCallback(({ key }) => {
+		history.push(key);
+	}, []);
+
 	return (
-		<div className={style.app}>
-			<div className={style.menuContainer}>
-				<Menu mode="inline" items={PagesItems} />
+		<div className={styles.app}>
+			<div className={styles.menuContainer}>
+				<Menu mode="inline" items={MenuItems} onClick={handleOnClickMenu} />
 			</div>
-			<div className={style.content}>
+			<div className={styles.content}>
 				<HistoryRouter
 					history={history}
 					future={{
@@ -28,8 +33,8 @@ export default function App() {
 					}}
 				>
 					<Routes>
-						{Pages.map((Page) => {
-							return renderRoute(Page);
+						{PageItems.map((PageItem) => {
+							return renderRoute(PageItem);
 						})}
 					</Routes>
 				</HistoryRouter>

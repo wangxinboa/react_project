@@ -29,6 +29,7 @@ export default function AnalysisTable(props = {}) {
 				dataIndex: "operations",
 				key: "operations",
 				width: "200px",
+				fixed: "end",
 				render: (_, record, __) => {
 					return (
 						<div style={{ width: "100%", height: "100%" }}>

@@ -4,12 +4,12 @@ import { Button, Splitter } from "antd";
 import { JsCodeJsCodeAnalysisResultContext } from "./js_code_analysis_result.jsx";
 
 import ConfigureAnalysis from "./components/configure_analysis/configure_analysis.jsx";
-import UploadCodeFiles from "./components/upload_code_files/upload_code_files.jsx";
 import AstRelationsDrawer from "./components/js_code_analysis/ast_relations_drawer/ast_relations_drawer.jsx";
 
 import CodeFilesTree from "./components/code_files_tree/code_files_tree.jsx";
 // import CodeEditor from "./components/code_editor/code_editor.jsx";
 import JsCodeAnalysis from "./components/js_code_analysis/js_code_analysis.jsx";
+import { UploadCodeFiles } from "../../../components/upload_code_files/upload_code_files.jsx";
 
 import styles from "./js_code_analysis_result.module.scss";
 
@@ -33,7 +33,7 @@ const JsCodeAnalysisResultPage = () => {
 		(values) => {
 			setAnalysisConfigFromFormData(values);
 		},
-		[setAnalysisConfigFromFormData]
+		[setAnalysisConfigFromFormData],
 	);
 
 	const uploadCodeFilesRef = useRef(null);
@@ -50,7 +50,7 @@ const JsCodeAnalysisResultPage = () => {
 				uploadCodeFilesRef.current.endUpload();
 			});
 		},
-		[createAllStructsByAllCodeFiles, initCodeFilesByFiles]
+		[createAllStructsByAllCodeFiles, initCodeFilesByFiles],
 	);
 
 	const astRelationsDrawerRef = useRef(null);
@@ -88,7 +88,7 @@ const JsCodeAnalysisResultPage = () => {
 					>
 						ast 关系展示
 					</Button>
-					<UploadCodeFiles ref={uploadCodeFilesRef} onOk={handleOnUploadCodeFilesOk} autoCloseOnOk={false} />
+					<UploadCodeFiles ref={uploadCodeFilesRef} onOk={handleOnUploadCodeFilesOk} />
 					<Button
 						className={styles.js_code_analysis_result_header_right_button}
 						size="small"

@@ -2,12 +2,7 @@ import RootFolder from "./root_folder.js";
 import Folder from "./folder.js";
 import File from "./file.js";
 
-export default function createFilesTreeByFileList(
-	files,
-	RootFolderClass = RootFolder,
-	FolderClass = Folder,
-	FileClass = File
-) {
+export function createFilesTreeByFileList(files, RootFolderClass = RootFolder, FolderClass = Folder, FileClass = File) {
 	// 将 files 信息转化为 tree
 	let rootFolderNode = new RootFolderClass();
 

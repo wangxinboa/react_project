@@ -1,4 +1,4 @@
-import { File } from "../../../../utils/utils.js";
+import File from "../file.js";
 
 export default class CodeFile extends File {
 	codeFilesMap = null;

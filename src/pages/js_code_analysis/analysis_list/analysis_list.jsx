@@ -3,7 +3,7 @@ import { Button, Pagination } from "antd";
 
 import AnalysisTable from "./analysis_table.jsx";
 import AnalysisForm from "./analysis_form.jsx";
-import usePagination from "../../../hooks/use_pagination.js";
+import { usePagination } from "../../../hooks/use_pagination.js";
 import { downloadJSON } from "../../../utils/utils.js";
 import { toAnalysisContentPage } from "../../../router/router.js";
 import {
@@ -27,7 +27,7 @@ export default function AnalysisList() {
 			setPage(page);
 			setPageSize(pageSize);
 		},
-		[setPage, setPageSize]
+		[setPage, setPageSize],
 	);
 	/** 获取分析结果列表数据 */
 	const getAnalysisListPage = useCallback(() => {
@@ -51,14 +51,14 @@ export default function AnalysisList() {
 		(data) => {
 			return servicAddAnalysisListRecord(data).then(getAnalysisListPage);
 		},
-		[getAnalysisListPage]
+		[getAnalysisListPage],
 	);
 	/** 完成编辑分析结果记录 */
 	const handleOnAnalysisFormEditOk = useCallback(
 		(record, data) => {
 			return serviceUpdateAnalysisListRecord(record.id, data).then(getAnalysisListPage);
 		},
-		[getAnalysisListPage]
+		[getAnalysisListPage],
 	);
 	/** 点击编辑分析结果记录 */
 	const handleEditAnalysisRecord = useCallback((record) => {
@@ -73,7 +73,7 @@ export default function AnalysisList() {
 		(record) => {
 			serviceDeleteAnalysisListRecord(record.id).then(getAnalysisListPage);
 		},
-		[getAnalysisListPage]
+		[getAnalysisListPage],
 	);
 
 	useEffect(() => {

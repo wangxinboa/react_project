@@ -1,4 +1,4 @@
-import { RootFolder } from "../../../../utils/utils.js";
+import RootFolder from "../root_folder.js";
 import { createCodeMessage } from "./code_file_code_message.js";
 import CodeFolder from "./code_folder.js";
 import CodeFile from "./code_file.js";

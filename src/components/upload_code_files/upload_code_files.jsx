@@ -1,12 +1,12 @@
 import { forwardRef, useState, useCallback, useImperativeHandle } from "react";
 import { Modal, Button, Select, message } from "antd";
-import CFileUpload from "../../../../../components/file_upload_button/file_upload_button.jsx";
+import { CFileUpload } from "../file_upload_button/file_upload_button.jsx";
 
 import styles from "./upload_code_files.module.scss";
 
-const AnalysisResultSettingHandleOnOKMessageKey = "AnalysisResultSettingHandleOnOKMessageKey";
+const UploadCodeFilesOKMessageKey = "UploadCodeFilesOKMessageKey";
 
-const UploadCodeFiles = forwardRef((props, ref) => {
+export const UploadCodeFiles = forwardRef((props, ref) => {
 	const { onOk, autoCloseOnOk = true } = props;
 
 	const [visible, setVisible] = useState(false);
@@ -20,7 +20,7 @@ const UploadCodeFiles = forwardRef((props, ref) => {
 	const handleOnModalOK = useCallback(async () => {
 		if (needFiles.length === 0) {
 			message.warning({
-				key: AnalysisResultSettingHandleOnOKMessageKey,
+				key: UploadCodeFilesOKMessageKey,
 				content: "请选择需要解析的文件",
 			});
 		} else {
@@ -51,7 +51,7 @@ const UploadCodeFiles = forwardRef((props, ref) => {
 					value: suffix,
 					label: suffix,
 				};
-			})
+			}),
 		);
 		setNeedFiles([]);
 		setAllFiles([...files]);
@@ -61,7 +61,7 @@ const UploadCodeFiles = forwardRef((props, ref) => {
 		(e) => {
 			onAddFiles(e.target.files);
 		},
-		[onAddFiles]
+		[onAddFiles],
 	);
 	/** 选择指定后缀的文件数组 */
 	const onSetNeedFilesSuffixes = useCallback(
@@ -77,23 +77,19 @@ const UploadCodeFiles = forwardRef((props, ref) => {
 			}
 			setNeedFiles(newNeedFiles);
 		},
-		[allFiles]
+		[allFiles],
 	);
 
-	useImperativeHandle(
-		ref,
-		() => {
-			return {
-				startUpload() {
-					setVisible(true);
-				},
-				endUpload() {
-					setVisible(false);
-				},
-			};
-		},
-		[]
-	);
+	useImperativeHandle(ref, () => {
+		return {
+			startUpload() {
+				setVisible(true);
+			},
+			endUpload() {
+				setVisible(false);
+			},
+		};
+	}, []);
 
 	return (
 		<Modal title={"代码文件上传"} centered={true} open={visible} onOk={handleOnModalOK} onCancel={handleOnModalCancel}>
@@ -127,5 +123,3 @@ const UploadCodeFiles = forwardRef((props, ref) => {
 		</Modal>
 	);
 });
-
-export default UploadCodeFiles;

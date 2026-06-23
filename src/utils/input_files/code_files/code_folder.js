@@ -1,4 +1,4 @@
-import { Folder } from "../../../../utils/utils.js";
+import Folder from "../folder.js";
 
 export default class CodeFolder extends Folder {
 	selectable = false;

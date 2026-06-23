@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
 import { message } from "antd";
 
-import createCodeFilesTreeByFileList from "../../code_files/create_code_files_tree_by_file_list.js";
-import RootCodeFolder from "../../code_files/root_code_folder.js";
+import { createCodeFilesTreeByFileList } from "../../../../../utils/input_files/code_files/create_code_files_tree_by_file_list.js";
+import RootCodeFolder from "../../../../../utils/input_files/code_files/root_code_folder.js";
 
 export default function useCodeFilesTree(setSelectedCodeStructByCodeFile) {
 	// code file
@@ -24,7 +24,7 @@ export default function useCodeFilesTree(setSelectedCodeStructByCodeFile) {
 
 			setSelectedCodeStructByCodeFile(_selectedCodeFile);
 		},
-		[setSelectedCodeStructByCodeFile]
+		[setSelectedCodeStructByCodeFile],
 	);
 	/** 根据解析上传文件生成的 rootFolder 初始化 code files */
 	const initCodeFilesByRootFolder = useCallback((_rootCodeFolder) => {
@@ -43,7 +43,7 @@ export default function useCodeFilesTree(setSelectedCodeStructByCodeFile) {
 		(files) => {
 			return createCodeFilesTreeByFileList(files).readFilesAsText().then(initCodeFilesByRootFolder);
 		},
-		[initCodeFilesByRootFolder]
+		[initCodeFilesByRootFolder],
 	);
 	/** 根据 service 接口信息初始化 code files */
 	const initCodeFilesByService = useCallback(
@@ -65,7 +65,7 @@ export default function useCodeFilesTree(setSelectedCodeStructByCodeFile) {
 			window.rootCodeFolder = rootCodeFolder;
 			return rootCodeFolder;
 		},
-		[onSetCodeFilesTreeSelectedKeys]
+		[onSetCodeFilesTreeSelectedKeys],
 	);
 	/** 根据 code files 生成对应 service 接口数据格式 */
 	const createServiceDataByCodeFiles = useCallback(() => {

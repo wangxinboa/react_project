@@ -1,6 +1,6 @@
 import styles from "./file_upload_button.module.scss";
 
-export default function CFileUpload(props = {}) {
+export function CFileUpload(props = {}) {
 	const { onInput, webkitdirectory = null, multiple = null } = props;
 
 	return (
