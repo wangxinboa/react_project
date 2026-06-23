@@ -7,29 +7,38 @@ import CodeFunctionStack from "../pages/code_function_stack/code_function_stack.
 export const history = createHashHistory();
 
 export const IndexPage = {
-	Path: "/",
-	Component: AnalysisList,
+	key: "/",
+	Com: AnalysisList,
 };
 
-export const AnalysisListPage = {
-	Path: "/JsCodeAnalysisList",
-	Component: AnalysisList,
-};
-
-export const JsCodeAnalysisResultPage = {
-	Path: "/JsCodeAnalysisResult",
-	Component: JsCodeAnalysisResult,
+export const AnalysisPage = {
+	key: "/Analysis",
+	label: "代码分析",
+	children: [
+		{
+			key: "JsCodeAnalysisList",
+			path: "/Analysis/JsCodeAnalysisList",
+			label: "代码分析列表",
+			Com: AnalysisList,
+		},
+		{
+			key: "JsCodeAnalysisResult",
+			path: "/Analysis/JsCodeAnalysisResult",
+			label: "代码分析结果",
+			Com: JsCodeAnalysisResult,
+		},
+	],
 };
 
 export const CodeFunctionStackPage = {
-	Path: "/CodeFunctionStack",
-	Component: CodeFunctionStack,
+	key: "/CodeFunctionStack",
+	label: "代码函数栈",
+	Com: CodeFunctionStack,
 };
 
 export function toAnalysisContentPage(name, url) {
-	history.push(`${JsCodeAnalysisResultPage.Path}?analysis_name=${name}&analysis_url=${url}`);
+	history.push(`${AnalysisPage.children[0].key}?analysis_name=${name}&analysis_url=${url}`);
 }
 
-const Pages = [IndexPage, AnalysisListPage, JsCodeAnalysisResultPage, CodeFunctionStackPage];
-
-export default Pages;
+export const Pages = [IndexPage, AnalysisPage, CodeFunctionStackPage];
+export const PagesItems = [AnalysisPage, CodeFunctionStackPage];
