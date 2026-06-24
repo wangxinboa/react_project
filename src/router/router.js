@@ -1,5 +1,3 @@
-// src/router/router.js
-
 import { createHashHistory } from "history";
 
 import AnalysisList from "../pages/js_code_analysis/analysis_list/analysis_list.jsx";

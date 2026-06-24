@@ -1,5 +1,3 @@
-// src/pages/project_manager/project_list.jsx
-
 import { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import { Button, Table, Pagination, Popconfirm, message } from "antd";
 import { usePagination } from "../../hooks/use_pagination.js";
@@ -87,6 +85,11 @@ export function ProjectList() {
 		projectFormRef.current.startEditProject(record);
 	}, []);
 
+	/** 打开查看项目对话框 */
+	const handleView = useCallback((record) => {
+		projectFormRef.current.startViewProject(record);
+	}, []);
+
 	// ---------- 导入/导出 ----------
 	/**
 	 * 导出项目列表为 JSON 文件
@@ -149,13 +152,29 @@ export function ProjectList() {
 				title: "仓库地址",
 				dataIndex: "gitUrl",
 				key: "gitUrl",
-				width: 200,
+				width: 150,
+				render: (text) =>
+					text ? (
+						<a href={text} target="_blank" rel="noopener noreferrer">
+							仓库地址
+						</a>
+					) : (
+						"-"
+					),
 			},
 			{
 				title: "O2 地址",
 				dataIndex: "o2Url",
 				key: "o2Url",
-				width: 200,
+				width: 150,
+				render: (text) =>
+					text ? (
+						<a href={text} target="_blank" rel="noopener noreferrer">
+							O2 地址
+						</a>
+					) : (
+						"-"
+					),
 			},
 			{
 				title: "关联需求数",
@@ -167,11 +186,14 @@ export function ProjectList() {
 			{
 				title: "操作",
 				key: "operation",
-				width: 180,
+				width: 240,
 				fixed: "end",
 				render: (_, record) => {
 					return (
 						<div style={{ width: "100%", height: "100%" }}>
+							<Button type="text" onClick={() => handleView(record)}>
+								查看
+							</Button>
 							<Button type="text" onClick={() => handleEdit(record)}>
 								编辑
 							</Button>
@@ -190,7 +212,7 @@ export function ProjectList() {
 				},
 			},
 		];
-	}, [handleEdit, handleDelete]);
+	}, [handleView, handleEdit, handleDelete]);
 
 	// ---------- 初始化数据 ----------
 	useEffect(() => {

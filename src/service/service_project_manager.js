@@ -1,5 +1,3 @@
-// src/service/service_project_manager.js
-
 import { dbManager } from "../utils/indexeddb/indexed_db_manager.js";
 
 /** 数据库名称 */

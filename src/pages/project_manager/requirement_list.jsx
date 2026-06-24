@@ -95,12 +95,33 @@ export function RequirementList() {
 		requirementFormRef.current.startEditRequirement(record);
 	}, []);
 
+	/** 打开查看需求对话框 */
+	const handleView = useCallback((record) => {
+		requirementFormRef.current.startViewRequirement(record);
+	}, []);
+
 	// ---------- 表格列定义 ----------
 	const columns = useMemo(() => {
 		const projectMap = {};
 		for (let i = 0; i < allProjects.length; i++) {
 			projectMap[allProjects[i].id] = allProjects[i].name;
 		}
+
+		/**
+		 * 渲染 URL 列（有值时显示为可点击的列名）
+		 * @param {string} text - URL 值
+		 * @param {string} label - 列名
+		 * @returns {JSX.Element}
+		 */
+		const renderUrl = (text, label) =>
+			text ? (
+				<a href={text} target="_blank" rel="noopener noreferrer">
+					{label}
+				</a>
+			) : (
+				"-"
+			);
+
 		return [
 			{
 				title: "ID",
@@ -128,6 +149,48 @@ export function RequirementList() {
 					}
 					return names.join(", ");
 				},
+			},
+			{
+				title: "Aone 地址",
+				dataIndex: "aoneUrl",
+				key: "aoneUrl",
+				width: 150,
+				render: (text) => renderUrl(text, "Aone 地址"),
+			},
+			{
+				title: "PRD 地址",
+				dataIndex: "prdUrl",
+				key: "prdUrl",
+				width: 150,
+				render: (text) => renderUrl(text, "PRD 地址"),
+			},
+			{
+				title: "设计稿地址",
+				dataIndex: "designUrl",
+				key: "designUrl",
+				width: 150,
+				render: (text) => renderUrl(text, "设计稿地址"),
+			},
+			{
+				title: "效果测试地址",
+				dataIndex: "testUrl",
+				key: "testUrl",
+				width: 150,
+				render: (text) => renderUrl(text, "效果测试地址"),
+			},
+			{
+				title: "代码 CR 地址",
+				dataIndex: "crUrl",
+				key: "crUrl",
+				width: 150,
+				render: (text) => renderUrl(text, "代码 CR 地址"),
+			},
+			{
+				title: "迭代地址",
+				dataIndex: "iterationUrl",
+				key: "iterationUrl",
+				width: 150,
+				render: (text) => renderUrl(text, "迭代地址"),
 			},
 			{
 				title: "状态",
@@ -167,11 +230,14 @@ export function RequirementList() {
 				title: "操作",
 				key: "operation",
 				dataIndex: "operation",
-				width: 180,
+				width: 240,
 				fixed: "end",
 				render: (_, record) => {
 					return (
 						<div style={{ width: "100%", height: "100%" }}>
+							<Button type="text" onClick={() => handleView(record)}>
+								查看
+							</Button>
 							<Button type="text" onClick={() => handleEdit(record)}>
 								编辑
 							</Button>
@@ -190,20 +256,15 @@ export function RequirementList() {
 				},
 			},
 		];
-	}, [allProjects, handleEdit, handleDelete]);
+	}, [allProjects, handleView, handleEdit, handleDelete]);
 
 	// ---------- 初始化数据 ----------
 	useEffect(() => {
 		serviceGetProjectListPage(1, 1).then((res) => {
-			if (res.total === 0) {
-				fetchRequirementList();
-				fetchAllProjects();
-			} else {
-				fetchRequirementList();
-				fetchAllProjects();
-			}
+			fetchRequirementList();
+			fetchAllProjects();
 		});
-		// eslint-disable-next-line
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (

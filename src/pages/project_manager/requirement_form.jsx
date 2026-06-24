@@ -2,13 +2,14 @@
 
 import { forwardRef, useCallback, useImperativeHandle, useState, useMemo } from "react";
 import { Modal, Form, Input, Select, DatePicker } from "antd";
-import dayjs from "dayjs"; // 新增导入
+import dayjs from "dayjs";
 import { ModalStatusTypeEnum } from "../../utils/global_constant.js";
 import {
 	RequirementFormItemNames,
 	RequirementFormItemLabels,
 	RequirementStatusEnum,
 } from "../../service/service_project_manager.js";
+import { UrlFormItem } from "../../components/url_form_item/url_form_item.jsx";
 
 import styles from "./project_manager.module.scss";
 
@@ -17,7 +18,16 @@ const { Option } = Select;
 const labelCol = { flex: "110px" };
 
 /**
- * 需求管理 - 新增/编辑需求表单组件
+ * 标题映射（避免嵌套三目）
+ */
+const MODAL_TITLE_MAP = {
+	[ModalStatusTypeEnum.Add]: "新增需求",
+	[ModalStatusTypeEnum.Edit]: "编辑需求",
+	[ModalStatusTypeEnum.View]: "查看需求",
+};
+
+/**
+ * 需求管理 - 新增/编辑/查看需求表单组件
  * @component
  * @param {Object} props
  * @param {Function} props.onAddOk - 新增成功回调，参数为表单数据
@@ -33,6 +43,9 @@ export const RequirementForm = forwardRef((props, ref) => {
 
 	const isAdd = status === ModalStatusTypeEnum.Add;
 	const isEdit = status === ModalStatusTypeEnum.Edit;
+	const isView = status === ModalStatusTypeEnum.View;
+
+	const modalTitle = MODAL_TITLE_MAP[status] || "";
 
 	/**
 	 * 生成项目下拉选项
@@ -50,12 +63,41 @@ export const RequirementForm = forwardRef((props, ref) => {
 	}, [projects]);
 
 	/**
+	 * 填充需求表单数据
+	 * @param {Object} data - 需求数据
+	 */
+	const setRequirementFormValues = useCallback(
+		(data) => {
+			form.setFieldsValue({
+				[RequirementFormItemNames.name]: data.name,
+				[RequirementFormItemNames.projectIds]: data.projectIds,
+				[RequirementFormItemNames.aoneUrl]: data.aoneUrl,
+				[RequirementFormItemNames.prdUrl]: data.prdUrl,
+				[RequirementFormItemNames.designUrl]: data.designUrl,
+				[RequirementFormItemNames.testUrl]: data.testUrl,
+				[RequirementFormItemNames.crUrl]: data.crUrl,
+				[RequirementFormItemNames.iterationUrl]: data.iterationUrl,
+				[RequirementFormItemNames.devTime]: data.devTime ? dayjs(data.devTime) : null,
+				[RequirementFormItemNames.testTime]: data.testTime ? dayjs(data.testTime) : null,
+				[RequirementFormItemNames.onlineTime]: data.onlineTime ? dayjs(data.onlineTime) : null,
+				[RequirementFormItemNames.comment]: data.comment,
+				[RequirementFormItemNames.status]: data.status,
+			});
+		},
+		[form],
+	);
+
+	/**
 	 * 确认按钮回调
 	 * @returns {void}
 	 */
 	const handleOnOk = useCallback(() => {
+		if (isView) {
+			setVisible(false);
+			form.resetFields();
+			return;
+		}
 		form.validateFields().then((values) => {
-			// 日期格式转换
 			const formData = { ...values };
 			if (formData.devTime) formData.devTime = formData.devTime.format("YYYY-MM-DD");
 			if (formData.testTime) formData.testTime = formData.testTime.format("YYYY-MM-DD");
@@ -69,7 +111,7 @@ export const RequirementForm = forwardRef((props, ref) => {
 			setVisible(false);
 			form.resetFields();
 		});
-	}, [form, isAdd, isEdit, onAddOk, onEditOk, record]);
+	}, [form, isAdd, isEdit, isView, onAddOk, onEditOk, record]);
 
 	/**
 	 * 取消按钮回调
@@ -86,9 +128,6 @@ export const RequirementForm = forwardRef((props, ref) => {
 	useImperativeHandle(
 		ref,
 		() => ({
-			/**
-			 * 打开新增需求对话框
-			 */
 			startAddRequirement() {
 				setStatus(ModalStatusTypeEnum.Add);
 				setVisible(true);
@@ -97,109 +136,140 @@ export const RequirementForm = forwardRef((props, ref) => {
 					[RequirementFormItemNames.status]: RequirementStatusEnum.pending,
 				});
 			},
-			/**
-			 * 打开编辑需求对话框
-			 * @param {Object} record - 要编辑的需求数据
-			 */
 			startEditRequirement(record) {
 				setStatus(ModalStatusTypeEnum.Edit);
 				setRecord(record);
-				form.setFieldsValue({
-					[RequirementFormItemNames.name]: record.name,
-					[RequirementFormItemNames.projectIds]: record.projectIds,
-					[RequirementFormItemNames.aoneUrl]: record.aoneUrl,
-					[RequirementFormItemNames.prdUrl]: record.prdUrl,
-					[RequirementFormItemNames.designUrl]: record.designUrl,
-					[RequirementFormItemNames.testUrl]: record.testUrl,
-					[RequirementFormItemNames.crUrl]: record.crUrl,
-					[RequirementFormItemNames.iterationUrl]: record.iterationUrl,
-					[RequirementFormItemNames.devTime]: record.devTime ? dayjs(record.devTime) : null,
-					[RequirementFormItemNames.testTime]: record.testTime ? dayjs(record.testTime) : null,
-					[RequirementFormItemNames.onlineTime]: record.onlineTime ? dayjs(record.onlineTime) : null,
-					[RequirementFormItemNames.comment]: record.comment,
-					[RequirementFormItemNames.status]: record.status,
-				});
+				setRequirementFormValues(record);
+				setVisible(true);
+			},
+			startViewRequirement(record) {
+				setStatus(ModalStatusTypeEnum.View);
+				setRecord(record);
+				setRequirementFormValues(record);
 				setVisible(true);
 			},
 		}),
-		[form],
+		[form, setRequirementFormValues],
 	);
+
+	// 提取所有 URL 字段值
+	const aoneUrl = record ? record.aoneUrl : "";
+	const prdUrl = record ? record.prdUrl : "";
+	const designUrl = record ? record.designUrl : "";
+	const testUrl = record ? record.testUrl : "";
+	const crUrl = record ? record.crUrl : "";
+	const iterationUrl = record ? record.iterationUrl : "";
 
 	return (
 		<Modal
 			className={styles.requirementFormWrapper}
-			title={`${isAdd ? "新增" : "编辑"}需求`}
+			title={modalTitle}
 			open={visible}
 			onOk={handleOnOk}
 			onCancel={handleOnCancel}
 			width={700}
 			centered
+			okButtonProps={{ style: isView ? { display: "none" } : {} }}
+			cancelText={isView ? "关闭" : "取消"}
 		>
 			<Form className={styles.requirementForm} form={form} labelCol={labelCol}>
 				<Form.Item
 					name={RequirementFormItemNames.name}
 					label={RequirementFormItemLabels.name}
-					rules={[{ required: true }]}
+					rules={[{ required: !isView }]}
 				>
-					<Input />
+					{isView ? <span>{record ? record.name : ""}</span> : <Input />}
 				</Form.Item>
 				<Form.Item name={RequirementFormItemNames.projectIds} label={RequirementFormItemLabels.projectIds}>
-					<Select mode="multiple" placeholder="请选择关联项目" options={projectOptions} />
+					{isView ? (
+						<span>
+							{record && record.projectIds && record.projectIds.length > 0
+								? projectOptions
+										.filter((opt) => record.projectIds.includes(opt.value))
+										.map((opt) => opt.label)
+										.join(", ")
+								: "未关联"}
+						</span>
+					) : (
+						<Select mode="multiple" placeholder="请选择关联项目" options={projectOptions} />
+					)}
 				</Form.Item>
-				<Form.Item name={RequirementFormItemNames.aoneUrl} label={RequirementFormItemLabels.aoneUrl}>
-					<Input />
-				</Form.Item>
-				<Form.Item name={RequirementFormItemNames.prdUrl} label={RequirementFormItemLabels.prdUrl}>
-					<Input />
-				</Form.Item>
-				<Form.Item name={RequirementFormItemNames.designUrl} label={RequirementFormItemLabels.designUrl}>
-					<Input />
-				</Form.Item>
-				<Form.Item name={RequirementFormItemNames.testUrl} label={RequirementFormItemLabels.testUrl}>
-					<Input />
-				</Form.Item>
-				<Form.Item name={RequirementFormItemNames.crUrl} label={RequirementFormItemLabels.crUrl}>
-					<Input />
-				</Form.Item>
-				<Form.Item name={RequirementFormItemNames.iterationUrl} label={RequirementFormItemLabels.iterationUrl}>
-					<Input />
-				</Form.Item>
+				<UrlFormItem
+					isView={isView}
+					url={aoneUrl}
+					name={RequirementFormItemNames.aoneUrl}
+					label={RequirementFormItemLabels.aoneUrl}
+				/>
+				<UrlFormItem
+					isView={isView}
+					url={prdUrl}
+					name={RequirementFormItemNames.prdUrl}
+					label={RequirementFormItemLabels.prdUrl}
+				/>
+				<UrlFormItem
+					isView={isView}
+					url={designUrl}
+					name={RequirementFormItemNames.designUrl}
+					label={RequirementFormItemLabels.designUrl}
+				/>
+				<UrlFormItem
+					isView={isView}
+					url={testUrl}
+					name={RequirementFormItemNames.testUrl}
+					label={RequirementFormItemLabels.testUrl}
+				/>
+				<UrlFormItem
+					isView={isView}
+					url={crUrl}
+					name={RequirementFormItemNames.crUrl}
+					label={RequirementFormItemLabels.crUrl}
+				/>
+				<UrlFormItem
+					isView={isView}
+					url={iterationUrl}
+					name={RequirementFormItemNames.iterationUrl}
+					label={RequirementFormItemLabels.iterationUrl}
+				/>
 				<Form.Item
 					name={RequirementFormItemNames.devTime}
 					label={RequirementFormItemLabels.devTime}
-					rules={[{ required: true }]}
+					rules={[{ required: !isView }]}
 				>
-					<DatePicker />
+					{isView ? <span>{record ? record.devTime : ""}</span> : <DatePicker />}
 				</Form.Item>
 				<Form.Item
 					name={RequirementFormItemNames.testTime}
 					label={RequirementFormItemLabels.testTime}
-					rules={[{ required: true }]}
+					rules={[{ required: !isView }]}
 				>
-					<DatePicker />
+					{isView ? <span>{record ? record.testTime : ""}</span> : <DatePicker />}
 				</Form.Item>
 				<Form.Item
 					name={RequirementFormItemNames.onlineTime}
 					label={RequirementFormItemLabels.onlineTime}
-					rules={[{ required: true }]}
+					rules={[{ required: !isView }]}
 				>
-					<DatePicker />
+					{isView ? <span>{record ? record.onlineTime : ""}</span> : <DatePicker />}
 				</Form.Item>
 				<Form.Item
 					name={RequirementFormItemNames.status}
 					label={RequirementFormItemLabels.status}
-					rules={[{ required: true }]}
+					rules={[{ required: !isView }]}
 				>
-					<Select>
-						<Option value={RequirementStatusEnum.pending}>{RequirementStatusEnum.pending}</Option>
-						<Option value={RequirementStatusEnum.developing}>{RequirementStatusEnum.developing}</Option>
-						<Option value={RequirementStatusEnum.debugging}>{RequirementStatusEnum.debugging}</Option>
-						<Option value={RequirementStatusEnum.testing}>{RequirementStatusEnum.testing}</Option>
-						<Option value={RequirementStatusEnum.online}>{RequirementStatusEnum.online}</Option>
-					</Select>
+					{isView ? (
+						<span>{record ? record.status : ""}</span>
+					) : (
+						<Select>
+							<Option value={RequirementStatusEnum.pending}>{RequirementStatusEnum.pending}</Option>
+							<Option value={RequirementStatusEnum.developing}>{RequirementStatusEnum.developing}</Option>
+							<Option value={RequirementStatusEnum.debugging}>{RequirementStatusEnum.debugging}</Option>
+							<Option value={RequirementStatusEnum.testing}>{RequirementStatusEnum.testing}</Option>
+							<Option value={RequirementStatusEnum.online}>{RequirementStatusEnum.online}</Option>
+						</Select>
+					)}
 				</Form.Item>
 				<Form.Item name={RequirementFormItemNames.comment} label={RequirementFormItemLabels.comment}>
-					<TextArea rows={3} />
+					{isView ? <span>{record ? record.comment : ""}</span> : <TextArea rows={3} />}
 				</Form.Item>
 			</Form>
 		</Modal>

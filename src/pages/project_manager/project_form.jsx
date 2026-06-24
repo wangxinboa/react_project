@@ -1,12 +1,24 @@
+// src/pages/project_manager/project_form.jsx
+
 import { forwardRef, useCallback, useImperativeHandle, useState } from "react";
 import { Modal, Form, Input } from "antd";
 import { ModalStatusTypeEnum } from "../../utils/global_constant.js";
 import { ProjectFormItemNames, ProjectFormItemLabels } from "../../service/service_project_manager.js";
+import { UrlFormItem } from "../../components/url_form_item/url_form_item.jsx";
 
 const labelCol = { flex: "110px" };
 
 /**
- * 项目管理 - 新增/编辑项目表单组件
+ * 标题映射（避免嵌套三目）
+ */
+const MODAL_TITLE_MAP = {
+	[ModalStatusTypeEnum.Add]: "新增项目",
+	[ModalStatusTypeEnum.Edit]: "编辑项目",
+	[ModalStatusTypeEnum.View]: "查看项目",
+};
+
+/**
+ * 项目管理 - 新增/编辑/查看项目表单组件
  * @component
  * @param {Object} props
  * @param {Function} props.onAddOk - 新增成功回调，参数为表单数据
@@ -21,12 +33,36 @@ export const ProjectForm = forwardRef((props, ref) => {
 
 	const isAdd = status === ModalStatusTypeEnum.Add;
 	const isEdit = status === ModalStatusTypeEnum.Edit;
+	const isView = status === ModalStatusTypeEnum.View;
+
+	const modalTitle = MODAL_TITLE_MAP[status] || "";
+
+	/**
+	 * 填充项目表单数据
+	 * @param {Object} data - 项目数据
+	 */
+	const setProjectFormValues = useCallback(
+		(data) => {
+			form.setFieldsValue({
+				[ProjectFormItemNames.name]: data.name,
+				[ProjectFormItemNames.gitUrl]: data.gitUrl,
+				[ProjectFormItemNames.o2Url]: data.o2Url,
+				[ProjectFormItemNames.comment]: data.comment,
+			});
+		},
+		[form],
+	);
 
 	/**
 	 * 确认按钮回调
 	 * @returns {void}
 	 */
 	const handleOnOk = useCallback(() => {
+		if (isView) {
+			setVisible(false);
+			form.resetFields();
+			return;
+		}
 		const formValues = form.getFieldsValue();
 		if (isAdd) {
 			onAddOk(formValues);
@@ -35,7 +71,7 @@ export const ProjectForm = forwardRef((props, ref) => {
 		}
 		setVisible(false);
 		form.resetFields();
-	}, [form, isAdd, isEdit, onAddOk, onEditOk, record]);
+	}, [form, isAdd, isEdit, isView, onAddOk, onEditOk, record]);
 
 	/**
 	 * 取消按钮回调
@@ -52,53 +88,59 @@ export const ProjectForm = forwardRef((props, ref) => {
 	useImperativeHandle(
 		ref,
 		() => ({
-			/**
-			 * 打开新增项目对话框
-			 */
 			startAddProject() {
 				setStatus(ModalStatusTypeEnum.Add);
 				setVisible(true);
 				form.resetFields();
 			},
-			/**
-			 * 打开编辑项目对话框
-			 * @param {Object} record - 要编辑的项目数据
-			 */
 			startEditProject(record) {
 				setStatus(ModalStatusTypeEnum.Edit);
 				setRecord(record);
-				form.setFieldsValue({
-					[ProjectFormItemNames.name]: record.name,
-					[ProjectFormItemNames.gitUrl]: record.gitUrl,
-					[ProjectFormItemNames.o2Url]: record.o2Url,
-					[ProjectFormItemNames.comment]: record.comment,
-				});
+				setProjectFormValues(record);
+				setVisible(true);
+			},
+			startViewProject(record) {
+				setStatus(ModalStatusTypeEnum.View);
+				setRecord(record);
+				setProjectFormValues(record);
 				setVisible(true);
 			},
 		}),
-		[form],
+		[form, setProjectFormValues],
 	);
+
+	// 提取链接值，避免在 JSX 中重复访问 record
+	const gitUrl = record ? record.gitUrl : "";
+	const o2Url = record ? record.o2Url : "";
 
 	return (
 		<Modal
 			style={{ display: "flex", flexDirection: "column" }}
-			title={`${isAdd ? "新增" : "编辑"}项目`}
+			title={modalTitle}
 			open={visible}
 			onOk={handleOnOk}
 			onCancel={handleOnCancel}
+			okButtonProps={{ style: isView ? { display: "none" } : {} }}
+			cancelText={isView ? "关闭" : "取消"}
 		>
 			<Form form={form} labelCol={labelCol}>
-				<Form.Item name={ProjectFormItemNames.name} label={ProjectFormItemLabels.name} rules={[{ required: true }]}>
-					<Input />
+				<Form.Item name={ProjectFormItemNames.name} label={ProjectFormItemLabels.name} rules={[{ required: !isView }]}>
+					{isView ? <span>{record ? record.name : ""}</span> : <Input />}
 				</Form.Item>
-				<Form.Item name={ProjectFormItemNames.gitUrl} label={ProjectFormItemLabels.gitUrl} rules={[{ required: true }]}>
-					<Input />
-				</Form.Item>
-				<Form.Item name={ProjectFormItemNames.o2Url} label={ProjectFormItemLabels.o2Url}>
-					<Input />
-				</Form.Item>
+				<UrlFormItem
+					isView={isView}
+					url={gitUrl}
+					name={ProjectFormItemNames.gitUrl}
+					label={ProjectFormItemLabels.gitUrl}
+				/>
+				<UrlFormItem
+					isView={isView}
+					url={o2Url}
+					name={ProjectFormItemNames.o2Url}
+					label={ProjectFormItemLabels.o2Url}
+				/>
 				<Form.Item name={ProjectFormItemNames.comment} label={ProjectFormItemLabels.comment}>
-					<Input.TextArea rows={3} />
+					{isView ? <span>{record ? record.comment : ""}</span> : <Input.TextArea rows={3} />}
 				</Form.Item>
 			</Form>
 		</Modal>
