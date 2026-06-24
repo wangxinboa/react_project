@@ -6,27 +6,25 @@ export default class CodeFile extends File {
 
 	destroy() {
 		this.codeFilesMap = this.codeMessage = null;
-
 		super.destroy();
 	}
 
 	setCodeFilesMap(_codeFilesMap) {
 		this.codeFilesMap = _codeFilesMap;
 		this.codeFilesMap[this.key] = this;
-
 		return this;
 	}
+
 	setCodeMessage(_codeMessage) {
 		this.codeMessage = _codeMessage;
-
 		return this;
 	}
 
 	getPathByRelative(relativePath) {
 		const currentDir = this.key.split("/").slice(0, -1);
 		const importParts = relativePath.split("/");
-
-		for (const part of importParts) {
+		for (let i = 0, len = importParts.length; i < len; i++) {
+			const part = importParts[i];
 			if (part === ".") {
 				continue;
 			} else if (part === "..") {
@@ -37,13 +35,13 @@ export default class CodeFile extends File {
 				currentDir.push(part);
 			}
 		}
-
 		return currentDir.join("/");
 	}
 
 	getCodeFileByRelativePath(relativePath) {
 		return this.getCodeFileByPath(this.getPathByRelative(relativePath)) ?? null;
 	}
+
 	getCodeFileByPath(path) {
 		return this.codeFilesMap[path] ?? null;
 	}
@@ -52,8 +50,7 @@ export default class CodeFile extends File {
 		return {
 			isFile: true,
 			key: this.key,
-			name: this.name,
-
+			title: this.title,
 			codeMessage: this.codeMessage,
 		};
 	}

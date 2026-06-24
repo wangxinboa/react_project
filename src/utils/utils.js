@@ -5,4 +5,4 @@ export { default as RootFolder } from "./input_files/root_folder.js";
 
 export { default as getQuery } from "./url/get_query.js";
 
-export { default as downloadJSON } from "./download/download.js";
+export { downloadJSON } from "./download/download.js";

@@ -5,16 +5,14 @@ export default class CodeFolder extends Folder {
 
 	destroy() {
 		this.selectable = null;
-
 		super.destroy();
 	}
 
 	toJSON() {
 		return {
 			isFolder: true,
-
 			key: this.key,
-			name: this.name,
+			title: this.title,
 			children: this.children,
 			selectable: false,
 		};

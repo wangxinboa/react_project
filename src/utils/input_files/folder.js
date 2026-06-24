@@ -9,7 +9,7 @@ function defaultFolderSort(fileA, fileB) {
 	} else if (fileA.isFile && fileB.isFolder) {
 		return 1;
 	} else {
-		return collator.compare(fileA.name, fileB.name);
+		return collator.compare(fileA.title, fileB.title);
 	}
 }
 
@@ -17,28 +17,20 @@ export default class Folder {
 	constructor() {
 		this.type = "folder";
 		this.isFolder = true;
-
-		// this.key = void 0;
-		// this.name = void 0;
-
+		this.key = "";
+		this.title = "";
 		this.folders = [];
-		this.foldersMap = new Map();
-
+		this.foldersMap = {};
 		this.files = [];
-		this.filesMap = new Map();
-
+		this.filesMap = {};
 		this.parent = null;
 		this.children = [];
 	}
 
 	destroy() {
-		this.foldersMap.clear();
-		this.filesMap.clear();
-
 		for (let i = 0, len = this.children.length; i < len; i++) {
 			this.children[i].destroy();
 		}
-
 		this.type =
 			this.isFolder =
 			this.folders =
@@ -48,14 +40,13 @@ export default class Folder {
 			this.parent =
 			this.children =
 			this.key =
-			this.name =
+			this.title =
 				null;
 	}
 
-	init(path, name) {
+	init(path, title) {
 		this.key = path;
-		this.name = name;
-
+		this.title = title;
 		return this;
 	}
 
@@ -63,39 +54,37 @@ export default class Folder {
 		this.parent = parent;
 	}
 
-	hasFolder(name) {
-		return this.foldersMap.has(name);
+	hasFolder(title) {
+		return title in this.foldersMap;
 	}
-	getFolder(name) {
-		return this.foldersMap.get(name);
+
+	getFolder(title) {
+		return this.foldersMap[title];
 	}
+
 	addFolder(folder) {
 		this.folders.push(folder);
-		this.foldersMap.set(folder.name, folder);
-
+		this.foldersMap[folder.title] = folder;
 		folder.setParent(this);
 		this.children.push(folder);
-
 		this.sort();
-
 		return this;
 	}
 
-	hasFile(name) {
-		return this.filesMap.has(name);
+	hasFile(title) {
+		return title in this.filesMap;
 	}
-	getFile(name) {
-		return this.filesMap.get(name);
+
+	getFile(title) {
+		return this.filesMap[title];
 	}
+
 	addFile(file) {
 		this.files.push(file);
-		this.filesMap.set(file.name, file);
-
+		this.filesMap[file.title] = file;
 		file.setParent(this);
 		this.children.push(file);
-
 		this.sort();
-
 		return this;
 	}
 
@@ -105,7 +94,6 @@ export default class Folder {
 
 	sort(sort) {
 		this.children.sort(sort ?? defaultFolderSort);
-
 		return this;
 	}
 
@@ -113,10 +101,8 @@ export default class Folder {
 		return {
 			type: this.type,
 			isFolder: true,
-
 			key: this.key,
-			name: this.name,
-
+			title: this.title,
 			folders: this.folders,
 			files: this.files,
 			children: this.children,

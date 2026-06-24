@@ -189,7 +189,6 @@ export const UploadCodeFiles = forwardRef((props, ref) => {
 						checkable
 						showLine
 						blockNode
-						fieldNames={{ title: "name", key: "key", children: "children" }}
 						expandedKeys={expandedKeys}
 						checkedKeys={checkedKeys}
 						onExpand={handleOnTreeExpand}
