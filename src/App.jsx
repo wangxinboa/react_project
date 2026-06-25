@@ -2,7 +2,33 @@ import { unstable_HistoryRouter as HistoryRouter, Route, Routes } from "react-ro
 import { Menu } from "antd";
 import { PageItems, MenuItems, history } from "./router/router.js";
 import styles from "./App.module.scss";
-import { useCallback } from "react";
+import { useCallback, useState, useEffect } from "react";
+
+/**
+ * 根据路径获取菜单选中 key 和需要展开的父级 keys
+ * @param {string} pathname - 当前路径
+ * @returns {{ selectedKey: string, openKeys: string[] }}
+ */
+function getMenuState(pathname) {
+	let selectedKey = "";
+	const openKeys = [];
+	for (let i = 0; i < MenuItems.length; i++) {
+		const item = MenuItems[i];
+		if (item.children) {
+			for (let j = 0; j < item.children.length; j++) {
+				if (item.children[j].key === pathname) {
+					selectedKey = item.children[j].key;
+					openKeys.push(item.key);
+					break;
+				}
+			}
+		} else if (item.key === pathname) {
+			selectedKey = item.key;
+		}
+		if (selectedKey) break;
+	}
+	return { selectedKey, openKeys };
+}
 
 function renderRoute(Page) {
 	return (
@@ -15,14 +41,35 @@ function renderRoute(Page) {
 }
 
 export default function App() {
+	const initialPath = history.location.pathname;
+	const initMenuState = getMenuState(initialPath);
+	const [selectedKeys, setSelectedKeys] = useState(initMenuState.selectedKey ? [initMenuState.selectedKey] : []);
+	const [openKeys, setOpenKeys] = useState(initMenuState.openKeys);
+
 	const handleOnClickMenu = useCallback(({ key }) => {
 		history.push(key);
+	}, []);
+
+	useEffect(() => {
+		const unlisten = history.listen(({ location }) => {
+			const { selectedKey, openKeys } = getMenuState(location.pathname);
+			setSelectedKeys(selectedKey ? [selectedKey] : []);
+			setOpenKeys(openKeys);
+		});
+		return unlisten;
 	}, []);
 
 	return (
 		<div className={styles.app}>
 			<div className={styles.menuContainer}>
-				<Menu mode="inline" items={MenuItems} onClick={handleOnClickMenu} />
+				<Menu
+					mode="inline"
+					items={MenuItems}
+					selectedKeys={selectedKeys}
+					openKeys={openKeys}
+					onOpenChange={setOpenKeys}
+					onClick={handleOnClickMenu}
+				/>
 			</div>
 			<div className={styles.content}>
 				<HistoryRouter
