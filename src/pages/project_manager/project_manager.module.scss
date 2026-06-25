@@ -36,3 +36,14 @@
 		height: 100%;
 	}
 }
+
+.cellText {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.operationCell {
+	width: 100%;
+	height: 100%;
+}

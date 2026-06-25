@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState, useEffect } from "react";
-import { Button, Table, Pagination, Popconfirm, message } from "antd";
+import { Button, Table, Pagination, Popconfirm, Tooltip, message } from "antd";
 import dayjs from "dayjs";
 import { usePagination } from "../../hooks/use_pagination.js";
 import { RequirementForm } from "./requirement_form.jsx";
@@ -145,6 +145,11 @@ export function RequirementList() {
 				dataIndex: "name",
 				key: "name",
 				width: 150,
+				render: (text) => (
+					<Tooltip title={text}>
+						<div className={styles.cellText}>{text}</div>
+					</Tooltip>
+				),
 			},
 			{
 				title: "关联项目",
@@ -158,7 +163,12 @@ export function RequirementList() {
 						const name = projectMap[ids[i]];
 						if (name) names.push(name);
 					}
-					return names.join(", ");
+					const fullText = names.join(", ");
+					return (
+						<Tooltip title={fullText}>
+							<div className={styles.cellText}>{fullText}</div>
+						</Tooltip>
+					);
 				},
 			},
 			{
@@ -248,7 +258,7 @@ export function RequirementList() {
 				fixed: "end",
 				render: (_, record) => {
 					return (
-						<div style={{ width: "100%", height: "100%" }}>
+						<div className={styles.operationCell}>
 							<Button type="text" onClick={() => handleView(record)}>
 								查看
 							</Button>

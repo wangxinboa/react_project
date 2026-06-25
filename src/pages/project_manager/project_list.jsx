@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState, useEffect } from "react";
-import { Button, Table, Pagination, Popconfirm, message } from "antd";
+import { Button, Table, Pagination, Popconfirm, Tooltip, Tag, message } from "antd";
 import { usePagination } from "../../hooks/use_pagination.js";
 import { ProjectForm } from "./project_form.jsx";
 import {
@@ -9,13 +9,31 @@ import {
 	serviceDeleteProject,
 	serviceGetAllProjects,
 	serviceImportProjects,
-	serviceCorrectData,
 } from "../../service/project_manager/project_service.js";
-import { serviceImportRequirements } from "../../service/project_manager/project_requirement_service.js";
-import { serviceGetRequirementList } from "../../service/project_manager/project_requirement_service.js";
+import {
+	serviceImportRequirements,
+	serviceGetRequirementList,
+} from "../../service/project_manager/project_requirement_service.js";
+import { RequirementStatusEnum } from "../../service/project_manager/project_manager_constants.js";
 import { downloadJSON } from "../../utils/download/download.js";
 import { CFileUpload } from "../../components/file_upload_button/file_upload_button.jsx";
 import styles from "./project_manager.module.scss";
+
+/**
+ * 根据需求状态返回对应 Tag 颜色
+ * @param {string} status - 需求状态
+ * @returns {string}
+ */
+function getStatusColor(status) {
+	const colorMap = {
+		[RequirementStatusEnum.pending]: "default",
+		[RequirementStatusEnum.developing]: "blue",
+		[RequirementStatusEnum.debugging]: "orange",
+		[RequirementStatusEnum.testing]: "purple",
+		[RequirementStatusEnum.online]: "green",
+	};
+	return colorMap[status] || "default";
+}
 
 /**
  * 项目管理 - 独立页面
@@ -25,6 +43,7 @@ import styles from "./project_manager.module.scss";
 export function ProjectList() {
 	const projectFormRef = useRef(null);
 	const [projectList, setProjectList] = useState([]);
+	const [requirements, setRequirements] = useState([]);
 	const { page, setPage, pageSize, setPageSize, total, setTotal } = usePagination(1, 10);
 
 	/** 获取项目列表（分页） */
@@ -34,6 +53,13 @@ export function ProjectList() {
 			setTotal(res.total);
 		});
 	}, [page, pageSize, setTotal]);
+
+	/** 获取所有需求数据（用于关联显示） */
+	const fetchRequirements = useCallback(() => {
+		serviceGetRequirementList().then((res) => {
+			setRequirements(res.data);
+		});
+	}, []);
 
 	/** 分页变化回调 */
 	const handlePaginationChange = useCallback(
@@ -55,9 +81,10 @@ export function ProjectList() {
 			serviceAddProject(data).then(() => {
 				message.success("项目添加成功");
 				fetchProjectList();
+				fetchRequirements();
 			});
 		},
-		[fetchProjectList],
+		[fetchProjectList, fetchRequirements],
 	);
 
 	/** 编辑项目成功回调 */
@@ -77,9 +104,10 @@ export function ProjectList() {
 			serviceDeleteProject(id).then(() => {
 				message.success("项目删除成功");
 				fetchProjectList();
+				fetchRequirements();
 			});
 		},
-		[fetchProjectList],
+		[fetchProjectList, fetchRequirements],
 	);
 
 	/** 打开编辑项目对话框 */
@@ -109,7 +137,7 @@ export function ProjectList() {
 	}, []);
 
 	/**
-	 * 处理导入文件选择
+	 * 处理导入文件选择（仅支持 { projects, requirements } 格式）
 	 * @param {React.ChangeEvent<HTMLInputElement>} e
 	 */
 	const handleImportFileChange = useCallback(
@@ -120,19 +148,12 @@ export function ProjectList() {
 			reader.onload = (event) => {
 				try {
 					const data = JSON.parse(event.target.result);
-					let projectsToImport = [];
-					let requirementsToImport = [];
-
-					if (Array.isArray(data)) {
-						projectsToImport = data;
-					} else if (typeof data === "object" && data !== null) {
-						if (Array.isArray(data.projects)) {
-							projectsToImport = data.projects;
-						}
-						if (Array.isArray(data.requirements)) {
-							requirementsToImport = data.requirements;
-						}
+					if (typeof data !== "object" || data === null) {
+						message.error("文件格式不正确，需要包含 projects 和 requirements 的对象");
+						return;
 					}
+					const projectsToImport = Array.isArray(data.projects) ? data.projects : [];
+					const requirementsToImport = Array.isArray(data.requirements) ? data.requirements : [];
 
 					if (projectsToImport.length === 0 && requirementsToImport.length === 0) {
 						message.warning("文件中没有找到有效的项目或需求数据");
@@ -141,6 +162,7 @@ export function ProjectList() {
 
 					const importChain =
 						projectsToImport.length > 0 ? serviceImportProjects(projectsToImport) : Promise.resolve({ success: true });
+
 					importChain
 						.then(() => {
 							if (requirementsToImport.length > 0) {
@@ -151,6 +173,7 @@ export function ProjectList() {
 						.then(() => {
 							message.success("导入成功");
 							fetchProjectList();
+							fetchRequirements();
 						})
 						.catch(() => {
 							message.error("导入失败");
@@ -162,23 +185,17 @@ export function ProjectList() {
 			reader.readAsText(file);
 			e.target.value = "";
 		},
-		[fetchProjectList],
+		[fetchProjectList, fetchRequirements],
 	);
-
-	/** 数据校正 */
-	const handleCorrectData = useCallback(() => {
-		serviceCorrectData()
-			.then(() => {
-				message.success("数据校正完成");
-				fetchProjectList();
-			})
-			.catch(() => {
-				message.error("数据校正失败");
-			});
-	}, [fetchProjectList]);
 
 	// ---------- 表格列定义 ----------
 	const columns = useMemo(() => {
+		// 构建需求 ID -> 需求对象 的映射
+		const reqMap = {};
+		for (let i = 0; i < requirements.length; i++) {
+			reqMap[requirements[i].id] = requirements[i];
+		}
+
 		return [
 			{
 				title: "ID",
@@ -192,6 +209,11 @@ export function ProjectList() {
 				dataIndex: "name",
 				key: "name",
 				width: 150,
+				render: (text) => (
+					<Tooltip title={text}>
+						<div className={styles.cellText}>{text}</div>
+					</Tooltip>
+				),
 			},
 			{
 				title: "仓库地址",
@@ -222,20 +244,40 @@ export function ProjectList() {
 					),
 			},
 			{
-				title: "关联需求数",
+				title: "关联未上线需求",
 				dataIndex: "requirementIds",
 				key: "requirementIds",
-				width: 120,
-				render: (ids) => (ids ? ids.length : 0),
+				width: 250,
+				render: (ids) => {
+					if (!ids || ids.length === 0) {
+						return <span>无</span>;
+					}
+					const tags = [];
+					for (let j = 0; j < ids.length; j++) {
+						const req = reqMap[ids[j]];
+						if (req && req.status !== RequirementStatusEnum.online) {
+							const color = getStatusColor(req.status);
+							tags.push(
+								<Tag key={req.id} color={color}>
+									{req.name}
+								</Tag>,
+							);
+						}
+					}
+					if (tags.length === 0) {
+						return <span>无</span>;
+					}
+					return <div>{tags}</div>;
+				},
 			},
 			{
 				title: "操作",
 				key: "operation",
-				width: 300,
+				width: 240,
 				fixed: "end",
 				render: (_, record) => {
 					return (
-						<div style={{ width: "100%", height: "100%" }}>
+						<div className={styles.operationCell}>
 							<Button type="text" onClick={() => handleView(record)}>
 								查看
 							</Button>
@@ -257,10 +299,11 @@ export function ProjectList() {
 				},
 			},
 		];
-	}, [handleView, handleEdit, handleDelete]);
+	}, [requirements, handleView, handleEdit, handleDelete]);
 
 	useEffect(() => {
 		fetchProjectList();
+		fetchRequirements();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -273,7 +316,6 @@ export function ProjectList() {
 					导入项目
 					<CFileUpload onInput={handleImportFileChange} accept=".json" />
 				</Button>
-				<Button onClick={handleCorrectData}>数据校正</Button>
 			</div>
 			<div className={styles.tableWrapper}>
 				<Table
