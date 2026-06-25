@@ -3,6 +3,30 @@ import { Stores, RequirementStatusEnum } from "./project_manager_constants.js";
 import { updateProjectRequirementIds } from "./project_service.js";
 
 /**
+ * 状态优先级映射（数字越小越靠前）
+ * @constant {Object}
+ */
+const StatusPriority = Object.freeze({
+	[RequirementStatusEnum.developing]: 1,
+	[RequirementStatusEnum.debugging]: 2,
+	[RequirementStatusEnum.testing]: 3,
+	[RequirementStatusEnum.pending]: 4,
+	[RequirementStatusEnum.online]: 5,
+});
+
+/**
+ * 比较函数：按状态优先级升序
+ * @param {Object} a - 需求 A
+ * @param {Object} b - 需求 B
+ * @returns {number}
+ */
+function compareByStatusPriority(a, b) {
+	const pA = StatusPriority[a.status] || 99;
+	const pB = StatusPriority[b.status] || 99;
+	return pA - pB;
+}
+
+/**
  * 获取所有需求列表（不分页）
  * @returns {Promise<{data: Array, total: number}>}
  */
@@ -14,13 +38,14 @@ export function serviceGetRequirementList() {
 }
 
 /**
- * 分页获取需求列表
+ * 分页获取需求列表，按状态优先级升序排列
  * @param {number} page - 当前页码（从1开始）
  * @param {number} pageSize - 每页条数
  * @returns {Promise<{data: Array, total: number}>}
  */
 export function serviceGetRequirementListPage(page, pageSize) {
 	return dbManager.getAll(Stores.requirements).then((allRequirements) => {
+		allRequirements.sort(compareByStatusPriority);
 		const start = (page - 1) * pageSize;
 		const end = start + pageSize;
 		const data = [];
@@ -70,7 +95,7 @@ export function serviceAddRequirement(record) {
 /**
  * 更新需求
  * @param {number} id - 需求 ID
- * @param {Object} record - 要更新的字段
+ * @param {Object} record - 要更新的字段（与新增相同，不含 comment）
  * @returns {Promise<{success: boolean}>}
  */
 export function serviceUpdateRequirement(id, record) {

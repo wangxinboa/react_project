@@ -2,6 +2,18 @@ import { dbManager, getNextId } from "./project_manager_db.js";
 import { Stores } from "./project_manager_constants.js";
 
 /**
+ * 比较函数：按关联需求数量降序
+ * @param {Object} a - 项目 A
+ * @param {Object} b - 项目 B
+ * @returns {number}
+ */
+function compareByRequirementCount(a, b) {
+	const lenA = (a.requirementIds && a.requirementIds.length) || 0;
+	const lenB = (b.requirementIds && b.requirementIds.length) || 0;
+	return lenB - lenA;
+}
+
+/**
  * 更新所有需求中对特定项目的引用（添加或移除需求ID）
  * @param {number} requirementId - 需求 ID
  * @param {number[]} projectIds - 关联的项目 ID 数组
@@ -62,13 +74,14 @@ export function serviceGetProjectList() {
 }
 
 /**
- * 分页获取项目列表
+ * 分页获取项目列表，按关联需求数量降序排列
  * @param {number} page - 当前页码（从1开始）
  * @param {number} pageSize - 每页条数
  * @returns {Promise<{data: Array, total: number}>}
  */
 export function serviceGetProjectListPage(page, pageSize) {
 	return dbManager.getAll(Stores.projects).then((allProjects) => {
+		allProjects.sort(compareByRequirementCount);
 		const start = (page - 1) * pageSize;
 		const end = start + pageSize;
 		const data = [];
