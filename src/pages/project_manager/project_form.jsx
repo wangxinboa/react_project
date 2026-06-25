@@ -48,7 +48,6 @@ export const ProjectForm = forwardRef((props, ref) => {
 				[ProjectFormItemNames.name]: data.name,
 				[ProjectFormItemNames.gitUrl]: data.gitUrl,
 				[ProjectFormItemNames.o2Url]: data.o2Url,
-				[ProjectFormItemNames.comment]: data.comment,
 			});
 		},
 		[form],
@@ -145,11 +144,6 @@ export const ProjectForm = forwardRef((props, ref) => {
 					name={ProjectFormItemNames.o2Url}
 					label={ProjectFormItemLabels.o2Url}
 				/>
-				{!(isView && !record?.comment) && (
-					<Form.Item name={ProjectFormItemNames.comment} label={ProjectFormItemLabels.comment}>
-						{isView ? <span>{record.comment}</span> : <Input.TextArea rows={3} />}
-					</Form.Item>
-				)}
 			</Form>
 		</Modal>
 	);

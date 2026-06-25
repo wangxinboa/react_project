@@ -88,13 +88,13 @@ export function serviceGetProjectListPage(page, pageSize) {
  * @param {string} record.name - 项目名称
  * @param {string} record.gitUrl - Git 仓库地址
  * @param {string} [record.o2Url] - O2 地址
- * @param {string} [record.comment] - 注释说明
  * @returns {Promise<{success: boolean}>}
  */
 export function serviceAddProject(record) {
 	return getNextId(Stores.projects).then((id) => {
 		record.id = id;
 		record.createTime = Date.now();
+		delete record.comment;
 		if (!record.requirementIds) {
 			record.requirementIds = [];
 		}
@@ -109,7 +109,6 @@ export function serviceAddProject(record) {
  * @param {string} record.name - 项目名称
  * @param {string} record.gitUrl - Git 仓库地址
  * @param {string} [record.o2Url] - O2 地址
- * @param {string} [record.comment] - 注释说明
  * @returns {Promise<{success: boolean}>}
  */
 export function serviceUpdateProject(id, record) {
@@ -127,7 +126,7 @@ export function serviceUpdateProject(id, record) {
 		target.name = record.name;
 		target.gitUrl = record.gitUrl;
 		target.o2Url = record.o2Url;
-		target.comment = record.comment;
+		// 不再更新 comment 字段
 		return dbManager.put(Stores.projects, target).then(() => ({ success: true }));
 	});
 }
@@ -180,6 +179,7 @@ export function serviceImportProjects(projectList) {
 		const addPromises = [];
 		for (let i = 0; i < projectList.length; i++) {
 			const project = projectList[i];
+			delete project.comment;
 			if (!project.requirementIds) {
 				project.requirementIds = [];
 			}

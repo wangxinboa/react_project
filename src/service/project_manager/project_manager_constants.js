@@ -28,7 +28,6 @@ export const ProjectFormItemNames = Object.freeze({
 	name: "name",
 	gitUrl: "gitUrl",
 	o2Url: "o2Url",
-	comment: "comment",
 });
 
 /**
@@ -40,7 +39,6 @@ export const ProjectFormItemLabels = Object.freeze({
 	name: "项目名称",
 	gitUrl: "仓库地址",
 	o2Url: "o2 地址",
-	comment: "注释说明",
 });
 
 /**
