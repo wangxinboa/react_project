@@ -45,9 +45,9 @@ export function serviceGetRequirementListPage(page, pageSize) {
  * @param {string} [record.testUrl] - 效果测试地址
  * @param {string} [record.crUrl] - 代码 CR 地址
  * @param {string} [record.iterationUrl] - 迭代地址
- * @param {string} record.devTime - 开发时间
- * @param {string} record.testTime - 提测时间
- * @param {string} record.onlineTime - 上线时间
+ * @param {number} record.devTime - 开发时间（时间戳）
+ * @param {number} record.testTime - 提测时间（时间戳）
+ * @param {number} record.onlineTime - 上线时间（时间戳）
  * @param {string} [record.comment] - 注释说明
  * @param {string} [record.status] - 状态（默认待开发）
  * @returns {Promise<{success: boolean}>}
@@ -55,10 +55,10 @@ export function serviceGetRequirementListPage(page, pageSize) {
 export function serviceAddRequirement(record) {
 	return getNextId(STORES.requirements).then((id) => {
 		record.id = id;
+		record.createTime = Date.now();
 		if (!record.projectIds) {
 			record.projectIds = [];
 		}
-		record.createTime = new Date().toISOString();
 		if (!record.status) {
 			record.status = RequirementStatusEnum.pending;
 		}
@@ -126,6 +126,38 @@ export function serviceDeleteRequirement(id) {
 		}
 		return updateProjectRequirementIds(id, target.projectIds || [], "remove").then(() => {
 			return dbManager.delete(STORES.requirements, id).then(() => ({ success: true }));
+		});
+	});
+}
+
+/**
+ * 导入需求数据（清空现有需求后导入，并重建项目关联）
+ * @param {Array} requirementList - 需求数组
+ * @returns {Promise<{success: boolean}>}
+ */
+export function serviceImportRequirements(requirementList) {
+	return dbManager.clear(STORES.requirements).then(() => {
+		const addPromises = [];
+		for (let i = 0; i < requirementList.length; i++) {
+			const req = requirementList[i];
+			if (!req.projectIds) {
+				req.projectIds = [];
+			}
+			if (!req.createTime) {
+				req.createTime = Date.now();
+			}
+			addPromises.push(dbManager.add(STORES.requirements, req));
+		}
+		return Promise.all(addPromises).then(() => {
+			// 重建所有需求与项目的关联
+			const relinkPromises = [];
+			for (let i = 0; i < requirementList.length; i++) {
+				const req = requirementList[i];
+				if (req.projectIds.length > 0) {
+					relinkPromises.push(updateProjectRequirementIds(req.id, req.projectIds, "add"));
+				}
+			}
+			return Promise.all(relinkPromises).then(() => ({ success: true }));
 		});
 	});
 }

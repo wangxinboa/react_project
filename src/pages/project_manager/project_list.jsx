@@ -10,6 +10,8 @@ import {
 	serviceGetAllProjects,
 	serviceImportProjects,
 } from "../../service/project_manager/project_service.js";
+import { serviceImportRequirements } from "../../service/project_manager/project_requirement_service.js";
+import { serviceGetRequirementList } from "../../service/project_manager/project_requirement_service.js";
 import { downloadJSON } from "../../utils/download/download.js";
 import { CFileUpload } from "../../components/file_upload_button/file_upload_button.jsx";
 import styles from "./project_manager.module.scss";
@@ -91,13 +93,17 @@ export function ProjectList() {
 
 	// ---------- 导入/导出 ----------
 	/**
-	 * 导出项目列表为 JSON 文件
+	 * 导出项目列表和需求列表为 JSON 文件
 	 */
 	const handleExportProjects = useCallback(() => {
-		serviceGetAllProjects().then((projects) => {
-			const jsonStr = JSON.stringify(projects, null, 2);
-			downloadJSON(jsonStr, "projects_backup.json");
-			message.success("导出成功");
+		Promise.all([serviceGetAllProjects(), serviceGetRequirementList()]).then(([projects, requirementsRes]) => {
+			const exportData = {
+				projects: projects,
+				requirements: requirementsRes.data,
+			};
+			const jsonStr = JSON.stringify(exportData, null, 2);
+			downloadJSON(jsonStr, "project_backup.json");
+			message.success("导出成功（包含项目和需求）");
 		});
 	}, []);
 
@@ -112,15 +118,45 @@ export function ProjectList() {
 			const reader = new FileReader();
 			reader.onload = (event) => {
 				try {
-					const projects = JSON.parse(event.target.result);
-					if (!Array.isArray(projects)) {
-						message.error("文件格式不正确，需要 JSON 数组");
+					const data = JSON.parse(event.target.result);
+					// 兼容旧格式（纯项目数组）和新格式（对象包含 projects/requirements）
+					let projectsToImport = [];
+					let requirementsToImport = [];
+
+					if (Array.isArray(data)) {
+						// 旧格式：只导入项目
+						projectsToImport = data;
+					} else if (typeof data === "object" && data !== null) {
+						if (Array.isArray(data.projects)) {
+							projectsToImport = data.projects;
+						}
+						if (Array.isArray(data.requirements)) {
+							requirementsToImport = data.requirements;
+						}
+					}
+
+					if (projectsToImport.length === 0 && requirementsToImport.length === 0) {
+						message.warning("文件中没有找到有效的项目或需求数据");
 						return;
 					}
-					serviceImportProjects(projects).then(() => {
-						message.success("导入成功");
-						fetchProjectList();
-					});
+
+					// 先导入项目，再导入需求（需求依赖项目 ID）
+					const importChain =
+						projectsToImport.length > 0 ? serviceImportProjects(projectsToImport) : Promise.resolve({ success: true });
+					importChain
+						.then(() => {
+							if (requirementsToImport.length > 0) {
+								return serviceImportRequirements(requirementsToImport);
+							}
+							return { success: true };
+						})
+						.then(() => {
+							message.success("导入成功");
+							fetchProjectList();
+						})
+						.catch(() => {
+							message.error("导入失败");
+						});
 				} catch (err) {
 					message.error("文件解析失败，请确认是有效的 JSON");
 				}

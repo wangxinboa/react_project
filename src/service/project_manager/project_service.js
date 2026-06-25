@@ -94,6 +94,7 @@ export function serviceGetProjectListPage(page, pageSize) {
 export function serviceAddProject(record) {
 	return getNextId(STORES.projects).then((id) => {
 		record.id = id;
+		record.createTime = Date.now();
 		if (!record.requirementIds) {
 			record.requirementIds = [];
 		}
@@ -181,6 +182,10 @@ export function serviceImportProjects(projectList) {
 			const project = projectList[i];
 			if (!project.requirementIds) {
 				project.requirementIds = [];
+			}
+			// 确保导入的项目也有创建时间，若没有则补充当前时间戳
+			if (project.createTime === undefined || project.createTime === null) {
+				project.createTime = Date.now();
 			}
 			addPromises.push(dbManager.add(STORES.projects, project));
 		}
