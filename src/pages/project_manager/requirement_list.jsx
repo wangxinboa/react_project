@@ -148,7 +148,9 @@ export function RequirementList() {
 				fixed: "left",
 				render: (text) => (
 					<Tooltip title={text} {...TooltipProps}>
-						<div className={styles.cellText}>{text}</div>
+						<div className={styles.cellFlexContainer}>
+							<div className={styles.cellFlexText}>{text}</div>
+						</div>
 					</Tooltip>
 				),
 			},
@@ -167,7 +169,9 @@ export function RequirementList() {
 					const fullText = names.join(", ");
 					return (
 						<Tooltip title={fullText} {...TooltipProps}>
-							<div className={styles.cellText}>{fullText}</div>
+							<div className={styles.cellFlexContainer}>
+								<div className={styles.cellFlexText}>{fullText}</div>
+							</div>
 						</Tooltip>
 					);
 				},

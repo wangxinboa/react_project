@@ -199,7 +199,9 @@ export function ProjectList() {
 				fixed: "left",
 				render: (text) => (
 					<Tooltip title={text} {...TooltipProps}>
-						<div className={styles.cellText}>{text}</div>
+						<div className={styles.cellFlexContainer}>
+							<div className={styles.cellFlexText}>{text}</div>
+						</div>
 					</Tooltip>
 				),
 			},
@@ -257,7 +259,9 @@ export function ProjectList() {
 					}
 					return (
 						<Tooltip title={<div className={styles.tagList}>{tags}</div>} {...TooltipProps}>
-							<div className={styles.tagRow}>{tags}</div>
+							<div className={styles.cellFlexContainer}>
+								<div className={styles.cellFlexText}>{tags}</div>
+							</div>
 						</Tooltip>
 					);
 				},
