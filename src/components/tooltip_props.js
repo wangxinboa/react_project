@@ -4,5 +4,7 @@
  */
 export const TooltipProps = Object.freeze({
 	color: "#ffffff",
-	overlayInnerStyle: { color: "rgba(0, 0, 0, 0.88)" },
+	styles: {
+		container: { color: "rgba(0, 0, 0, 0.88)" },
+	},
 });
