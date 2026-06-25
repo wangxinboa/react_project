@@ -1,5 +1,5 @@
 import { dbManager, getNextId } from "./project_manager_db.js";
-import { STORES } from "./project_manager_constants.js";
+import { Stores } from "./project_manager_constants.js";
 
 /**
  * 更新所有需求中对特定项目的引用（添加或移除需求ID）
@@ -9,7 +9,7 @@ import { STORES } from "./project_manager_constants.js";
  * @returns {Promise<void>}
  */
 export function updateProjectRequirementIds(requirementId, projectIds, operation) {
-	return dbManager.getAll(STORES.projects).then((projects) => {
+	return dbManager.getAll(Stores.projects).then((projects) => {
 		const updatePromises = [];
 		for (let i = 0; i < projectIds.length; i++) {
 			const projectId = projectIds[i];
@@ -41,7 +41,7 @@ export function updateProjectRequirementIds(requirementId, projectIds, operation
 							proj.requirementIds = newIds;
 						}
 					}
-					updatePromises.push(dbManager.put(STORES.projects, proj));
+					updatePromises.push(dbManager.put(Stores.projects, proj));
 					break;
 				}
 			}
@@ -55,7 +55,7 @@ export function updateProjectRequirementIds(requirementId, projectIds, operation
  * @returns {Promise<{data: Array, total: number}>}
  */
 export function serviceGetProjectList() {
-	return dbManager.getAll(STORES.projects).then((data) => ({
+	return dbManager.getAll(Stores.projects).then((data) => ({
 		data,
 		total: data.length,
 	}));
@@ -68,7 +68,7 @@ export function serviceGetProjectList() {
  * @returns {Promise<{data: Array, total: number}>}
  */
 export function serviceGetProjectListPage(page, pageSize) {
-	return dbManager.getAll(STORES.projects).then((allProjects) => {
+	return dbManager.getAll(Stores.projects).then((allProjects) => {
 		const start = (page - 1) * pageSize;
 		const end = start + pageSize;
 		const data = [];
@@ -92,13 +92,13 @@ export function serviceGetProjectListPage(page, pageSize) {
  * @returns {Promise<{success: boolean}>}
  */
 export function serviceAddProject(record) {
-	return getNextId(STORES.projects).then((id) => {
+	return getNextId(Stores.projects).then((id) => {
 		record.id = id;
 		record.createTime = Date.now();
 		if (!record.requirementIds) {
 			record.requirementIds = [];
 		}
-		return dbManager.add(STORES.projects, record).then(() => ({ success: true }));
+		return dbManager.add(Stores.projects, record).then(() => ({ success: true }));
 	});
 }
 
@@ -113,7 +113,7 @@ export function serviceAddProject(record) {
  * @returns {Promise<{success: boolean}>}
  */
 export function serviceUpdateProject(id, record) {
-	return dbManager.getAll(STORES.projects).then((projects) => {
+	return dbManager.getAll(Stores.projects).then((projects) => {
 		let target = null;
 		for (let i = 0; i < projects.length; i++) {
 			if (projects[i].id === id) {
@@ -128,7 +128,7 @@ export function serviceUpdateProject(id, record) {
 		target.gitUrl = record.gitUrl;
 		target.o2Url = record.o2Url;
 		target.comment = record.comment;
-		return dbManager.put(STORES.projects, target).then(() => ({ success: true }));
+		return dbManager.put(Stores.projects, target).then(() => ({ success: true }));
 	});
 }
 
@@ -139,7 +139,7 @@ export function serviceUpdateProject(id, record) {
  */
 export function serviceDeleteProject(id) {
 	return dbManager
-		.getAll(STORES.requirements)
+		.getAll(Stores.requirements)
 		.then((requirements) => {
 			const requirementUpdates = [];
 			for (let j = 0; j < requirements.length; j++) {
@@ -152,13 +152,13 @@ export function serviceDeleteProject(id) {
 						}
 					}
 					req.projectIds = newProjectIds;
-					requirementUpdates.push(dbManager.put(STORES.requirements, req));
+					requirementUpdates.push(dbManager.put(Stores.requirements, req));
 				}
 			}
 			return Promise.all(requirementUpdates);
 		})
 		.then(() => {
-			return dbManager.delete(STORES.projects, id).then(() => ({ success: true }));
+			return dbManager.delete(Stores.projects, id).then(() => ({ success: true }));
 		});
 }
 
@@ -167,7 +167,7 @@ export function serviceDeleteProject(id) {
  * @returns {Promise<Array>}
  */
 export function serviceGetAllProjects() {
-	return dbManager.getAll(STORES.projects);
+	return dbManager.getAll(Stores.projects);
 }
 
 /**
@@ -176,7 +176,7 @@ export function serviceGetAllProjects() {
  * @returns {Promise<{success: boolean}>}
  */
 export function serviceImportProjects(projectList) {
-	return dbManager.clear(STORES.projects).then(() => {
+	return dbManager.clear(Stores.projects).then(() => {
 		const addPromises = [];
 		for (let i = 0; i < projectList.length; i++) {
 			const project = projectList[i];
@@ -186,7 +186,7 @@ export function serviceImportProjects(projectList) {
 			if (project.createTime === undefined || project.createTime === null) {
 				project.createTime = Date.now();
 			}
-			addPromises.push(dbManager.add(STORES.projects, project));
+			addPromises.push(dbManager.add(Stores.projects, project));
 		}
 		return Promise.all(addPromises).then(() => ({ success: true }));
 	});

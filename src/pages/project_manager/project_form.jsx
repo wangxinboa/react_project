@@ -12,7 +12,7 @@ const labelCol = { flex: "110px" };
 /**
  * 标题映射
  */
-const MODAL_TITLE_MAP = {
+const ModalTitleMap = {
 	[ModalStatusTypeEnum.Add]: "新增项目",
 	[ModalStatusTypeEnum.Edit]: "编辑项目",
 	[ModalStatusTypeEnum.View]: "查看项目",
@@ -36,7 +36,7 @@ export const ProjectForm = forwardRef((props, ref) => {
 	const isEdit = status === ModalStatusTypeEnum.Edit;
 	const isView = status === ModalStatusTypeEnum.View;
 
-	const modalTitle = MODAL_TITLE_MAP[status] || "";
+	const modalTitle = ModalTitleMap[status] || "";
 
 	/**
 	 * 填充项目表单数据

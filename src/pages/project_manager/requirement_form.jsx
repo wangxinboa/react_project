@@ -19,7 +19,7 @@ const labelCol = { flex: "110px" };
 /**
  * 标题映射
  */
-const MODAL_TITLE_MAP = {
+const ModalTitleMap = {
 	[ModalStatusTypeEnum.Add]: "新增需求",
 	[ModalStatusTypeEnum.Edit]: "编辑需求",
 	[ModalStatusTypeEnum.View]: "查看需求",
@@ -54,7 +54,7 @@ export const RequirementForm = forwardRef((props, ref) => {
 	const isEdit = status === ModalStatusTypeEnum.Edit;
 	const isView = status === ModalStatusTypeEnum.View;
 
-	const modalTitle = MODAL_TITLE_MAP[status] || "";
+	const modalTitle = ModalTitleMap[status] || "";
 
 	/**
 	 * 生成项目下拉选项
@@ -107,7 +107,6 @@ export const RequirementForm = forwardRef((props, ref) => {
 			return;
 		}
 		form.validateFields().then((values) => {
-			// 直接将时间戳值（由 TimestampDatePicker 返回）传入，无需额外转换
 			const formData = { ...values };
 			if (isAdd) {
 				onAddOk(formData);

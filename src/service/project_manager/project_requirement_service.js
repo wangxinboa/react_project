@@ -1,5 +1,5 @@
 import { dbManager, getNextId } from "./project_manager_db.js";
-import { STORES, RequirementStatusEnum } from "./project_manager_constants.js";
+import { Stores, RequirementStatusEnum } from "./project_manager_constants.js";
 import { updateProjectRequirementIds } from "./project_service.js";
 
 /**
@@ -7,7 +7,7 @@ import { updateProjectRequirementIds } from "./project_service.js";
  * @returns {Promise<{data: Array, total: number}>}
  */
 export function serviceGetRequirementList() {
-	return dbManager.getAll(STORES.requirements).then((data) => ({
+	return dbManager.getAll(Stores.requirements).then((data) => ({
 		data,
 		total: data.length,
 	}));
@@ -20,7 +20,7 @@ export function serviceGetRequirementList() {
  * @returns {Promise<{data: Array, total: number}>}
  */
 export function serviceGetRequirementListPage(page, pageSize) {
-	return dbManager.getAll(STORES.requirements).then((allRequirements) => {
+	return dbManager.getAll(Stores.requirements).then((allRequirements) => {
 		const start = (page - 1) * pageSize;
 		const end = start + pageSize;
 		const data = [];
@@ -53,7 +53,7 @@ export function serviceGetRequirementListPage(page, pageSize) {
  * @returns {Promise<{success: boolean}>}
  */
 export function serviceAddRequirement(record) {
-	return getNextId(STORES.requirements).then((id) => {
+	return getNextId(Stores.requirements).then((id) => {
 		record.id = id;
 		record.createTime = Date.now();
 		if (!record.projectIds) {
@@ -62,7 +62,7 @@ export function serviceAddRequirement(record) {
 		if (!record.status) {
 			record.status = RequirementStatusEnum.pending;
 		}
-		return dbManager.add(STORES.requirements, record).then(() => {
+		return dbManager.add(Stores.requirements, record).then(() => {
 			return updateProjectRequirementIds(record.id, record.projectIds, "add").then(() => ({ success: true }));
 		});
 	});
@@ -75,7 +75,7 @@ export function serviceAddRequirement(record) {
  * @returns {Promise<{success: boolean}>}
  */
 export function serviceUpdateRequirement(id, record) {
-	return dbManager.getAll(STORES.requirements).then((requirements) => {
+	return dbManager.getAll(Stores.requirements).then((requirements) => {
 		let target = null;
 		for (let i = 0; i < requirements.length; i++) {
 			if (requirements[i].id === id) {
@@ -100,7 +100,7 @@ export function serviceUpdateRequirement(id, record) {
 			target.onlineTime = record.onlineTime;
 			target.comment = record.comment;
 			target.status = record.status || RequirementStatusEnum.pending;
-			return dbManager.put(STORES.requirements, target).then(() => {
+			return dbManager.put(Stores.requirements, target).then(() => {
 				return updateProjectRequirementIds(id, target.projectIds, "add").then(() => ({ success: true }));
 			});
 		});
@@ -113,7 +113,7 @@ export function serviceUpdateRequirement(id, record) {
  * @returns {Promise<{success: boolean}>}
  */
 export function serviceDeleteRequirement(id) {
-	return dbManager.getAll(STORES.requirements).then((requirements) => {
+	return dbManager.getAll(Stores.requirements).then((requirements) => {
 		let target = null;
 		for (let i = 0; i < requirements.length; i++) {
 			if (requirements[i].id === id) {
@@ -125,7 +125,7 @@ export function serviceDeleteRequirement(id) {
 			return Promise.reject(new Error("需求不存在"));
 		}
 		return updateProjectRequirementIds(id, target.projectIds || [], "remove").then(() => {
-			return dbManager.delete(STORES.requirements, id).then(() => ({ success: true }));
+			return dbManager.delete(Stores.requirements, id).then(() => ({ success: true }));
 		});
 	});
 }
@@ -136,7 +136,7 @@ export function serviceDeleteRequirement(id) {
  * @returns {Promise<{success: boolean}>}
  */
 export function serviceImportRequirements(requirementList) {
-	return dbManager.clear(STORES.requirements).then(() => {
+	return dbManager.clear(Stores.requirements).then(() => {
 		const addPromises = [];
 		for (let i = 0; i < requirementList.length; i++) {
 			const req = requirementList[i];
@@ -146,10 +146,9 @@ export function serviceImportRequirements(requirementList) {
 			if (!req.createTime) {
 				req.createTime = Date.now();
 			}
-			addPromises.push(dbManager.add(STORES.requirements, req));
+			addPromises.push(dbManager.add(Stores.requirements, req));
 		}
 		return Promise.all(addPromises).then(() => {
-			// 重建所有需求与项目的关联
 			const relinkPromises = [];
 			for (let i = 0; i < requirementList.length; i++) {
 				const req = requirementList[i];

@@ -1,14 +1,14 @@
 import { dbManager } from "../../utils/indexeddb/indexed_db_manager.js";
-import { DB_NAME, DB_VERSION, STORES } from "./project_manager_constants.js";
+import { DbName, DbVersion, Stores } from "./project_manager_constants.js";
 
 /**
  * 初始化数据库（项目管理和需求管理共用）
  * @returns {Promise<IDBDatabase>}
  */
 function initDB() {
-	return dbManager.init(DB_NAME, DB_VERSION, [
-		{ name: STORES.projects, keyPath: "id" },
-		{ name: STORES.requirements, keyPath: "id" },
+	return dbManager.init(DbName, DbVersion, [
+		{ name: Stores.projects, keyPath: "id" },
+		{ name: Stores.requirements, keyPath: "id" },
 	]);
 }
 

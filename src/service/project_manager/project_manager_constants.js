@@ -2,19 +2,19 @@
  * 数据库名称
  * @constant {string}
  */
-export const DB_NAME = "ProjectManagerDB";
+export const DbName = "ProjectManagerDB";
 
 /**
  * 数据库版本
  * @constant {number}
  */
-export const DB_VERSION = 1;
+export const DbVersion = 1;
 
 /**
  * 对象存储名称
  * @constant {Object}
  */
-export const STORES = Object.freeze({
+export const Stores = Object.freeze({
 	projects: "projects",
 	requirements: "requirements",
 });
