@@ -190,7 +190,6 @@ export function ProjectList() {
 
 	// ---------- 表格列定义 ----------
 	const columns = useMemo(() => {
-		// 构建需求 ID -> 需求对象 的映射
 		const reqMap = {};
 		for (let i = 0; i < requirements.length; i++) {
 			reqMap[requirements[i].id] = requirements[i];
@@ -267,7 +266,11 @@ export function ProjectList() {
 					if (tags.length === 0) {
 						return <span>无</span>;
 					}
-					return <div>{tags}</div>;
+					return (
+						<Tooltip title={<div className={styles.tagList}>{tags}</div>}>
+							<div className={styles.tagRow}>{tags}</div>
+						</Tooltip>
+					);
 				},
 			},
 			{
