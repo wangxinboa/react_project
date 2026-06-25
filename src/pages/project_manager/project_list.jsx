@@ -9,6 +9,7 @@ import {
 	serviceDeleteProject,
 	serviceGetAllProjects,
 	serviceImportProjects,
+	serviceCorrectData,
 } from "../../service/project_manager/project_service.js";
 import { serviceImportRequirements } from "../../service/project_manager/project_requirement_service.js";
 import { serviceGetRequirementList } from "../../service/project_manager/project_requirement_service.js";
@@ -119,12 +120,10 @@ export function ProjectList() {
 			reader.onload = (event) => {
 				try {
 					const data = JSON.parse(event.target.result);
-					// 兼容旧格式（纯项目数组）和新格式（对象包含 projects/requirements）
 					let projectsToImport = [];
 					let requirementsToImport = [];
 
 					if (Array.isArray(data)) {
-						// 旧格式：只导入项目
 						projectsToImport = data;
 					} else if (typeof data === "object" && data !== null) {
 						if (Array.isArray(data.projects)) {
@@ -140,7 +139,6 @@ export function ProjectList() {
 						return;
 					}
 
-					// 先导入项目，再导入需求（需求依赖项目 ID）
 					const importChain =
 						projectsToImport.length > 0 ? serviceImportProjects(projectsToImport) : Promise.resolve({ success: true });
 					importChain
@@ -162,11 +160,22 @@ export function ProjectList() {
 				}
 			};
 			reader.readAsText(file);
-			// 重置 input 值，允许再次选择同一文件
 			e.target.value = "";
 		},
 		[fetchProjectList],
 	);
+
+	/** 数据校正 */
+	const handleCorrectData = useCallback(() => {
+		serviceCorrectData()
+			.then(() => {
+				message.success("数据校正完成");
+				fetchProjectList();
+			})
+			.catch(() => {
+				message.error("数据校正失败");
+			});
+	}, [fetchProjectList]);
 
 	// ---------- 表格列定义 ----------
 	const columns = useMemo(() => {
@@ -222,7 +231,7 @@ export function ProjectList() {
 			{
 				title: "操作",
 				key: "operation",
-				width: 240,
+				width: 300,
 				fixed: "end",
 				render: (_, record) => {
 					return (
@@ -264,6 +273,7 @@ export function ProjectList() {
 					导入项目
 					<CFileUpload onInput={handleImportFileChange} accept=".json" />
 				</Button>
+				<Button onClick={handleCorrectData}>数据校正</Button>
 			</div>
 			<div className={styles.tableWrapper}>
 				<Table
