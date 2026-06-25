@@ -191,3 +191,24 @@ export function serviceImportProjects(projectList) {
 		return Promise.all(addPromises).then(() => ({ success: true }));
 	});
 }
+
+/**
+ * 删除所有项目中的 comment 属性（校正旧数据）
+ * @returns {Promise<{success: boolean, message: string}>}
+ */
+export function serviceRemoveProjectComments() {
+	return dbManager.getAll(Stores.projects).then((projects) => {
+		const updatePromises = [];
+		for (let i = 0; i < projects.length; i++) {
+			const proj = projects[i];
+			if (proj.comment !== undefined) {
+				delete proj.comment;
+				updatePromises.push(dbManager.put(Stores.projects, proj));
+			}
+		}
+		return Promise.all(updatePromises).then(() => ({
+			success: true,
+			message: `已清理 ${updatePromises.length} 个项目的注释说明`,
+		}));
+	});
+}

@@ -9,6 +9,7 @@ import {
 	serviceDeleteProject,
 	serviceGetAllProjects,
 	serviceImportProjects,
+	serviceRemoveProjectComments,
 } from "../../service/project_manager/project_service.js";
 import {
 	serviceImportRequirements,
@@ -176,6 +177,18 @@ export function ProjectList() {
 		[fetchProjectList, fetchRequirements],
 	);
 
+	/** 数据校正：删除项目旧数据中的注释说明属性 */
+	const handleRemoveComments = useCallback(() => {
+		serviceRemoveProjectComments()
+			.then((res) => {
+				message.success(res.message);
+				fetchProjectList();
+			})
+			.catch(() => {
+				message.error("数据校正失败");
+			});
+	}, [fetchProjectList]);
+
 	// ---------- 表格列定义 ----------
 	const columns = useMemo(() => {
 		const reqMap = {};
@@ -307,6 +320,7 @@ export function ProjectList() {
 					导入项目
 					<CFileUpload onInput={handleImportFileChange} accept=".json" />
 				</Button>
+				<Button onClick={handleRemoveComments}>数据校正</Button>
 			</div>
 			<div className={styles.tableWrapper}>
 				<Table
