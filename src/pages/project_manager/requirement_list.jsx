@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import { Button, Table, Pagination, Popconfirm, message } from "antd";
+import dayjs from "dayjs";
 import { usePagination } from "../../hooks/use_pagination.js";
 import { RequirementForm } from "./requirement_form.jsx";
 import {
@@ -27,6 +28,15 @@ function renderUrl(text, label) {
 	) : (
 		"-"
 	);
+}
+
+/**
+ * 格式化时间戳为日期字符串
+ * @param {number} ts
+ * @returns {string}
+ */
+function formatDate(ts) {
+	return ts ? dayjs(ts).format("YYYY-MM-DD") : "-";
 }
 
 /**
@@ -214,18 +224,21 @@ export function RequirementList() {
 				dataIndex: "devTime",
 				key: "devTime",
 				width: 120,
+				render: (ts) => formatDate(ts),
 			},
 			{
 				title: "提测时间",
 				dataIndex: "testTime",
 				key: "testTime",
 				width: 120,
+				render: (ts) => formatDate(ts),
 			},
 			{
 				title: "上线时间",
 				dataIndex: "onlineTime",
 				key: "onlineTime",
 				width: 120,
+				render: (ts) => formatDate(ts),
 			},
 			{
 				title: "操作",

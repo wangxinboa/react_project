@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useImperativeHandle, useState, useMemo } from "react";
-import { Modal, Form, Input, Select, DatePicker } from "antd";
+import { Modal, Form, Input, Select } from "antd";
 import dayjs from "dayjs";
 import { ModalStatusTypeEnum } from "../../utils/global_constant.js";
 import {
@@ -8,6 +8,7 @@ import {
 	RequirementStatusEnum,
 } from "../../service/project_manager/project_manager_constants.js";
 import { UrlFormItem } from "../../components/url_form_item/url_form_item.jsx";
+import { TimestampDatePicker } from "../../components/timestamp_date_picker/timestamp_date_picker.jsx";
 
 import styles from "./project_manager.module.scss";
 
@@ -25,10 +26,20 @@ const MODAL_TITLE_MAP = {
 };
 
 /**
+ * 格式化时间戳为日期字符串（查看模式）
+ * @param {number} ts - 时间戳
+ * @returns {string}
+ */
+function formatTs(ts) {
+	if (!ts) return "";
+	return dayjs(ts).format("YYYY-MM-DD");
+}
+
+/**
  * 需求管理 - 新增/编辑/查看需求表单组件
  * @component
  * @param {Object} props
- * @param {Function} props.onAddOk - 新增成功回调，参数为表单数据
+ * @param {Function} props.onAddOk - 新增成功回调，参数为表单数据（日期为时间戳）
  * @param {Function} props.onEditOk - 编辑成功回调，参数为 (id, 表单数据)
  * @param {Array} props.projects - 所有项目的列表，用于关联项目下拉选择
  */
@@ -61,7 +72,7 @@ export const RequirementForm = forwardRef((props, ref) => {
 	}, [projects]);
 
 	/**
-	 * 填充需求表单数据
+	 * 填充需求表单数据（时间戳直接作为 value）
 	 * @param {Object} data - 需求数据
 	 */
 	const setRequirementFormValues = useCallback(
@@ -75,9 +86,9 @@ export const RequirementForm = forwardRef((props, ref) => {
 				[RequirementFormItemNames.testUrl]: data.testUrl,
 				[RequirementFormItemNames.crUrl]: data.crUrl,
 				[RequirementFormItemNames.iterationUrl]: data.iterationUrl,
-				[RequirementFormItemNames.devTime]: data.devTime ? dayjs(data.devTime) : null,
-				[RequirementFormItemNames.testTime]: data.testTime ? dayjs(data.testTime) : null,
-				[RequirementFormItemNames.onlineTime]: data.onlineTime ? dayjs(data.onlineTime) : null,
+				[RequirementFormItemNames.devTime]: data.devTime,
+				[RequirementFormItemNames.testTime]: data.testTime,
+				[RequirementFormItemNames.onlineTime]: data.onlineTime,
 				[RequirementFormItemNames.comment]: data.comment,
 				[RequirementFormItemNames.status]: data.status,
 			});
@@ -96,11 +107,8 @@ export const RequirementForm = forwardRef((props, ref) => {
 			return;
 		}
 		form.validateFields().then((values) => {
+			// 直接将时间戳值（由 TimestampDatePicker 返回）传入，无需额外转换
 			const formData = { ...values };
-			if (formData.devTime) formData.devTime = formData.devTime.format("YYYY-MM-DD");
-			if (formData.testTime) formData.testTime = formData.testTime.format("YYYY-MM-DD");
-			if (formData.onlineTime) formData.onlineTime = formData.onlineTime.format("YYYY-MM-DD");
-
 			if (isAdd) {
 				onAddOk(formData);
 			} else if (isEdit) {
@@ -235,25 +243,17 @@ export const RequirementForm = forwardRef((props, ref) => {
 						label={RequirementFormItemLabels.devTime}
 						rules={[{ required: !isView }]}
 					>
-						{isView ? <span>{record.devTime}</span> : <DatePicker />}
+						{isView ? <span>{formatTs(record.devTime)}</span> : <TimestampDatePicker />}
 					</Form.Item>
 				)}
 				{!(isView && !record?.testTime) && (
-					<Form.Item
-						name={RequirementFormItemNames.testTime}
-						label={RequirementFormItemLabels.testTime}
-						rules={[{ required: !isView }]}
-					>
-						{isView ? <span>{record.testTime}</span> : <DatePicker />}
+					<Form.Item name={RequirementFormItemNames.testTime} label={RequirementFormItemLabels.testTime}>
+						{isView ? <span>{formatTs(record.testTime)}</span> : <TimestampDatePicker />}
 					</Form.Item>
 				)}
 				{!(isView && !record?.onlineTime) && (
-					<Form.Item
-						name={RequirementFormItemNames.onlineTime}
-						label={RequirementFormItemLabels.onlineTime}
-						rules={[{ required: !isView }]}
-					>
-						{isView ? <span>{record.onlineTime}</span> : <DatePicker />}
+					<Form.Item name={RequirementFormItemNames.onlineTime} label={RequirementFormItemLabels.onlineTime}>
+						{isView ? <span>{formatTs(record.onlineTime)}</span> : <TimestampDatePicker />}
 					</Form.Item>
 				)}
 				{!(isView && !record?.status) && (
