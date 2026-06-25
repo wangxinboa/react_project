@@ -5,7 +5,7 @@ import styles from "./App.module.scss";
 import { useCallback, useState, useEffect } from "react";
 
 /**
- * 根据路径获取菜单选中 key 和需要展开的父级 keys
+ * 根据路径获取菜单选中 key 和需要展开的父级 keys（仅用于初始状态）
  * @param {string} pathname - 当前路径
  * @returns {{ selectedKey: string, openKeys: string[] }}
  */
@@ -44,19 +44,20 @@ export default function App() {
 	const initialPath = history.location.pathname;
 	const initMenuState = getMenuState(initialPath);
 	const [selectedKeys, setSelectedKeys] = useState(initMenuState.selectedKey ? [initMenuState.selectedKey] : []);
+	// 初始展开状态根据当前路径设定，后续由用户手动控制
 	const [openKeys, setOpenKeys] = useState(initMenuState.openKeys);
+
+	useEffect(() => {
+		// 仅监听路由变化更新选中项，不改变展开状态
+		const unlisten = history.listen(({ location }) => {
+			const { selectedKey } = getMenuState(location.pathname);
+			setSelectedKeys(selectedKey ? [selectedKey] : []);
+		});
+		return unlisten;
+	}, []);
 
 	const handleOnClickMenu = useCallback(({ key }) => {
 		history.push(key);
-	}, []);
-
-	useEffect(() => {
-		const unlisten = history.listen(({ location }) => {
-			const { selectedKey, openKeys } = getMenuState(location.pathname);
-			setSelectedKeys(selectedKey ? [selectedKey] : []);
-			setOpenKeys(openKeys);
-		});
-		return unlisten;
 	}, []);
 
 	return (
