@@ -145,6 +145,7 @@ export function RequirementList() {
 				dataIndex: "name",
 				key: "name",
 				width: 150,
+				fixed: "left",
 				render: (text) => (
 					<Tooltip title={text} {...TooltipProps}>
 						<div className={styles.cellText}>{text}</div>
