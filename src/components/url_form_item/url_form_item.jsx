@@ -7,19 +7,18 @@ import { Form, Input } from "antd";
  * @param {string} [props.url] - 查看模式下的链接地址，编辑模式忽略
  * @param {string} props.name - 字段名
  * @param {string} props.label - 字段标签
- * @returns {JSX.Element}
+ * @returns {JSX.Element|null}
  */
 export function UrlFormItem({ isView, url, name, label }) {
+	if (isView && !url) {
+		return null;
+	}
 	return (
 		<Form.Item name={name} label={label}>
 			{isView ? (
-				url ? (
-					<a href={url} target="_blank" rel="noopener noreferrer">
-						{label}
-					</a>
-				) : (
-					<span>-</span>
-				)
+				<a href={url} target="_blank" rel="noopener noreferrer">
+					{label}
+				</a>
 			) : (
 				<Input />
 			)}

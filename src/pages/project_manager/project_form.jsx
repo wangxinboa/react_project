@@ -1,5 +1,3 @@
-// src/pages/project_manager/project_form.jsx
-
 import { forwardRef, useCallback, useImperativeHandle, useState } from "react";
 import { Modal, Form, Input } from "antd";
 import { ModalStatusTypeEnum } from "../../utils/global_constant.js";
@@ -109,7 +107,6 @@ export const ProjectForm = forwardRef((props, ref) => {
 		[form, setProjectFormValues],
 	);
 
-	// 提取链接值，避免在 JSX 中重复访问 record
 	const gitUrl = record ? record.gitUrl : "";
 	const o2Url = record ? record.o2Url : "";
 
@@ -124,9 +121,15 @@ export const ProjectForm = forwardRef((props, ref) => {
 			cancelText={isView ? "关闭" : "取消"}
 		>
 			<Form form={form} labelCol={labelCol}>
-				<Form.Item name={ProjectFormItemNames.name} label={ProjectFormItemLabels.name} rules={[{ required: !isView }]}>
-					{isView ? <span>{record ? record.name : ""}</span> : <Input />}
-				</Form.Item>
+				{!(isView && !record?.name) && (
+					<Form.Item
+						name={ProjectFormItemNames.name}
+						label={ProjectFormItemLabels.name}
+						rules={[{ required: !isView }]}
+					>
+						{isView ? <span>{record.name}</span> : <Input />}
+					</Form.Item>
+				)}
 				<UrlFormItem
 					isView={isView}
 					url={gitUrl}
@@ -139,9 +142,11 @@ export const ProjectForm = forwardRef((props, ref) => {
 					name={ProjectFormItemNames.o2Url}
 					label={ProjectFormItemLabels.o2Url}
 				/>
-				<Form.Item name={ProjectFormItemNames.comment} label={ProjectFormItemLabels.comment}>
-					{isView ? <span>{record ? record.comment : ""}</span> : <Input.TextArea rows={3} />}
-				</Form.Item>
+				{!(isView && !record?.comment) && (
+					<Form.Item name={ProjectFormItemNames.comment} label={ProjectFormItemLabels.comment}>
+						{isView ? <span>{record.comment}</span> : <Input.TextArea rows={3} />}
+					</Form.Item>
+				)}
 			</Form>
 		</Modal>
 	);

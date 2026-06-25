@@ -1,5 +1,3 @@
-// src/pages/project_manager/requirement_form.jsx
-
 import { forwardRef, useCallback, useImperativeHandle, useState, useMemo } from "react";
 import { Modal, Form, Input, Select, DatePicker } from "antd";
 import dayjs from "dayjs";
@@ -152,7 +150,6 @@ export const RequirementForm = forwardRef((props, ref) => {
 		[form, setRequirementFormValues],
 	);
 
-	// 提取所有 URL 字段值
 	const aoneUrl = record ? record.aoneUrl : "";
 	const prdUrl = record ? record.prdUrl : "";
 	const designUrl = record ? record.designUrl : "";
@@ -173,27 +170,29 @@ export const RequirementForm = forwardRef((props, ref) => {
 			cancelText={isView ? "关闭" : "取消"}
 		>
 			<Form className={styles.requirementForm} form={form} labelCol={labelCol}>
-				<Form.Item
-					name={RequirementFormItemNames.name}
-					label={RequirementFormItemLabels.name}
-					rules={[{ required: !isView }]}
-				>
-					{isView ? <span>{record ? record.name : ""}</span> : <Input />}
-				</Form.Item>
-				<Form.Item name={RequirementFormItemNames.projectIds} label={RequirementFormItemLabels.projectIds}>
-					{isView ? (
-						<span>
-							{record && record.projectIds && record.projectIds.length > 0
-								? projectOptions
-										.filter((opt) => record.projectIds.includes(opt.value))
-										.map((opt) => opt.label)
-										.join(", ")
-								: "未关联"}
-						</span>
-					) : (
-						<Select mode="multiple" placeholder="请选择关联项目" options={projectOptions} />
-					)}
-				</Form.Item>
+				{!(isView && !record?.name) && (
+					<Form.Item
+						name={RequirementFormItemNames.name}
+						label={RequirementFormItemLabels.name}
+						rules={[{ required: !isView }]}
+					>
+						{isView ? <span>{record.name}</span> : <Input />}
+					</Form.Item>
+				)}
+				{!(isView && (!record?.projectIds || record.projectIds.length === 0)) && (
+					<Form.Item name={RequirementFormItemNames.projectIds} label={RequirementFormItemLabels.projectIds}>
+						{isView ? (
+							<span>
+								{projectOptions
+									.filter((opt) => record.projectIds.includes(opt.value))
+									.map((opt) => opt.label)
+									.join(", ")}
+							</span>
+						) : (
+							<Select mode="multiple" placeholder="请选择关联项目" options={projectOptions} />
+						)}
+					</Form.Item>
+				)}
 				<UrlFormItem
 					isView={isView}
 					url={aoneUrl}
@@ -230,47 +229,57 @@ export const RequirementForm = forwardRef((props, ref) => {
 					name={RequirementFormItemNames.iterationUrl}
 					label={RequirementFormItemLabels.iterationUrl}
 				/>
-				<Form.Item
-					name={RequirementFormItemNames.devTime}
-					label={RequirementFormItemLabels.devTime}
-					rules={[{ required: !isView }]}
-				>
-					{isView ? <span>{record ? record.devTime : ""}</span> : <DatePicker />}
-				</Form.Item>
-				<Form.Item
-					name={RequirementFormItemNames.testTime}
-					label={RequirementFormItemLabels.testTime}
-					rules={[{ required: !isView }]}
-				>
-					{isView ? <span>{record ? record.testTime : ""}</span> : <DatePicker />}
-				</Form.Item>
-				<Form.Item
-					name={RequirementFormItemNames.onlineTime}
-					label={RequirementFormItemLabels.onlineTime}
-					rules={[{ required: !isView }]}
-				>
-					{isView ? <span>{record ? record.onlineTime : ""}</span> : <DatePicker />}
-				</Form.Item>
-				<Form.Item
-					name={RequirementFormItemNames.status}
-					label={RequirementFormItemLabels.status}
-					rules={[{ required: !isView }]}
-				>
-					{isView ? (
-						<span>{record ? record.status : ""}</span>
-					) : (
-						<Select>
-							<Option value={RequirementStatusEnum.pending}>{RequirementStatusEnum.pending}</Option>
-							<Option value={RequirementStatusEnum.developing}>{RequirementStatusEnum.developing}</Option>
-							<Option value={RequirementStatusEnum.debugging}>{RequirementStatusEnum.debugging}</Option>
-							<Option value={RequirementStatusEnum.testing}>{RequirementStatusEnum.testing}</Option>
-							<Option value={RequirementStatusEnum.online}>{RequirementStatusEnum.online}</Option>
-						</Select>
-					)}
-				</Form.Item>
-				<Form.Item name={RequirementFormItemNames.comment} label={RequirementFormItemLabels.comment}>
-					{isView ? <span>{record ? record.comment : ""}</span> : <TextArea rows={3} />}
-				</Form.Item>
+				{!(isView && !record?.devTime) && (
+					<Form.Item
+						name={RequirementFormItemNames.devTime}
+						label={RequirementFormItemLabels.devTime}
+						rules={[{ required: !isView }]}
+					>
+						{isView ? <span>{record.devTime}</span> : <DatePicker />}
+					</Form.Item>
+				)}
+				{!(isView && !record?.testTime) && (
+					<Form.Item
+						name={RequirementFormItemNames.testTime}
+						label={RequirementFormItemLabels.testTime}
+						rules={[{ required: !isView }]}
+					>
+						{isView ? <span>{record.testTime}</span> : <DatePicker />}
+					</Form.Item>
+				)}
+				{!(isView && !record?.onlineTime) && (
+					<Form.Item
+						name={RequirementFormItemNames.onlineTime}
+						label={RequirementFormItemLabels.onlineTime}
+						rules={[{ required: !isView }]}
+					>
+						{isView ? <span>{record.onlineTime}</span> : <DatePicker />}
+					</Form.Item>
+				)}
+				{!(isView && !record?.status) && (
+					<Form.Item
+						name={RequirementFormItemNames.status}
+						label={RequirementFormItemLabels.status}
+						rules={[{ required: !isView }]}
+					>
+						{isView ? (
+							<span>{record.status}</span>
+						) : (
+							<Select>
+								<Option value={RequirementStatusEnum.pending}>{RequirementStatusEnum.pending}</Option>
+								<Option value={RequirementStatusEnum.developing}>{RequirementStatusEnum.developing}</Option>
+								<Option value={RequirementStatusEnum.debugging}>{RequirementStatusEnum.debugging}</Option>
+								<Option value={RequirementStatusEnum.testing}>{RequirementStatusEnum.testing}</Option>
+								<Option value={RequirementStatusEnum.online}>{RequirementStatusEnum.online}</Option>
+							</Select>
+						)}
+					</Form.Item>
+				)}
+				{!(isView && !record?.comment) && (
+					<Form.Item name={RequirementFormItemNames.comment} label={RequirementFormItemLabels.comment}>
+						{isView ? <span>{record.comment}</span> : <TextArea rows={3} />}
+					</Form.Item>
+				)}
 			</Form>
 		</Modal>
 	);
