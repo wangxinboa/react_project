@@ -3,15 +3,31 @@ import { Button, Table, Pagination, Popconfirm, message } from "antd";
 import { usePagination } from "../../hooks/use_pagination.js";
 import { RequirementForm } from "./requirement_form.jsx";
 import {
-	serviceGetProjectListPage,
 	serviceGetRequirementListPage,
 	serviceAddRequirement,
 	serviceUpdateRequirement,
 	serviceDeleteRequirement,
-	RequirementStatusEnum,
-} from "../../service/service_project_manager.js";
+} from "../../service/project_manager/project_requirement_service.js";
+import { serviceGetAllProjects } from "../../service/project_manager/project_service.js";
+import { RequirementStatusEnum } from "../../service/project_manager/project_manager_constants.js";
 
 import styles from "./project_manager.module.scss";
+
+/**
+ * 渲染 URL 列（有值时显示为可点击的列名）
+ * @param {string} text - URL 值
+ * @param {string} label - 列名
+ * @returns {JSX.Element}
+ */
+function renderUrl(text, label) {
+	return text ? (
+		<a href={text} target="_blank" rel="noopener noreferrer">
+			{label}
+		</a>
+	) : (
+		"-"
+	);
+}
 
 /**
  * 需求管理 - 独立页面
@@ -24,7 +40,6 @@ export function RequirementList() {
 	const [allProjects, setAllProjects] = useState([]);
 	const { page, setPage, pageSize, setPageSize, total, setTotal } = usePagination(1, 10);
 
-	// ---------- 需求 CRUD ----------
 	/** 获取需求列表（分页） */
 	const fetchRequirementList = useCallback(() => {
 		serviceGetRequirementListPage(page, pageSize).then((res) => {
@@ -35,8 +50,8 @@ export function RequirementList() {
 
 	/** 获取所有项目（用于关联下拉） */
 	const fetchAllProjects = useCallback(() => {
-		serviceGetProjectListPage(1, 9999).then((res) => {
-			setAllProjects(res.data);
+		serviceGetAllProjects().then((projects) => {
+			setAllProjects(projects);
 		});
 	}, []);
 
@@ -106,21 +121,6 @@ export function RequirementList() {
 		for (let i = 0; i < allProjects.length; i++) {
 			projectMap[allProjects[i].id] = allProjects[i].name;
 		}
-
-		/**
-		 * 渲染 URL 列（有值时显示为可点击的列名）
-		 * @param {string} text - URL 值
-		 * @param {string} label - 列名
-		 * @returns {JSX.Element}
-		 */
-		const renderUrl = (text, label) =>
-			text ? (
-				<a href={text} target="_blank" rel="noopener noreferrer">
-					{label}
-				</a>
-			) : (
-				"-"
-			);
 
 		return [
 			{
@@ -259,7 +259,6 @@ export function RequirementList() {
 		];
 	}, [allProjects, handleView, handleEdit, handleDelete]);
 
-	// ---------- 初始化数据 ----------
 	useEffect(() => {
 		fetchRequirementList();
 		fetchAllProjects();

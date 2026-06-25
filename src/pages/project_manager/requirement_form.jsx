@@ -6,7 +6,7 @@ import {
 	RequirementFormItemNames,
 	RequirementFormItemLabels,
 	RequirementStatusEnum,
-} from "../../service/service_project_manager.js";
+} from "../../service/project_manager/project_manager_constants.js";
 import { UrlFormItem } from "../../components/url_form_item/url_form_item.jsx";
 
 import styles from "./project_manager.module.scss";

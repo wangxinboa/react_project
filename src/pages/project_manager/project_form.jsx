@@ -1,7 +1,10 @@
 import { forwardRef, useCallback, useImperativeHandle, useState } from "react";
 import { Modal, Form, Input } from "antd";
 import { ModalStatusTypeEnum } from "../../utils/global_constant.js";
-import { ProjectFormItemNames, ProjectFormItemLabels } from "../../service/service_project_manager.js";
+import {
+	ProjectFormItemNames,
+	ProjectFormItemLabels,
+} from "../../service/project_manager/project_manager_constants.js";
 import { UrlFormItem } from "../../components/url_form_item/url_form_item.jsx";
 
 const labelCol = { flex: "110px" };

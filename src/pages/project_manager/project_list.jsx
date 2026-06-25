@@ -9,7 +9,7 @@ import {
 	serviceDeleteProject,
 	serviceGetAllProjects,
 	serviceImportProjects,
-} from "../../service/service_project_manager.js";
+} from "../../service/project_manager/project_service.js";
 import { downloadJSON } from "../../utils/download/download.js";
 import { CFileUpload } from "../../components/file_upload_button/file_upload_button.jsx";
 import styles from "./project_manager.module.scss";
@@ -24,7 +24,6 @@ export function ProjectList() {
 	const [projectList, setProjectList] = useState([]);
 	const { page, setPage, pageSize, setPageSize, total, setTotal } = usePagination(1, 10);
 
-	// ---------- 项目 CRUD ----------
 	/** 获取项目列表（分页） */
 	const fetchProjectList = useCallback(() => {
 		serviceGetProjectListPage(page, pageSize).then((res) => {
@@ -215,7 +214,6 @@ export function ProjectList() {
 		];
 	}, [handleView, handleEdit, handleDelete]);
 
-	// ---------- 初始化数据 ----------
 	useEffect(() => {
 		fetchProjectList();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
