@@ -14,26 +14,14 @@ import {
 	serviceImportRequirements,
 	serviceGetRequirementList,
 } from "../../service/project_manager/project_requirement_service.js";
-import { RequirementStatusEnum } from "../../service/project_manager/project_manager_constants.js";
+import {
+	RequirementStatusEnum,
+	RequirementStatusColorMap,
+} from "../../service/project_manager/project_manager_constants.js";
 import { downloadJSON } from "../../utils/download/download.js";
 import { CFileUpload } from "../../components/file_upload_button/file_upload_button.jsx";
+import { TooltipProps } from "../../components/tooltip_props.js";
 import styles from "./project_manager.module.scss";
-
-/**
- * 根据需求状态返回对应 Tag 颜色
- * @param {string} status - 需求状态
- * @returns {string}
- */
-function getStatusColor(status) {
-	const colorMap = {
-		[RequirementStatusEnum.pending]: "default",
-		[RequirementStatusEnum.developing]: "blue",
-		[RequirementStatusEnum.debugging]: "orange",
-		[RequirementStatusEnum.testing]: "purple",
-		[RequirementStatusEnum.online]: "green",
-	};
-	return colorMap[status] || "default";
-}
 
 /**
  * 项目管理 - 独立页面
@@ -209,7 +197,7 @@ export function ProjectList() {
 				key: "name",
 				width: 150,
 				render: (text) => (
-					<Tooltip title={text}>
+					<Tooltip title={text} {...TooltipProps}>
 						<div className={styles.cellText}>{text}</div>
 					</Tooltip>
 				),
@@ -255,7 +243,7 @@ export function ProjectList() {
 					for (let j = 0; j < ids.length; j++) {
 						const req = reqMap[ids[j]];
 						if (req && req.status !== RequirementStatusEnum.online) {
-							const color = getStatusColor(req.status);
+							const color = RequirementStatusColorMap[req.status] || "default";
 							tags.push(
 								<Tag key={req.id} color={color}>
 									{req.name}
@@ -267,7 +255,7 @@ export function ProjectList() {
 						return <span>无</span>;
 					}
 					return (
-						<Tooltip title={<div className={styles.tagList}>{tags}</div>}>
+						<Tooltip title={<div className={styles.tagList}>{tags}</div>} {...TooltipProps}>
 							<div className={styles.tagRow}>{tags}</div>
 						</Tooltip>
 					);

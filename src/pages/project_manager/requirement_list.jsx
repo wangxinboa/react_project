@@ -10,8 +10,8 @@ import {
 	serviceDeleteRequirement,
 } from "../../service/project_manager/project_requirement_service.js";
 import { serviceGetAllProjects } from "../../service/project_manager/project_service.js";
-import { RequirementStatusEnum } from "../../service/project_manager/project_manager_constants.js";
-
+import { RequirementStatusColorMap } from "../../service/project_manager/project_manager_constants.js";
+import { TooltipProps } from "../../components/tooltip_props.js";
 import styles from "./project_manager.module.scss";
 
 /**
@@ -146,7 +146,7 @@ export function RequirementList() {
 				key: "name",
 				width: 150,
 				render: (text) => (
-					<Tooltip title={text}>
+					<Tooltip title={text} {...TooltipProps}>
 						<div className={styles.cellText}>{text}</div>
 					</Tooltip>
 				),
@@ -165,7 +165,7 @@ export function RequirementList() {
 					}
 					const fullText = names.join(", ");
 					return (
-						<Tooltip title={fullText}>
+						<Tooltip title={fullText} {...TooltipProps}>
 							<div className={styles.cellText}>{fullText}</div>
 						</Tooltip>
 					);
@@ -219,14 +219,7 @@ export function RequirementList() {
 				key: "status",
 				width: 100,
 				render: (status) => {
-					const colorMap = {
-						[RequirementStatusEnum.pending]: "default",
-						[RequirementStatusEnum.developing]: "blue",
-						[RequirementStatusEnum.debugging]: "orange",
-						[RequirementStatusEnum.testing]: "purple",
-						[RequirementStatusEnum.online]: "green",
-					};
-					return <span style={{ color: colorMap[status] || "black" }}>{status}</span>;
+					return <span style={{ color: RequirementStatusColorMap[status] || "black" }}>{status}</span>;
 				},
 			},
 			{

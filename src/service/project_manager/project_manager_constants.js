@@ -97,3 +97,16 @@ export const RequirementStatusEnum = Object.freeze({
 	testing: "正在测试",
 	online: "已上线",
 });
+
+/**
+ * 需求状态对应的 Tag 颜色映射
+ * @readonly
+ * @enum {string}
+ */
+export const RequirementStatusColorMap = Object.freeze({
+	[RequirementStatusEnum.pending]: "default",
+	[RequirementStatusEnum.developing]: "blue",
+	[RequirementStatusEnum.debugging]: "orange",
+	[RequirementStatusEnum.testing]: "purple",
+	[RequirementStatusEnum.online]: "green",
+});
