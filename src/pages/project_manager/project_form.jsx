@@ -7,7 +7,7 @@ import { UrlFormItem } from "../../components/url_form_item/url_form_item.jsx";
 const labelCol = { flex: "110px" };
 
 /**
- * 标题映射（避免嵌套三目）
+ * 标题映射
  */
 const MODAL_TITLE_MAP = {
 	[ModalStatusTypeEnum.Add]: "新增项目",

@@ -141,6 +141,7 @@ export function ProjectList() {
 				dataIndex: "id",
 				key: "id",
 				width: 80,
+				hidden: true,
 			},
 			{
 				title: "项目名称",
@@ -152,7 +153,7 @@ export function ProjectList() {
 				title: "仓库地址",
 				dataIndex: "gitUrl",
 				key: "gitUrl",
-				width: 150,
+				width: 100,
 				render: (text) =>
 					text ? (
 						<a href={text} target="_blank" rel="noopener noreferrer">
@@ -166,7 +167,7 @@ export function ProjectList() {
 				title: "O2 地址",
 				dataIndex: "o2Url",
 				key: "o2Url",
-				width: 150,
+				width: 100,
 				render: (text) =>
 					text ? (
 						<a href={text} target="_blank" rel="noopener noreferrer">

@@ -128,6 +128,7 @@ export function RequirementList() {
 				dataIndex: "id",
 				key: "id",
 				width: 80,
+				hidden: true,
 			},
 			{
 				title: "需求名称",
@@ -260,10 +261,8 @@ export function RequirementList() {
 
 	// ---------- 初始化数据 ----------
 	useEffect(() => {
-		serviceGetProjectListPage(1, 1).then((res) => {
-			fetchRequirementList();
-			fetchAllProjects();
-		});
+		fetchRequirementList();
+		fetchAllProjects();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
