@@ -58,7 +58,6 @@ export const RequirementFormItemNames = Object.freeze({
 	devTime: "devTime",
 	testTime: "testTime",
 	onlineTime: "onlineTime",
-	comment: "comment",
 	status: "status",
 });
 
@@ -79,7 +78,6 @@ export const RequirementFormItemLabels = Object.freeze({
 	devTime: "开发时间",
 	testTime: "提测时间",
 	onlineTime: "上线时间",
-	comment: "注释说明",
 	status: "状态",
 });
 

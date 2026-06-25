@@ -48,7 +48,6 @@ export function serviceGetRequirementListPage(page, pageSize) {
  * @param {number} record.devTime - 开发时间（时间戳）
  * @param {number} record.testTime - 提测时间（时间戳）
  * @param {number} record.onlineTime - 上线时间（时间戳）
- * @param {string} [record.comment] - 注释说明
  * @param {string} [record.status] - 状态（默认待开发）
  * @returns {Promise<{success: boolean}>}
  */
@@ -71,7 +70,7 @@ export function serviceAddRequirement(record) {
 /**
  * 更新需求
  * @param {number} id - 需求 ID
- * @param {Object} record - 要更新的字段（与新增相同）
+ * @param {Object} record - 要更新的字段
  * @returns {Promise<{success: boolean}>}
  */
 export function serviceUpdateRequirement(id, record) {
@@ -98,7 +97,6 @@ export function serviceUpdateRequirement(id, record) {
 			target.devTime = record.devTime;
 			target.testTime = record.testTime;
 			target.onlineTime = record.onlineTime;
-			target.comment = record.comment;
 			target.status = record.status || RequirementStatusEnum.pending;
 			return dbManager.put(Stores.requirements, target).then(() => {
 				return updateProjectRequirementIds(id, target.projectIds, "add").then(() => ({ success: true }));

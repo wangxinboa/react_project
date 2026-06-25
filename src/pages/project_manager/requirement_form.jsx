@@ -12,7 +12,6 @@ import { TimestampDatePicker } from "../../components/timestamp_date_picker/time
 
 import styles from "./project_manager.module.scss";
 
-const { TextArea } = Input;
 const { Option } = Select;
 const labelCol = { flex: "110px" };
 
@@ -89,7 +88,6 @@ export const RequirementForm = forwardRef((props, ref) => {
 				[RequirementFormItemNames.devTime]: data.devTime,
 				[RequirementFormItemNames.testTime]: data.testTime,
 				[RequirementFormItemNames.onlineTime]: data.onlineTime,
-				[RequirementFormItemNames.comment]: data.comment,
 				[RequirementFormItemNames.status]: data.status,
 			});
 		},
@@ -272,11 +270,6 @@ export const RequirementForm = forwardRef((props, ref) => {
 								<Option value={RequirementStatusEnum.online}>{RequirementStatusEnum.online}</Option>
 							</Select>
 						)}
-					</Form.Item>
-				)}
-				{!(isView && !record?.comment) && (
-					<Form.Item name={RequirementFormItemNames.comment} label={RequirementFormItemLabels.comment}>
-						{isView ? <span>{record.comment}</span> : <TextArea rows={3} />}
 					</Form.Item>
 				)}
 			</Form>

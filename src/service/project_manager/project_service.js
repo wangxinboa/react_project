@@ -94,7 +94,6 @@ export function serviceAddProject(record) {
 	return getNextId(Stores.projects).then((id) => {
 		record.id = id;
 		record.createTime = Date.now();
-		delete record.comment;
 		if (!record.requirementIds) {
 			record.requirementIds = [];
 		}
@@ -126,7 +125,6 @@ export function serviceUpdateProject(id, record) {
 		target.name = record.name;
 		target.gitUrl = record.gitUrl;
 		target.o2Url = record.o2Url;
-		// 不再更新 comment 字段
 		return dbManager.put(Stores.projects, target).then(() => ({ success: true }));
 	});
 }
@@ -179,7 +177,6 @@ export function serviceImportProjects(projectList) {
 		const addPromises = [];
 		for (let i = 0; i < projectList.length; i++) {
 			const project = projectList[i];
-			delete project.comment;
 			if (!project.requirementIds) {
 				project.requirementIds = [];
 			}
@@ -189,26 +186,5 @@ export function serviceImportProjects(projectList) {
 			addPromises.push(dbManager.add(Stores.projects, project));
 		}
 		return Promise.all(addPromises).then(() => ({ success: true }));
-	});
-}
-
-/**
- * 删除所有项目中的 comment 属性（校正旧数据）
- * @returns {Promise<{success: boolean, message: string}>}
- */
-export function serviceRemoveProjectComments() {
-	return dbManager.getAll(Stores.projects).then((projects) => {
-		const updatePromises = [];
-		for (let i = 0; i < projects.length; i++) {
-			const proj = projects[i];
-			if (proj.comment !== undefined) {
-				delete proj.comment;
-				updatePromises.push(dbManager.put(Stores.projects, proj));
-			}
-		}
-		return Promise.all(updatePromises).then(() => ({
-			success: true,
-			message: `已清理 ${updatePromises.length} 个项目的注释说明`,
-		}));
 	});
 }
