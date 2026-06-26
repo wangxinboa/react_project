@@ -5,7 +5,7 @@ import {
 	ProjectFormItemNames,
 	ProjectFormItemLabels,
 } from "../../service/project_manager/project_manager_constants.js";
-import { UrlFormItem } from "../../components/url_form_item/url_form_item.jsx";
+import { CUrlFormItem } from "../../components/c_url_form_item/c_url_form_item.jsx";
 
 const labelCol = { flex: "110px" };
 
@@ -132,13 +132,13 @@ export const ProjectForm = forwardRef((props, ref) => {
 						{isView ? <span>{record.name}</span> : <Input />}
 					</Form.Item>
 				)}
-				<UrlFormItem
+				<CUrlFormItem
 					isView={isView}
 					url={gitUrl}
 					name={ProjectFormItemNames.gitUrl}
 					label={ProjectFormItemLabels.gitUrl}
 				/>
-				<UrlFormItem
+				<CUrlFormItem
 					isView={isView}
 					url={o2Url}
 					name={ProjectFormItemNames.o2Url}

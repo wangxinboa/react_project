@@ -1,6 +1,6 @@
 import { forwardRef, useState, useCallback, useImperativeHandle } from "react";
 import { Modal, Button, Select, message, Tree } from "antd";
-import { CFileUpload } from "../file_upload_button/file_upload_button.jsx";
+import { CFileUpload } from "../c_file_upload/c_file_upload.jsx";
 import { createCodeFilesTreeByFileList } from "../../utils/input_files/code_files/create_code_files_tree_by_file_list.js";
 
 import styles from "./upload_code_files.module.scss";

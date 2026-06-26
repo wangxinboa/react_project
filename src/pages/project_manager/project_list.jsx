@@ -19,7 +19,7 @@ import {
 	RequirementStatusColorMap,
 } from "../../service/project_manager/project_manager_constants.js";
 import { downloadJSON } from "../../utils/download/download.js";
-import { CFileUpload } from "../../components/file_upload_button/file_upload_button.jsx";
+import { CFileUpload } from "../../components/c_file_upload/c_file_upload.jsx";
 import { TooltipProps } from "../../components/tooltip_props.js";
 import styles from "./project_manager.module.scss";
 

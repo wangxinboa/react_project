@@ -7,8 +7,8 @@ import {
 	RequirementFormItemLabels,
 	RequirementStatusEnum,
 } from "../../service/project_manager/project_manager_constants.js";
-import { UrlFormItem } from "../../components/url_form_item/url_form_item.jsx";
-import { TimestampDatePicker } from "../../components/timestamp_date_picker/timestamp_date_picker.jsx";
+import { CUrlFormItem } from "../../components/c_url_form_item/c_url_form_item.jsx";
+import { CTimestampDatePicker } from "../../components/c_timestamp_date_picker/c_timestamp_date_picker.jsx";
 
 import styles from "./project_manager.module.scss";
 
@@ -198,37 +198,37 @@ export const RequirementForm = forwardRef((props, ref) => {
 						)}
 					</Form.Item>
 				)}
-				<UrlFormItem
+				<CUrlFormItem
 					isView={isView}
 					url={aoneUrl}
 					name={RequirementFormItemNames.aoneUrl}
 					label={RequirementFormItemLabels.aoneUrl}
 				/>
-				<UrlFormItem
+				<CUrlFormItem
 					isView={isView}
 					url={prdUrl}
 					name={RequirementFormItemNames.prdUrl}
 					label={RequirementFormItemLabels.prdUrl}
 				/>
-				<UrlFormItem
+				<CUrlFormItem
 					isView={isView}
 					url={designUrl}
 					name={RequirementFormItemNames.designUrl}
 					label={RequirementFormItemLabels.designUrl}
 				/>
-				<UrlFormItem
+				<CUrlFormItem
 					isView={isView}
 					url={testUrl}
 					name={RequirementFormItemNames.testUrl}
 					label={RequirementFormItemLabels.testUrl}
 				/>
-				<UrlFormItem
+				<CUrlFormItem
 					isView={isView}
 					url={crUrl}
 					name={RequirementFormItemNames.crUrl}
 					label={RequirementFormItemLabels.crUrl}
 				/>
-				<UrlFormItem
+				<CUrlFormItem
 					isView={isView}
 					url={iterationUrl}
 					name={RequirementFormItemNames.iterationUrl}
@@ -240,17 +240,17 @@ export const RequirementForm = forwardRef((props, ref) => {
 						label={RequirementFormItemLabels.devTime}
 						rules={[{ required: !isView }]}
 					>
-						{isView ? <span>{formatTs(record.devTime)}</span> : <TimestampDatePicker />}
+						{isView ? <span>{formatTs(record.devTime)}</span> : <CTimestampDatePicker />}
 					</Form.Item>
 				)}
 				{!(isView && !record?.testTime) && (
 					<Form.Item name={RequirementFormItemNames.testTime} label={RequirementFormItemLabels.testTime}>
-						{isView ? <span>{formatTs(record.testTime)}</span> : <TimestampDatePicker />}
+						{isView ? <span>{formatTs(record.testTime)}</span> : <CTimestampDatePicker />}
 					</Form.Item>
 				)}
 				{!(isView && !record?.onlineTime) && (
 					<Form.Item name={RequirementFormItemNames.onlineTime} label={RequirementFormItemLabels.onlineTime}>
-						{isView ? <span>{formatTs(record.onlineTime)}</span> : <TimestampDatePicker />}
+						{isView ? <span>{formatTs(record.onlineTime)}</span> : <CTimestampDatePicker />}
 					</Form.Item>
 				)}
 				{!(isView && !record?.status) && (

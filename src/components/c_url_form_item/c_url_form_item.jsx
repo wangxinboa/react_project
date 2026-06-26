@@ -9,7 +9,7 @@ import { Form, Input } from "antd";
  * @param {string} props.label - 字段标签
  * @returns {JSX.Element|null}
  */
-export function UrlFormItem({ isView, url, name, label }) {
+export function CUrlFormItem({ isView, url, name, label }) {
 	if (isView && !url) {
 		return null;
 	}

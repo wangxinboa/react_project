@@ -9,7 +9,7 @@ import dayjs from "dayjs";
  * @param {(timestamp: number) => void} props.onChange - 返回时间戳
  * @returns {JSX.Element}
  */
-export function TimestampDatePicker({ value, onChange, ...restProps }) {
+export function CTimestampDatePicker({ value, onChange, ...restProps }) {
 	/**
 	 * 时间戳转 dayjs 对象
 	 * @param {number} ts
