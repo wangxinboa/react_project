@@ -20,7 +20,7 @@ import {
 } from "../../service/project_manager/project_manager_constants.js";
 import { downloadJSON } from "../../utils/download/download.js";
 import { CFileUpload } from "../../components/c_file_upload/c_file_upload.jsx";
-import { TooltipProps } from "../../components/tooltip_props.js";
+import { CTooltipProps } from "../../components/c_tooltip_props.js";
 import styles from "./project_manager.module.scss";
 
 /**
@@ -198,7 +198,7 @@ export function ProjectList() {
 				width: 150,
 				fixed: "left",
 				render: (text) => (
-					<Tooltip title={text} {...TooltipProps}>
+					<Tooltip title={text} {...CTooltipProps}>
 						<div className={styles.cellFlexContainer}>
 							<div className={styles.cellFlexText}>{text}</div>
 						</div>
@@ -258,7 +258,7 @@ export function ProjectList() {
 						return <span>无</span>;
 					}
 					return (
-						<Tooltip title={<div className={styles.tagList}>{tags}</div>} {...TooltipProps}>
+						<Tooltip title={<div className={styles.tagList}>{tags}</div>} {...CTooltipProps}>
 							<div className={styles.cellFlexContainer}>
 								<div className={styles.cellFlexText}>{tags}</div>
 							</div>

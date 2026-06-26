@@ -11,7 +11,7 @@ import {
 } from "../../service/project_manager/project_requirement_service.js";
 import { serviceGetAllProjects } from "../../service/project_manager/project_service.js";
 import { RequirementStatusColorMap } from "../../service/project_manager/project_manager_constants.js";
-import { TooltipProps } from "../../components/tooltip_props.js";
+import { CTooltipProps } from "../../components/c_tooltip_props.js";
 import styles from "./project_manager.module.scss";
 
 /**
@@ -147,7 +147,7 @@ export function RequirementList() {
 				width: 150,
 				fixed: "left",
 				render: (text) => (
-					<Tooltip title={text} {...TooltipProps}>
+					<Tooltip title={text} {...CTooltipProps}>
 						<div className={styles.cellFlexContainer}>
 							<div className={styles.cellFlexText}>{text}</div>
 						</div>
@@ -168,7 +168,7 @@ export function RequirementList() {
 					}
 					const fullText = names.join(", ");
 					return (
-						<Tooltip title={fullText} {...TooltipProps}>
+						<Tooltip title={fullText} {...CTooltipProps}>
 							<div className={styles.cellFlexContainer}>
 								<div className={styles.cellFlexText}>{fullText}</div>
 							</div>
