@@ -1,0 +1,12 @@
+.aiPromptList {
+	padding: 16px;
+
+	> .header {
+		margin-bottom: 16px;
+	}
+
+	.operationCell {
+		display: flex;
+		gap: 8px;
+	}
+}

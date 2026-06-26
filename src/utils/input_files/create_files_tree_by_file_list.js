@@ -1,15 +1,16 @@
-import RootFolder from "./root_folder.js";
-import Folder from "./folder.js";
-import File from "./file.js";
+import { RootFolder } from "./root_folder.js";
 
-export function createFilesTreeByFileList(files, RootFolderClass = RootFolder, FolderClass = Folder, FileClass = File) {
-	// 将 files 信息转化为 tree
-	let rootFolderNode = new RootFolderClass();
-
-	for (let i = 0, filesLen = files.length; i < filesLen; i++) {
+/**
+ * 根据浏览器的 FileList 构建文件树
+ * @param {FileList} files - 文件列表（需支持 webkitRelativePath）
+ * @returns {RootFolder}
+ */
+export function createFilesTreeByFileList(files) {
+	const rootFolder = new RootFolder();
+	for (let i = 0; i < files.length; i++) {
 		const file = files[i];
-		rootFolderNode.addFileByPath(file.webkitRelativePath, FolderClass, FileClass).initFile(file);
+		const path = file.webkitRelativePath || file.name;
+		rootFolder.addFileByPath(path, file);
 	}
-
-	return rootFolderNode;
+	return rootFolder;
 }

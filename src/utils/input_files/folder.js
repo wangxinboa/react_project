@@ -1,111 +1,102 @@
-const collator = new Intl.Collator(undefined, {
-	numeric: true, // 开启数字识别
-	sensitivity: "base", // 大小写不敏感
-});
+const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
 
-function defaultFolderSort(fileA, fileB) {
-	if (fileA.isFolder && fileB.isFile) {
+/**
+ * 默认排序：文件夹在前，文件在后，同类型按名称排序
+ * @param {Folder | AppType.File} a
+ * @param {Folder | AppType.File} b
+ * @returns {number}
+ */
+function defaultSort(a, b) {
+	if (a.isFolder && !b.isFolder) {
 		return -1;
-	} else if (fileA.isFile && fileB.isFolder) {
-		return 1;
-	} else {
-		return collator.compare(fileA.title, fileB.title);
 	}
+	if (!a.isFolder && b.isFolder) {
+		return 1;
+	}
+	return collator.compare(a.title, b.title);
 }
 
-export default class Folder {
-	constructor() {
-		this.type = "folder";
-		this.isFolder = true;
-		this.key = "";
-		this.title = "";
-		this.folders = [];
-		this.foldersMap = {};
-		this.files = [];
-		this.filesMap = {};
-		this.parent = null;
-		this.children = [];
-	}
+/**
+ * 文件树节点 - 文件夹
+ * @class
+ */
+export class Folder {
+	type = "folder";
+	isFolder = true;
+	/** @type {string} 文件夹完整路径 */
+	key = "";
+	/** @type {string} 文件夹名 */
+	title = "";
+	/** @type {(Folder | AppType.File)[]} */
+	children = [];
+	/** @type {Object<string, Folder | AppType.File>} */
+	childrenMap = {};
 
-	destroy() {
-		for (let i = 0, len = this.children.length; i < len; i++) {
-			this.children[i].destroy();
-		}
-		this.type =
-			this.isFolder =
-			this.folders =
-			this.foldersMap =
-			this.files =
-			this.filesMap =
-			this.parent =
-			this.children =
-			this.key =
-			this.title =
-				null;
-	}
-
-	init(path, title) {
-		this.key = path;
+	/**
+	 * 初始化文件夹
+	 * @param {string} key - 文件夹路径
+	 * @param {string} title - 文件夹名称
+	 * @returns {Folder}
+	 */
+	init(key, title) {
+		this.key = key;
 		this.title = title;
 		return this;
 	}
 
-	setParent(parent) {
-		this.parent = parent;
-	}
-
-	hasFolder(title) {
-		return title in this.foldersMap;
-	}
-
-	getFolder(title) {
-		return this.foldersMap[title];
-	}
-
-	addFolder(folder) {
-		this.folders.push(folder);
-		this.foldersMap[folder.title] = folder;
-		folder.setParent(this);
-		this.children.push(folder);
-		this.sort();
+	/**
+	 * 添加子节点（文件或文件夹）
+	 * @param {Folder | AppType.File} child
+	 * @returns {Folder}
+	 */
+	addChild(child) {
+		this.children.push(child);
+		this.childrenMap[child.title] = child;
+		this.children.sort(defaultSort);
 		return this;
 	}
 
-	hasFile(title) {
-		return title in this.filesMap;
+	/**
+	 * 根据名称获取子节点
+	 * @param {string} title
+	 * @returns {Folder | AppType.File | undefined}
+	 */
+	getChild(title) {
+		return this.childrenMap[title];
 	}
 
-	getFile(title) {
-		return this.filesMap[title];
+	/**
+	 * 是否存在指定名称的子节点
+	 * @param {string} title
+	 * @returns {boolean}
+	 */
+	hasChild(title) {
+		return title in this.childrenMap;
 	}
 
-	addFile(file) {
-		this.files.push(file);
-		this.filesMap[file.title] = file;
-		file.setParent(this);
-		this.children.push(file);
-		this.sort();
-		return this;
-	}
-
-	getChildrenLength() {
-		return this.folders + this.folders;
-	}
-
-	sort(sort) {
-		this.children.sort(sort ?? defaultFolderSort);
-		return this;
-	}
-
-	toJSON() {
-		return {
-			type: this.type,
-			isFolder: true,
+	/**
+	 * 转为 antd Tree 节点数据（递归）
+	 * @returns {{key: string, title: string, selectable: boolean, children: Object[]}}
+	 */
+	toTreeNode() {
+		const node = {
 			key: this.key,
 			title: this.title,
-			folders: this.folders,
-			files: this.files,
-			children: this.children,
+			selectable: false,
+			children: [],
 		};
+		for (let i = 0; i < this.children.length; i++) {
+			node.children.push(this.children[i].toTreeNode());
+		}
+		return node;
+	}
+
+	/** 释放子节点资源 */
+	destroy() {
+		for (let i = 0; i < this.children.length; i++) {
+			this.children[i].destroy();
+		}
+		this.children = null;
+		this.childrenMap = null;
 	}
 }

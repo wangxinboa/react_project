@@ -16,7 +16,7 @@ export function CFileUpload(props = {}) {
 		<input
 			type="file"
 			name="files"
-			className={styles.c_hidden_input_button}
+			className={styles.cHiddenInputButton}
 			webkitdirectory={webkitdirectory}
 			multiple={multiple}
 			accept={accept}

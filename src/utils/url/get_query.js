@@ -3,7 +3,7 @@ let _paramsStr_ = null,
 	_key_ = null,
 	_val_ = null;
 
-export default function getQuery(key, url = window.location.href) {
+export function getQuery(key, url = window.location.href) {
 	_pairs_ = _key_ = _val_ = null;
 	_paramsStr_ = decodeURIComponent(url).split("?")[1];
 
