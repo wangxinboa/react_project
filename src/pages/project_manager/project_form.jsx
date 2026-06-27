@@ -6,12 +6,10 @@ import {
 	ProjectFormItemLabels,
 } from "../../service/project_manager/project_manager_constants.js";
 import { CUrlFormItem } from "../../components/c_url_form_item/c_url_form_item.jsx";
+import styles from "./project_manager.module.scss";
 
 const labelCol = { flex: "110px" };
 
-/**
- * 标题映射
- */
 const ModalTitleMap = {
 	[ModalStatusTypeEnum.Add]: "新增项目",
 	[ModalStatusTypeEnum.Edit]: "编辑项目",
@@ -20,10 +18,11 @@ const ModalTitleMap = {
 
 /**
  * 项目管理 - 新增/编辑/查看项目表单组件
- * @component
  * @param {Object} props
  * @param {Function} props.onAddOk - 新增成功回调，参数为表单数据
  * @param {Function} props.onEditOk - 编辑成功回调，参数为 (id, 表单数据)
+ * @param {React.Ref} ref
+ * @returns {JSX.Element}
  */
 export const ProjectForm = forwardRef((props, ref) => {
 	const { onAddOk, onEditOk } = props;
@@ -38,10 +37,6 @@ export const ProjectForm = forwardRef((props, ref) => {
 
 	const modalTitle = ModalTitleMap[status] || "";
 
-	/**
-	 * 填充项目表单数据
-	 * @param {Object} data - 项目数据
-	 */
 	const setProjectFormValues = useCallback(
 		(data) => {
 			form.setFieldsValue({
@@ -53,10 +48,6 @@ export const ProjectForm = forwardRef((props, ref) => {
 		[form],
 	);
 
-	/**
-	 * 确认按钮回调
-	 * @returns {void}
-	 */
 	const handleOnOk = useCallback(() => {
 		if (isView) {
 			setVisible(false);
@@ -73,18 +64,11 @@ export const ProjectForm = forwardRef((props, ref) => {
 		form.resetFields();
 	}, [form, isAdd, isEdit, isView, onAddOk, onEditOk, record]);
 
-	/**
-	 * 取消按钮回调
-	 * @returns {void}
-	 */
 	const handleOnCancel = useCallback(() => {
 		setVisible(false);
 		form.resetFields();
 	}, [form]);
 
-	/**
-	 * 暴露给父组件的方法
-	 */
 	useImperativeHandle(
 		ref,
 		() => ({
@@ -114,7 +98,7 @@ export const ProjectForm = forwardRef((props, ref) => {
 
 	return (
 		<Modal
-			style={{ display: "flex", flexDirection: "column" }}
+			className={styles.modalFlexColumn}
 			title={modalTitle}
 			open={visible}
 			onOk={handleOnOk}

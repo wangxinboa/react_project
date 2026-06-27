@@ -23,7 +23,15 @@
 			display: flex;
 			gap: 8px;
 			align-items: center;
+
+			> .flexInput {
+				flex: 1;
+			}
 		}
+	}
+
+	> .suffixSelect {
+		width: 100%;
 	}
 }
 

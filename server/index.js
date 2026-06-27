@@ -43,14 +43,17 @@ app.get("/api/file-tree", async (req, res) => {
 	try {
 		const { rootPath, exclude } = req.query;
 		if (!rootPath) return res.status(400).json({ error: "rootPath is required" });
+
 		const absoluteRoot = path.resolve(rootPath);
-		await fs.access(absoluteRoot);
+		await fs.access(absoluteRoot); // 简单的存在性检查，不区分文件/文件夹
+
 		const excludeList = exclude
 			? exclude
 					.split(",")
 					.map((s) => s.trim())
 					.filter(Boolean)
 			: [];
+
 		const children = await buildFileTree(absoluteRoot, excludeList);
 		const rootNode = {
 			key: absoluteRoot,
@@ -61,6 +64,7 @@ app.get("/api/file-tree", async (req, res) => {
 		};
 		res.json({ success: true, data: rootNode });
 	} catch (err) {
+		console.error(err);
 		res.status(500).json({ success: false, error: err.message });
 	}
 });
@@ -74,7 +78,6 @@ async function loadPrompts() {
 	try {
 		const raw = await fs.readFile(DATA_FILE, "utf-8");
 		promptsData = JSON.parse(raw);
-		// 重新计算最大 ID
 		nextId = 1;
 		for (let i = 0; i < promptsData.length; i++) {
 			if (promptsData[i].id >= nextId) nextId = promptsData[i].id + 1;
@@ -89,12 +92,10 @@ async function savePrompts() {
 	await fs.writeFile(DATA_FILE, JSON.stringify(promptsData, null, 2), "utf-8");
 }
 
-// 获取所有
 app.get("/api/prompts", (req, res) => {
 	res.json({ success: true, data: promptsData });
 });
 
-// 获取单个
 app.get("/api/prompts/:id", (req, res) => {
 	const id = parseInt(req.params.id, 10);
 	const item = promptsData.find((p) => p.id === id);
@@ -102,7 +103,6 @@ app.get("/api/prompts/:id", (req, res) => {
 	res.json({ success: true, data: item });
 });
 
-// 新增
 app.post("/api/prompts", async (req, res) => {
 	try {
 		const { name, components } = req.body;
@@ -122,7 +122,6 @@ app.post("/api/prompts", async (req, res) => {
 	}
 });
 
-// 更新
 app.put("/api/prompts/:id", async (req, res) => {
 	try {
 		const id = parseInt(req.params.id, 10);
@@ -139,7 +138,6 @@ app.put("/api/prompts/:id", async (req, res) => {
 	}
 });
 
-// 删除
 app.delete("/api/prompts/:id", async (req, res) => {
 	try {
 		const id = parseInt(req.params.id, 10);

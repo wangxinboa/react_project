@@ -1,16 +1,19 @@
-import { useState, useCallback, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useCallback, useEffect } from "react";
 import { Button, Table, Popconfirm, message } from "antd";
-import { fetchAllPrompts, deletePrompt } from "../../service/service_ai_prompt.js";
+import { serviceFetchAllPrompts, serviceDeletePrompt } from "../../service/service_ai_prompt.js";
+import { toAIPromptEditor } from "../../router/router.js";
 import styles from "./ai_prompt_list.module.scss";
 
-export function AIPromptList() {
+/**
+ * AI 提示词列表页
+ * @component
+ */
+export const AIPromptList = React.memo(function AIPromptList() {
 	const [dataSource, setDataSource] = useState([]);
-	const navigate = useNavigate();
 
 	const loadData = useCallback(async () => {
 		try {
-			const list = await fetchAllPrompts();
+			const list = await serviceFetchAllPrompts();
 			setDataSource(list);
 		} catch (e) {
 			message.error("加载列表失败");
@@ -20,7 +23,7 @@ export function AIPromptList() {
 	const handleDelete = useCallback(
 		async (id) => {
 			try {
-				await deletePrompt(id);
+				await serviceDeletePrompt(id);
 				message.success("删除成功");
 				loadData();
 			} catch (e) {
@@ -37,7 +40,7 @@ export function AIPromptList() {
 			key: "action",
 			render: (_, record) => (
 				<div className={styles.operationCell}>
-					<Button type="link" onClick={() => navigate(`/AIPrompt/Editor?id=${record.id}`)}>
+					<Button type="link" onClick={() => toAIPromptEditor(record.id)}>
 						编辑
 					</Button>
 					<Popconfirm title="确定删除吗？" onConfirm={() => handleDelete(record.id)}>
@@ -57,11 +60,11 @@ export function AIPromptList() {
 	return (
 		<div className={styles.aiPromptList}>
 			<div className={styles.header}>
-				<Button type="primary" onClick={() => navigate("/AIPrompt/Editor")}>
+				<Button type="primary" onClick={() => toAIPromptEditor()}>
 					新建提示词
 				</Button>
 			</div>
 			<Table rowKey="id" columns={columns} dataSource={dataSource} pagination={false} />
 		</div>
 	);
-}
+});

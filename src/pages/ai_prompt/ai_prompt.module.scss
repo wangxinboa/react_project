@@ -9,6 +9,10 @@
 		gap: 8px;
 		margin-bottom: 16px;
 		align-items: center;
+
+		> .nameInput {
+			width: 200px;
+		}
 	}
 
 	> .componentList {

@@ -9,15 +9,11 @@ import {
 } from "../../service/project_manager/project_manager_constants.js";
 import { CUrlFormItem } from "../../components/c_url_form_item/c_url_form_item.jsx";
 import { CTimestampDatePicker } from "../../components/c_timestamp_date_picker/c_timestamp_date_picker.jsx";
-
 import styles from "./project_manager.module.scss";
 
 const { Option } = Select;
 const labelCol = { flex: "110px" };
 
-/**
- * 标题映射
- */
 const ModalTitleMap = {
 	[ModalStatusTypeEnum.Add]: "新增需求",
 	[ModalStatusTypeEnum.Edit]: "编辑需求",
@@ -36,11 +32,12 @@ function formatTs(ts) {
 
 /**
  * 需求管理 - 新增/编辑/查看需求表单组件
- * @component
  * @param {Object} props
- * @param {Function} props.onAddOk - 新增成功回调，参数为表单数据（日期为时间戳）
- * @param {Function} props.onEditOk - 编辑成功回调，参数为 (id, 表单数据)
- * @param {Array} props.projects - 所有项目的列表，用于关联项目下拉选择
+ * @param {Function} props.onAddOk - 新增成功回调
+ * @param {Function} props.onEditOk - 编辑成功回调
+ * @param {Object[]} props.projects - 所有项目列表
+ * @param {React.Ref} ref
+ * @returns {JSX.Element}
  */
 export const RequirementForm = forwardRef((props, ref) => {
 	const { onAddOk, onEditOk, projects } = props;
@@ -55,10 +52,6 @@ export const RequirementForm = forwardRef((props, ref) => {
 
 	const modalTitle = ModalTitleMap[status] || "";
 
-	/**
-	 * 生成项目下拉选项
-	 * @returns {Array<{value: number, label: string}>}
-	 */
 	const projectOptions = useMemo(() => {
 		const options = [];
 		for (let i = 0; i < projects.length; i++) {
@@ -70,10 +63,6 @@ export const RequirementForm = forwardRef((props, ref) => {
 		return options;
 	}, [projects]);
 
-	/**
-	 * 填充需求表单数据（时间戳直接作为 value）
-	 * @param {Object} data - 需求数据
-	 */
 	const setRequirementFormValues = useCallback(
 		(data) => {
 			form.setFieldsValue({
@@ -94,10 +83,6 @@ export const RequirementForm = forwardRef((props, ref) => {
 		[form],
 	);
 
-	/**
-	 * 确认按钮回调
-	 * @returns {void}
-	 */
 	const handleOnOk = useCallback(() => {
 		if (isView) {
 			setVisible(false);
@@ -116,18 +101,11 @@ export const RequirementForm = forwardRef((props, ref) => {
 		});
 	}, [form, isAdd, isEdit, isView, onAddOk, onEditOk, record]);
 
-	/**
-	 * 取消按钮回调
-	 * @returns {void}
-	 */
 	const handleOnCancel = useCallback(() => {
 		setVisible(false);
 		form.resetFields();
 	}, [form]);
 
-	/**
-	 * 暴露给父组件的方法
-	 */
 	useImperativeHandle(
 		ref,
 		() => ({

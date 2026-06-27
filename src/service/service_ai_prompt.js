@@ -1,14 +1,12 @@
-// 文件路径：src/service/service_ai_prompt.js
-
 const BASE_URL = "http://localhost:2998";
 
 /**
- * 获取文件树
- * @param {string} rootPath
- * @param {string} [exclude]
- * @returns {Promise<Object>} 返回 { success, data } 格式的响应数据
+ * 获取文件树（请求本地服务）
+ * @param {string} rootPath - 要扫描的根目录绝对路径
+ * @param {string} [exclude] - 逗号分割的排除文件夹名，如 "node_modules,dist"
+ * @returns {Promise<AppType.ServerTreeNode>} 包含完整文件树的根节点
  */
-export async function fetchFileTree(rootPath, exclude) {
+export async function serviceFetchFileTree(rootPath, exclude) {
 	const params = new URLSearchParams({ rootPath });
 	if (exclude) params.append("exclude", exclude);
 	const res = await fetch(`${BASE_URL}/api/file-tree?${params.toString()}`);
@@ -19,9 +17,9 @@ export async function fetchFileTree(rootPath, exclude) {
 
 /**
  * 获取所有提示词配置
- * @returns {Promise<Array>}
+ * @returns {Promise<Array<{id: number, name: string, components: Array, createTime: number, updateTime: number}>>}
  */
-export async function fetchAllPrompts() {
+export async function serviceFetchAllPrompts() {
 	const res = await fetch(`${BASE_URL}/api/prompts`);
 	const json = await res.json();
 	if (!json.success) throw new Error(json.error || "获取列表失败");
@@ -31,9 +29,9 @@ export async function fetchAllPrompts() {
 /**
  * 获取单个提示词配置
  * @param {number} id
- * @returns {Promise<Object>}
+ * @returns {Promise<{id: number, name: string, components: Array, createTime: number, updateTime: number}>}
  */
-export async function fetchPromptById(id) {
+export async function serviceFetchPromptById(id) {
 	const res = await fetch(`${BASE_URL}/api/prompts/${id}`);
 	const json = await res.json();
 	if (!json.success) throw new Error(json.error || "获取详情失败");
@@ -43,9 +41,9 @@ export async function fetchPromptById(id) {
 /**
  * 创建提示词配置
  * @param {{ name: string, components: Array }} data
- * @returns {Promise<Object>}
+ * @returns {Promise<{id: number, name: string, components: Array, createTime: number, updateTime: number}>}
  */
-export async function createPrompt(data) {
+export async function serviceCreatePrompt(data) {
 	const res = await fetch(`${BASE_URL}/api/prompts`, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
@@ -60,9 +58,9 @@ export async function createPrompt(data) {
  * 更新提示词配置
  * @param {number} id
  * @param {{ name?: string, components?: Array }} data
- * @returns {Promise<Object>}
+ * @returns {Promise<{id: number, name: string, components: Array, createTime: number, updateTime: number}>}
  */
-export async function updatePrompt(id, data) {
+export async function serviceUpdatePrompt(id, data) {
 	const res = await fetch(`${BASE_URL}/api/prompts/${id}`, {
 		method: "PUT",
 		headers: { "Content-Type": "application/json" },
@@ -78,7 +76,7 @@ export async function updatePrompt(id, data) {
  * @param {number} id
  * @returns {Promise<void>}
  */
-export async function deletePrompt(id) {
+export async function serviceDeletePrompt(id) {
 	const res = await fetch(`${BASE_URL}/api/prompts/${id}`, {
 		method: "DELETE",
 	});

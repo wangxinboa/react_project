@@ -1,3 +1,4 @@
+import React from "react";
 import { Tree } from "antd";
 import styles from "./c_file_tree.module.scss";
 
@@ -9,10 +10,10 @@ import styles from "./c_file_tree.module.scss";
  * @param {(checkedKeys: string[]) => void} props.onCheck - 勾选变化回调
  * @returns {JSX.Element}
  */
-export function CFileTree({ treeData, checkedKeys, onCheck }) {
+export const CFileTree = React.memo(function CFileTree({ treeData, checkedKeys, onCheck }) {
 	return (
 		<div className={styles.cFileTreeContainer}>
 			<Tree checkable showLine blockNode treeData={treeData} checkedKeys={checkedKeys} onCheck={onCheck} />
 		</div>
 	);
-}
+});

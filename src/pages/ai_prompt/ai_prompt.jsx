@@ -1,79 +1,70 @@
-import { useState, useCallback, useEffect, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import React, { useState, useCallback, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Button, Input, message } from "antd";
-import { PromptComponentType, PromptComponentMap } from "./prompt_components/prompt_components.js";
-import { fetchPromptById, createPrompt, updatePrompt } from "../../service/service_ai_prompt.js";
+import {
+	PromptComponentType,
+	PromptComponentMap,
+	generatePromptStringByType,
+} from "./prompt_components/prompt_components.js";
+import { serviceFetchPromptById, serviceCreatePrompt, serviceUpdatePrompt } from "../../service/service_ai_prompt.js";
+import { history } from "../../router/router.js";
 import styles from "./ai_prompt.module.scss";
 
 /**
- * 提示词编辑器页面（新建/编辑）
+ * 组件配置项结构
+ * @typedef {Object} ComponentConfig
+ * @property {string} type
+ * @property {Object} props
+ * @property {string[]} [props.checkedKeys]
+ * @property {Object<string, AppType.FileInfo>} [props.codeFilesMap]
+ * @property {string} [props.value]
  */
-export function AIPromptEditor() {
-	const navigate = useNavigate();
-	const [searchParams] = useSearchParams();
-	const editId = searchParams.get("id") ? parseInt(searchParams.get("id"), 10) : null;
 
+/**
+ * AI 提示词编辑器（新建 / 编辑）
+ * @component
+ * @returns {JSX.Element}
+ */
+export const AIPrompt = React.memo(function AIPrompt() {
+	const [searchParams] = useSearchParams();
+	const initialId = searchParams.get("id") ? parseInt(searchParams.get("id"), 10) : null;
+	const [promptId, setPromptId] = useState(initialId);
 	const [name, setName] = useState("");
 	const [components, setComponents] = useState([]);
 	const [saving, setSaving] = useState(false);
-	const promptMapRef = useRef({});
 
-	useEffect(() => {
-		if (editId) {
-			fetchPromptById(editId)
-				.then((data) => {
-					setName(data.name || "");
-					const comps = [];
-					if (data.components) {
-						for (let i = 0; i < data.components.length; i++) {
-							const { type, props } = data.components[i];
-							comps.push({ type, props: props || {} });
-						}
-					}
-					setComponents(comps);
-				})
-				.catch(() => message.error("加载失败"));
-		}
-	}, [editId]);
-
-	const updateComponentProps = useCallback((index, newProps) => {
-		setComponents((prev) => {
+	const updateComponentProps = useCallback(
+		(index, newProps) => {
 			const next = [];
-			for (let i = 0; i < prev.length; i++) {
+			for (let i = 0; i < components.length; i++) {
 				if (i === index) {
-					next.push({ ...prev[i], props: { ...prev[i].props, ...newProps } });
+					next.push({ ...components[i], props: { ...components[i].props, ...newProps } });
 				} else {
-					next.push(prev[i]);
+					next.push(components[i]);
 				}
 			}
-			return next;
-		});
-	}, []);
+			setComponents(next);
+		},
+		[components],
+	);
 
 	const handleAdd = (type) => {
 		const defaultProps =
-			type === PromptComponentType.TextArea ? { value: "" } : { rootPath: "", exclude: "", checkedKeys: [] };
-		setComponents((prev) => {
-			const next = [];
-			for (let i = 0; i < prev.length; i++) next.push(prev[i]);
-			next.push({ type, props: defaultProps });
-			return next;
-		});
+			type === PromptComponentType.TextArea
+				? { value: "" }
+				: { rootPath: "", exclude: "", checkedKeys: [], codeFilesMap: {} };
+		const next = [];
+		for (let i = 0; i < components.length; i++) next.push(components[i]);
+		next.push({ type, props: defaultProps });
+		setComponents(next);
 	};
 
 	const handleDelete = (index) => {
-		delete promptMapRef.current[index];
-		setComponents((prev) => {
-			const next = [];
-			for (let i = 0; i < prev.length; i++) {
-				if (i !== index) next.push(prev[i]);
-			}
-			return next;
-		});
-	};
-
-	const handlePromptChange = (index, str) => {
-		promptMapRef.current[index] = str;
+		const next = [];
+		for (let i = 0; i < components.length; i++) {
+			if (i !== index) next.push(components[i]);
+		}
+		setComponents(next);
 	};
 
 	const handleSave = async () => {
@@ -83,15 +74,22 @@ export function AIPromptEditor() {
 		}
 		setSaving(true);
 		try {
-			const payload = components.map((c) => ({ type: c.type, props: c.props }));
-			if (editId) {
-				await updatePrompt(editId, { name: name.trim(), components: payload });
+			const payload = [];
+			for (let i = 0; i < components.length; i++) {
+				const c = components[i];
+				const { codeFilesMap, ...restProps } = c.props;
+				payload.push({ type: c.type, props: restProps });
+			}
+			if (promptId) {
+				await serviceUpdatePrompt(promptId, { name: name.trim(), components: payload });
 				message.success("更新成功");
 			} else {
-				await createPrompt({ name: name.trim(), components: payload });
+				const data = await serviceCreatePrompt({ name: name.trim(), components: payload });
+				setPromptId(data.id);
+				const newHash = `#${history.location.pathname}?id=${data.id}`;
+				window.history.replaceState(null, "", newHash);
 				message.success("创建成功");
 			}
-			navigate("/AIPrompt");
 		} catch (e) {
 			message.error("保存失败");
 		} finally {
@@ -102,16 +100,40 @@ export function AIPromptEditor() {
 	const handlePrint = () => {
 		let full = "";
 		for (let i = 0; i < components.length; i++) {
-			full += promptMapRef.current[i] || "";
+			const comp = components[i];
+			full += generatePromptStringByType(comp.type, comp.props);
 		}
 		console.info(full);
 		navigator.clipboard.writeText(full);
 	};
 
+	useEffect(() => {
+		if (initialId) {
+			serviceFetchPromptById(initialId)
+				.then((data) => {
+					setName(data.name || "");
+					const comps = [];
+					if (data.components) {
+						for (let i = 0; i < data.components.length; i++) {
+							const { type, props } = data.components[i];
+							comps.push({ type, props: { ...props, codeFilesMap: {} } });
+						}
+					}
+					setComponents(comps);
+				})
+				.catch(() => message.error("加载失败"));
+		}
+	}, [initialId]);
+
 	return (
 		<div className={styles.editor}>
 			<div className={styles.toolbar}>
-				<Input placeholder="提示词名称" value={name} onChange={(e) => setName(e.target.value)} style={{ width: 200 }} />
+				<Input
+					className={styles.nameInput}
+					placeholder="提示词名称"
+					value={name}
+					onChange={(e) => setName(e.target.value)}
+				/>
 				<Button onClick={() => handleAdd(PromptComponentType.CodeTree)}>添加代码树</Button>
 				<Button onClick={() => handleAdd(PromptComponentType.TextArea)}>添加文本域</Button>
 				<Button type="primary" loading={saving} onClick={handleSave}>
@@ -123,9 +145,6 @@ export function AIPromptEditor() {
 				{components.map((comp, index) => {
 					const Component = PromptComponentMap[comp.type];
 					if (!Component) return null;
-					const commonProps = {
-						onPromptChange: (str) => handlePromptChange(index, str),
-					};
 					if (comp.type === PromptComponentType.CodeTree) {
 						return (
 							<div key={index} className={styles.componentItem}>
@@ -140,7 +159,7 @@ export function AIPromptEditor() {
 									exclude={comp.props.exclude}
 									checkedKeys={comp.props.checkedKeys}
 									onConfigChange={(config) => updateComponentProps(index, config)}
-									{...commonProps}
+									onCodeFilesMapChange={(map) => updateComponentProps(index, { codeFilesMap: map })}
 								/>
 							</div>
 						);
@@ -153,15 +172,11 @@ export function AIPromptEditor() {
 									删除
 								</Button>
 							</div>
-							<Component
-								value={comp.props.value}
-								onChange={(value) => updateComponentProps(index, { value })}
-								{...commonProps}
-							/>
+							<Component value={comp.props.value} onChange={(value) => updateComponentProps(index, { value })} />
 						</div>
 					);
 				})}
 			</div>
 		</div>
 	);
-}
+});

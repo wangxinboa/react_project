@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import { Button, Table, Pagination, Popconfirm, Tooltip, message } from "antd";
-import dayjs from "dayjs";
 import { usePagination } from "../../hooks/use_pagination.js";
 import { RequirementForm } from "./requirement_form.jsx";
 import {
@@ -12,10 +11,11 @@ import {
 import { serviceGetAllProjects } from "../../service/project_manager/project_service.js";
 import { RequirementStatusColorMap } from "../../service/project_manager/project_manager_constants.js";
 import { CTooltipProps } from "../../components/c_tooltip_props.js";
+import { formatDate } from "../../utils/date_format/date_format.js";
 import styles from "./project_manager.module.scss";
 
 /**
- * 渲染 URL 列（有值时显示为可点击的列名）
+ * 渲染 URL 列
  * @param {string} text - URL 值
  * @param {string} label - 列名
  * @returns {JSX.Element}
@@ -31,17 +31,7 @@ function renderUrl(text, label) {
 }
 
 /**
- * 格式化时间戳为日期字符串
- * @param {number} ts
- * @returns {string}
- */
-function formatDate(ts) {
-	return ts ? dayjs(ts).format("YYYY-MM-DD") : "-";
-}
-
-/**
  * 需求管理 - 独立页面
- * @component
  * @returns {JSX.Element}
  */
 export function RequirementList() {
@@ -50,7 +40,6 @@ export function RequirementList() {
 	const [allProjects, setAllProjects] = useState([]);
 	const { page, setPage, pageSize, setPageSize, total, setTotal } = usePagination(1, 10);
 
-	/** 获取需求列表（分页） */
 	const fetchRequirementList = useCallback(() => {
 		serviceGetRequirementListPage(page, pageSize).then((res) => {
 			setRequirementList(res.data);
@@ -58,14 +47,12 @@ export function RequirementList() {
 		});
 	}, [page, pageSize, setTotal]);
 
-	/** 获取所有项目（用于关联下拉） */
 	const fetchAllProjects = useCallback(() => {
 		serviceGetAllProjects().then((projects) => {
 			setAllProjects(projects);
 		});
 	}, []);
 
-	/** 分页变化回调 */
 	const handlePaginationChange = useCallback(
 		(page, pageSize) => {
 			setPage(page);
@@ -74,12 +61,10 @@ export function RequirementList() {
 		[setPage, setPageSize],
 	);
 
-	/** 打开新增需求对话框 */
 	const startAddRequirement = useCallback(() => {
 		requirementFormRef.current.startAddRequirement();
 	}, []);
 
-	/** 新增需求成功回调 */
 	const handleAddOk = useCallback(
 		(data) => {
 			serviceAddRequirement(data).then(() => {
@@ -91,7 +76,6 @@ export function RequirementList() {
 		[fetchRequirementList, fetchAllProjects],
 	);
 
-	/** 编辑需求成功回调 */
 	const handleEditOk = useCallback(
 		(id, data) => {
 			serviceUpdateRequirement(id, data).then(() => {
@@ -103,7 +87,6 @@ export function RequirementList() {
 		[fetchRequirementList, fetchAllProjects],
 	);
 
-	/** 删除需求 */
 	const handleDelete = useCallback(
 		(id) => {
 			serviceDeleteRequirement(id).then(() => {
@@ -115,17 +98,14 @@ export function RequirementList() {
 		[fetchRequirementList, fetchAllProjects],
 	);
 
-	/** 打开编辑需求对话框 */
 	const handleEdit = useCallback((record) => {
 		requirementFormRef.current.startEditRequirement(record);
 	}, []);
 
-	/** 打开查看需求对话框 */
 	const handleView = useCallback((record) => {
 		requirementFormRef.current.startViewRequirement(record);
 	}, []);
 
-	// ---------- 表格列定义 ----------
 	const columns = useMemo(() => {
 		const projectMap = {};
 		for (let i = 0; i < allProjects.length; i++) {
@@ -283,7 +263,7 @@ export function RequirementList() {
 	useEffect(() => {
 		fetchRequirementList();
 		fetchAllProjects();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line
 	}, []);
 
 	return (

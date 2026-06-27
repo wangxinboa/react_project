@@ -1,4 +1,4 @@
-export default class CacheMap {
+export class CacheMap {
 	constructor() {
 		this.cacheArray = [];
 		this.cacheObject = {};

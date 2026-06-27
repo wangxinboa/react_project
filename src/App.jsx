@@ -40,7 +40,7 @@ function renderRoute(Page) {
 	);
 }
 
-export default function App() {
+export function App() {
 	const initialPath = history.location.pathname;
 	const initMenuState = getMenuState(initialPath);
 	const [selectedKeys, setSelectedKeys] = useState(initMenuState.selectedKey ? [initMenuState.selectedKey] : []);
