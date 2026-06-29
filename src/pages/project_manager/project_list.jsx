@@ -131,7 +131,7 @@ export function ProjectList() {
 				projects,
 				requirements: reqList,
 			};
-			downloadJSON(JSON.stringify(exportData, null, 2), "project_backup.json");
+			downloadJSON(JSON.stringify(exportData, null, 2), "project_manager_data.json");
 			message.success("导出成功");
 		} catch (e) {
 			message.error("导出失败");

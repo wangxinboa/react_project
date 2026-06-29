@@ -27,34 +27,34 @@
 - "history": "^5.3.0",
 - "react-router-dom": "^6.23.1",
 - "antd": "^5.27.4",
-- "@babel/parser": "^7.27.5"
+- "@babel/parser": "^7.27.5",
+- "dayjs": "^1.11.13",
+- "express": "^4.21.0",
+- "cors": "^2.8.5"
 
 ### devDependencies
 
 - "sass": "^1.89.2"
 
-<!-- ```
-	npm install sass-loader node-sass redux react-redux react-router-dom history antd
-```
-
-* redux: ^5.0.1
-	>添加全局数据交互
-* react-redux: ^9.1.2
-	>添加全局数据交互
-* react-router-dom: ^6.23.1
-	>添加 react 路由
-* history: ^5.3.0
-	>添加 react 路由历史记录
-* antd: ^5.18.0
-	>添加 react 路由历史记录
-* node-sass: ^9.0.0
-	>支持 scss/sass 类型文件
-* sass-loader: ^13.3.2
-	>支持 scss/sass 类型文件
-
-* gh-pages: ^6.3.0
-	>将网站部署到 github 上 -->
-
 ## 内部添加(直接添加到代码中使用)的第三方框架
 
+- dayjs（日期处理）
+- express（本地后端服务）
+- cors（跨域支持）
+
 ## 外部添加(index.html 中添加全局使用)的第三方框架
+
+暂无（原 ace 编辑器引入已注释，按需启用）
+
+## 项目启动
+
+```bash
+# 安装依赖
+npm install
+
+# 启动前端开发服务器（默认 http://localhost:3000）
+npm start
+
+# 启动后端服务（默认 http://localhost:2998）
+npm run server
+```
