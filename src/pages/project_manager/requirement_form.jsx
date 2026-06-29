@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useImperativeHandle, useState, useMemo } from "react";
-import { Drawer, Form, Input, Select, Button, Space } from "antd";
+import { Drawer, Form, Input, Select, Button } from "antd";
 import dayjs from "dayjs";
 import { ModalStatusTypeEnum } from "../../utils/global_constant.js";
 import {
@@ -147,19 +147,21 @@ export const RequirementForm = forwardRef((props, ref) => {
 			open={visible}
 			onClose={handleOnCancel}
 			footer={
-				isView ? (
-					<Button onClick={handleOnCancel}>关闭</Button>
-				) : (
-					<Space>
-						<Button onClick={handleOnCancel}>取消</Button>
-						<Button type="primary" onClick={handleOnOk}>
-							确定
-						</Button>
-					</Space>
-				)
+				<div className={styles.drawerFooter}>
+					{isView ? (
+						<Button onClick={handleOnCancel}>关闭</Button>
+					) : (
+						<>
+							<Button onClick={handleOnCancel}>取消</Button>
+							<Button type="primary" onClick={handleOnOk} style={{ marginLeft: 8 }}>
+								确定
+							</Button>
+						</>
+					)}
+				</div>
 			}
 		>
-			<Form className={styles.requirementForm} form={form} labelCol={labelCol}>
+			<Form form={form} labelCol={labelCol}>
 				{!(isView && !record?.name) && (
 					<Form.Item
 						name={RequirementFormItemNames.name}

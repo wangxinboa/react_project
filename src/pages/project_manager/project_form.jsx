@@ -1,11 +1,12 @@
 import { forwardRef, useCallback, useImperativeHandle, useState } from "react";
-import { Drawer, Form, Input, Button, Space } from "antd";
+import { Drawer, Form, Input, Button } from "antd";
 import { ModalStatusTypeEnum } from "../../utils/global_constant.js";
 import {
 	ProjectFormItemNames,
 	ProjectFormItemLabels,
 } from "../../services/project_manager/project_manager_constants.js";
 import { CUrlFormItem } from "../../components/c_url_form_item/c_url_form_item.jsx";
+import styles from "./project_manager.module.scss";
 
 const labelCol = { flex: "110px" };
 
@@ -101,16 +102,18 @@ export const ProjectForm = forwardRef((props, ref) => {
 			open={visible}
 			onClose={handleOnCancel}
 			footer={
-				isView ? (
-					<Button onClick={handleOnCancel}>关闭</Button>
-				) : (
-					<Space>
-						<Button onClick={handleOnCancel}>取消</Button>
-						<Button type="primary" onClick={handleOnOk}>
-							确定
-						</Button>
-					</Space>
-				)
+				<div className={styles.drawerFooter}>
+					{isView ? (
+						<Button onClick={handleOnCancel}>关闭</Button>
+					) : (
+						<>
+							<Button onClick={handleOnCancel}>取消</Button>
+							<Button type="primary" onClick={handleOnOk} style={{ marginLeft: 8 }}>
+								确定
+							</Button>
+						</>
+					)}
+				</div>
 			}
 		>
 			<Form form={form} labelCol={labelCol}>
