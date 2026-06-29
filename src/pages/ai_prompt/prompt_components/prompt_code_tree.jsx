@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { Button, Input, Select, Switch, message } from "antd";
 import { CFileTree } from "../../../components/c_file_tree/c_file_tree.jsx";
-import { serviceFetchFileTree } from "../../../service/service_ai_prompt.js";
+import { serviceFetchFileTree } from "../../../services/service_ai_prompt.js";
 import { downloadText } from "../../../utils/download/download.js";
 import styles from "./prompt_components.module.scss";
 

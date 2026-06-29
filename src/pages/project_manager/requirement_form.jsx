@@ -1,12 +1,12 @@
 import { forwardRef, useCallback, useImperativeHandle, useState, useMemo } from "react";
-import { Modal, Form, Input, Select, Button } from "antd";
+import { Drawer, Form, Input, Select, Button, Space } from "antd";
 import dayjs from "dayjs";
 import { ModalStatusTypeEnum } from "../../utils/global_constant.js";
 import {
 	RequirementFormItemNames,
 	RequirementFormItemLabels,
 	RequirementStatusEnum,
-} from "../../service/project_manager/project_manager_constants.js";
+} from "../../services/project_manager/project_manager_constants.js";
 import { CUrlFormItem } from "../../components/c_url_form_item/c_url_form_item.jsx";
 import { CTimestampDatePicker } from "../../components/c_timestamp_date_picker/c_timestamp_date_picker.jsx";
 import styles from "./project_manager.module.scss";
@@ -140,15 +140,24 @@ export const RequirementForm = forwardRef((props, ref) => {
 	const iterationUrl = record ? record.iterationUrl : "";
 
 	return (
-		<Modal
-			className={styles.requirementFormWrapper}
+		<Drawer
 			title={modalTitle}
-			open={visible}
-			onOk={handleOnOk}
-			onCancel={handleOnCancel}
+			placement="right"
 			width={700}
-			centered
-			footer={isView ? <Button onClick={handleOnCancel}>关闭</Button> : undefined}
+			open={visible}
+			onClose={handleOnCancel}
+			footer={
+				isView ? (
+					<Button onClick={handleOnCancel}>关闭</Button>
+				) : (
+					<Space>
+						<Button onClick={handleOnCancel}>取消</Button>
+						<Button type="primary" onClick={handleOnOk}>
+							确定
+						</Button>
+					</Space>
+				)
+			}
 		>
 			<Form className={styles.requirementForm} form={form} labelCol={labelCol}>
 				{!(isView && !record?.name) && (
@@ -249,6 +258,6 @@ export const RequirementForm = forwardRef((props, ref) => {
 					</Form.Item>
 				)}
 			</Form>
-		</Modal>
+		</Drawer>
 	);
 });

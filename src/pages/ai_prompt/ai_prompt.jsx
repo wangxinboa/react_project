@@ -6,7 +6,7 @@ import {
 	PromptComponentMap,
 	generatePromptStringByType,
 } from "./prompt_components/prompt_components.js";
-import { serviceFetchPromptById, serviceCreatePrompt, serviceUpdatePrompt } from "../../service/service_ai_prompt.js";
+import { serviceFetchPromptById, serviceCreatePrompt, serviceUpdatePrompt } from "../../services/service_ai_prompt.js";
 import { history } from "../../router/router.js";
 import styles from "./ai_prompt.module.scss";
 

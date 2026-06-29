@@ -7,9 +7,9 @@ import {
 	serviceAddRequirement,
 	serviceUpdateRequirement,
 	serviceDeleteRequirement,
-} from "../../service/project_manager/project_requirement_service.js";
-import { serviceGetAllProjects } from "../../service/project_manager/project_service.js";
-import { RequirementStatusColorMap } from "../../service/project_manager/project_manager_constants.js";
+} from "../../services/project_manager/project_requirement_service.js";
+import { serviceGetAllProjects } from "../../services/project_manager/project_service.js";
+import { RequirementStatusColorMap } from "../../services/project_manager/project_manager_constants.js";
 import { CTooltipProps } from "../../components/c_tooltip_props.js";
 import { formatDate } from "../../utils/date_format/date_format.js";
 import styles from "./project_manager.module.scss";

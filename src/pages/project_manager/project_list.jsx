@@ -8,12 +8,12 @@ import {
 	serviceUpdateProject,
 	serviceDeleteProject,
 	serviceImportProjectManager,
-} from "../../service/project_manager/project_service.js";
-import { serviceGetAllRequirements } from "../../service/project_manager/project_requirement_service.js";
+} from "../../services/project_manager/project_service.js";
+import { serviceGetAllRequirements } from "../../services/project_manager/project_requirement_service.js";
 import {
 	RequirementStatusEnum,
 	RequirementStatusColorMap,
-} from "../../service/project_manager/project_manager_constants.js";
+} from "../../services/project_manager/project_manager_constants.js";
 import { downloadJSON } from "../../utils/download/download.js";
 import { CFileUpload } from "../../components/c_file_upload/c_file_upload.jsx";
 import { CTooltipProps } from "../../components/c_tooltip_props.js";

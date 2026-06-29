@@ -1,12 +1,11 @@
 import { forwardRef, useCallback, useImperativeHandle, useState } from "react";
-import { Modal, Form, Input, Button } from "antd";
+import { Drawer, Form, Input, Button, Space } from "antd";
 import { ModalStatusTypeEnum } from "../../utils/global_constant.js";
 import {
 	ProjectFormItemNames,
 	ProjectFormItemLabels,
-} from "../../service/project_manager/project_manager_constants.js";
+} from "../../services/project_manager/project_manager_constants.js";
 import { CUrlFormItem } from "../../components/c_url_form_item/c_url_form_item.jsx";
-import styles from "./project_manager.module.scss";
 
 const labelCol = { flex: "110px" };
 
@@ -96,13 +95,23 @@ export const ProjectForm = forwardRef((props, ref) => {
 	const o2Url = record ? record.o2Url : "";
 
 	return (
-		<Modal
-			className={styles.modalFlexColumn}
+		<Drawer
 			title={modalTitle}
+			placement="right"
 			open={visible}
-			onOk={handleOnOk}
-			onCancel={handleOnCancel}
-			footer={isView ? <Button onClick={handleOnCancel}>关闭</Button> : undefined}
+			onClose={handleOnCancel}
+			footer={
+				isView ? (
+					<Button onClick={handleOnCancel}>关闭</Button>
+				) : (
+					<Space>
+						<Button onClick={handleOnCancel}>取消</Button>
+						<Button type="primary" onClick={handleOnOk}>
+							确定
+						</Button>
+					</Space>
+				)
+			}
 		>
 			<Form form={form} labelCol={labelCol}>
 				{!(isView && !record?.name) && (
@@ -127,6 +136,6 @@ export const ProjectForm = forwardRef((props, ref) => {
 					label={ProjectFormItemLabels.o2Url}
 				/>
 			</Form>
-		</Modal>
+		</Drawer>
 	);
 });

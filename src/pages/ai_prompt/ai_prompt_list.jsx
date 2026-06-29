@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { Button, Table, Popconfirm, message } from "antd";
-import { serviceFetchAllPrompts, serviceDeletePrompt } from "../../service/service_ai_prompt.js";
+import { serviceFetchAllPrompts, serviceDeletePrompt } from "../../services/service_ai_prompt.js";
 import { toAIPromptEditor } from "../../router/router.js";
 import styles from "./ai_prompt_list.module.scss";
 
