@@ -5,12 +5,6 @@ import { serviceFetchFileTree } from "../../../services/service_ai_prompt.js";
 import { downloadText } from "../../../utils/download/download.js";
 import styles from "./prompt_components.module.scss";
 
-/**
- * 将服务端返回的节点转换为 antd Tree 所需格式，同时将文件信息存入 codeFilesMap
- * @param {AppType.ServerTreeNode} node - 服务端节点
- * @param {Object<string, AppType.FileInfo>} codeFilesMap - 文件信息映射
- * @returns {Object} antd Tree 节点
- */
 function convertNode(node, codeFilesMap) {
 	if (node.isFolder) {
 		const convertedChildren = [];
@@ -24,11 +18,6 @@ function convertNode(node, codeFilesMap) {
 	return { key: node.key, title: node.title, isLeaf: true, selectable: true };
 }
 
-/**
- * 判断路径是否看起来像文件，如果是则返回其父目录路径
- * @param {string} inputPath - 输入路径
- * @returns {string} 文件夹路径
- */
 function getFolderPath(inputPath) {
 	const lastSlash = inputPath.lastIndexOf("/");
 	const lastSegment = lastSlash >= 0 ? inputPath.substring(lastSlash + 1) : inputPath;
@@ -39,12 +28,6 @@ function getFolderPath(inputPath) {
 	return inputPath;
 }
 
-/**
- * 根据勾选的文件路径和文件信息映射，生成代码树提示字符串
- * @param {string[]} checkedKeys - 勾选的文件路径数组
- * @param {Object<string, AppType.FileInfo>} codeFilesMap - 文件信息映射
- * @returns {string} 拼接的提示字符串
- */
 export function generateCodeTreePromptString(checkedKeys, codeFilesMap) {
 	let str = "";
 	for (let i = 0; i < checkedKeys.length; i++) {
@@ -56,21 +39,6 @@ export function generateCodeTreePromptString(checkedKeys, codeFilesMap) {
 	return str;
 }
 
-/**
- * AI 提示词代码树组件（受控）
- * @param {Object} props
- * @param {string} [props.rootPath=''] - 根目录路径
- * @param {string} [props.exclude=''] - 排除的文件夹名，逗号分隔
- * @param {string[]} [props.checkedKeys=[]] - 当前勾选的文件 key 数组
- * @param {Object[]} [props.treeData=[]] - antd Tree 的树数据
- * @param {{value: string, label: string}[]} [props.suffixOptions=[]] - 后缀筛选选项
- * @param {Object<string, AppType.FileInfo>} [props.codeFilesMap={}] - 文件信息映射
- * @param {string[]} [props.allFileKeys=[]] - 所有文件 key 数组
- * @param {boolean} [props.shouldPrint=true] - 是否允许在全局打印时输出该组件
- * @param {(config: Object) => void} props.onChange - 状态变化回调，参数为要合并的配置对象
- * @param {() => void} props.onDelete - 删除当前组件回调
- * @returns {JSX.Element}
- */
 export const PromptCodeTree = React.memo(function PromptCodeTree({
 	rootPath = "",
 	exclude = "",
@@ -84,9 +52,10 @@ export const PromptCodeTree = React.memo(function PromptCodeTree({
 	onDelete,
 }) {
 	const [loading, setLoading] = useState(false);
+	const [selectedSuffixes, setSelectedSuffixes] = useState([]);
 	const initialLoadDone = useRef(false);
+	const prevSelectedSuffixesRef = useRef([]);
 
-	// 预先构建后缀到文件键的映射，供筛选时直接使用
 	const suffixToKeysMap = useMemo(() => {
 		const map = {};
 		for (let i = 0; i < allFileKeys.length; i++) {
@@ -102,14 +71,36 @@ export const PromptCodeTree = React.memo(function PromptCodeTree({
 		return map;
 	}, [allFileKeys, codeFilesMap]);
 
-	const selectedSuffixes = useMemo(() => {
+	const syncSelectedSuffixes = useCallback((keys, map) => {
 		const suffixSet = {};
-		for (let i = 0; i < checkedKeys.length; i++) {
-			const fi = codeFilesMap[checkedKeys[i]];
+		for (let i = 0; i < keys.length; i++) {
+			const fi = map[keys[i]];
 			if (fi) suffixSet[fi.suffix] = true;
 		}
-		return Object.keys(suffixSet);
-	}, [checkedKeys, codeFilesMap]);
+		const currentSuffixes = Object.keys(suffixSet);
+		const prevSuffixes = prevSelectedSuffixesRef.current;
+		const newOrder = [];
+		for (let i = 0; i < prevSuffixes.length; i++) {
+			if (suffixSet[prevSuffixes[i]]) {
+				newOrder.push(prevSuffixes[i]);
+			}
+		}
+		for (let i = 0; i < currentSuffixes.length; i++) {
+			const s = currentSuffixes[i];
+			let exists = false;
+			for (let j = 0; j < newOrder.length; j++) {
+				if (newOrder[j] === s) {
+					exists = true;
+					break;
+				}
+			}
+			if (!exists) {
+				newOrder.push(s);
+			}
+		}
+		prevSelectedSuffixesRef.current = newOrder;
+		setSelectedSuffixes(newOrder);
+	}, []);
 
 	const loadFileTree = useCallback(
 		async (path, exc) => {
@@ -141,13 +132,14 @@ export const PromptCodeTree = React.memo(function PromptCodeTree({
 					codeFilesMap: map,
 					allFileKeys: keys,
 				});
+				syncSelectedSuffixes(checkedKeys, map);
 			} catch (err) {
 				message.error("加载文件树失败");
 			} finally {
 				setLoading(false);
 			}
 		},
-		[checkedKeys, onChange],
+		[checkedKeys, onChange, syncSelectedSuffixes],
 	);
 
 	const handlePathChange = useCallback(
@@ -173,9 +165,13 @@ export const PromptCodeTree = React.memo(function PromptCodeTree({
 
 	const handleSuffixChange = useCallback(
 		(newSuffixes) => {
+			setSelectedSuffixes(newSuffixes);
+			prevSelectedSuffixesRef.current = newSuffixes;
+
 			const prevSuffixSet = {};
-			for (let i = 0; i < selectedSuffixes.length; i++) {
-				prevSuffixSet[selectedSuffixes[i]] = true;
+			const oldSuffixes = prevSelectedSuffixesRef.current;
+			for (let i = 0; i < oldSuffixes.length; i++) {
+				prevSuffixSet[oldSuffixes[i]] = true;
 			}
 			const newSuffixSet = {};
 			for (let i = 0; i < newSuffixes.length; i++) {
@@ -184,16 +180,17 @@ export const PromptCodeTree = React.memo(function PromptCodeTree({
 
 			const resultKeysObj = {};
 
-			// 1. 保留原有 checkedKeys 中后缀仍在 newSuffixes 中的文件
 			for (let i = 0; i < checkedKeys.length; i++) {
 				const key = checkedKeys[i];
-				const suffix = codeFilesMap[key]?.suffix;
-				if (suffix && newSuffixSet[suffix]) {
+				const fi = codeFilesMap[key];
+				if (!fi) continue;
+				const suffix = fi.suffix;
+				// 没有后缀的文件直接保留，有后缀的文件仅当后缀在选中集合中才保留
+				if (!suffix || newSuffixSet[suffix]) {
 					resultKeysObj[key] = true;
 				}
 			}
 
-			// 2. 对新增后缀，一键勾选该后缀的所有文件
 			for (let i = 0; i < newSuffixes.length; i++) {
 				const suffix = newSuffixes[i];
 				if (!prevSuffixSet[suffix]) {
@@ -210,12 +207,15 @@ export const PromptCodeTree = React.memo(function PromptCodeTree({
 			newCheckedKeys.sort();
 			onChange({ rootPath, exclude, checkedKeys: newCheckedKeys });
 		},
-		[selectedSuffixes, checkedKeys, codeFilesMap, suffixToKeysMap, rootPath, exclude, onChange],
+		[checkedKeys, codeFilesMap, suffixToKeysMap, rootPath, exclude, onChange],
 	);
 
 	const handleCheck = useCallback(
-		(keys) => onChange({ rootPath, exclude, checkedKeys: keys }),
-		[rootPath, exclude, onChange],
+		(keys) => {
+			syncSelectedSuffixes(keys, codeFilesMap);
+			onChange({ rootPath, exclude, checkedKeys: keys });
+		},
+		[rootPath, exclude, onChange, syncSelectedSuffixes, codeFilesMap],
 	);
 
 	const handleShouldPrintChange = useCallback((checked) => onChange({ shouldPrint: checked }), [onChange]);
