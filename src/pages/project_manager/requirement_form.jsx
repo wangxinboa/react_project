@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useImperativeHandle, useState, useMemo } from "react";
-import { Modal, Form, Input, Select } from "antd";
+import { Modal, Form, Input, Select, Button } from "antd";
 import dayjs from "dayjs";
 import { ModalStatusTypeEnum } from "../../utils/global_constant.js";
 import {
@@ -49,7 +49,6 @@ export const RequirementForm = forwardRef((props, ref) => {
 	const isAdd = status === ModalStatusTypeEnum.Add;
 	const isEdit = status === ModalStatusTypeEnum.Edit;
 	const isView = status === ModalStatusTypeEnum.View;
-
 	const modalTitle = ModalTitleMap[status] || "";
 
 	const projectOptions = useMemo(() => {
@@ -149,8 +148,7 @@ export const RequirementForm = forwardRef((props, ref) => {
 			onCancel={handleOnCancel}
 			width={700}
 			centered
-			okButtonProps={{ style: isView ? { display: "none" } : {} }}
-			cancelText={isView ? "关闭" : "取消"}
+			footer={isView ? <Button onClick={handleOnCancel}>关闭</Button> : undefined}
 		>
 			<Form className={styles.requirementForm} form={form} labelCol={labelCol}>
 				{!(isView && !record?.name) && (

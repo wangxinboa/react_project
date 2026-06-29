@@ -2,10 +2,8 @@ import { dbManager, getNextId } from "./project_manager_db.js";
 import { Stores, RequirementStatusEnum } from "./project_manager_constants.js";
 import { updateProjectRequirementIds } from "./project_service.js";
 
-/**
- * 状态优先级映射（数字越小越靠前）
- * @constant {Object}
- */
+const PROJECT_MANAGER_BASE = "http://localhost:2998/api/project_manager";
+
 const StatusPriority = Object.freeze({
 	[RequirementStatusEnum.developing]: 1,
 	[RequirementStatusEnum.debugging]: 2,
@@ -14,37 +12,56 @@ const StatusPriority = Object.freeze({
 	[RequirementStatusEnum.online]: 5,
 });
 
-/**
- * 比较函数：按状态优先级升序
- * @param {Object} a - 需求 A
- * @param {Object} b - 需求 B
- * @returns {number}
- */
 function compareByStatusPriority(a, b) {
 	const pA = StatusPriority[a.status] || 99;
 	const pB = StatusPriority[b.status] || 99;
 	return pA - pB;
 }
 
-/**
- * 获取所有需求列表（不分页）
- * @returns {Promise<{data: Array, total: number}>}
- */
+function syncToServer(method, url, body) {
+	const options = {
+		method,
+		headers: { "Content-Type": "application/json" },
+	};
+	if (body) options.body = JSON.stringify(body);
+	fetch(url, options).catch((err) => console.error("Server sync error:", err));
+}
+
+function fetchRequirementsFromServerAndStore() {
+	return fetch(`${PROJECT_MANAGER_BASE}/requirements`)
+		.then((res) => res.json())
+		.then((json) => {
+			if (!json.success) throw new Error("Server error");
+			const requirements = json.data || [];
+			return dbManager
+				.clear(Stores.requirements)
+				.then(() => {
+					const addPromises = [];
+					for (let i = 0; i < requirements.length; i++) {
+						addPromises.push(dbManager.add(Stores.requirements, requirements[i]));
+					}
+					return Promise.all(addPromises);
+				})
+				.then(() => requirements);
+		});
+}
+
+function ensureRequirementsInDB() {
+	return dbManager.getAll(Stores.requirements).then((requirements) => {
+		if (requirements.length > 0) return requirements;
+		return fetchRequirementsFromServerAndStore();
+	});
+}
+
 export function serviceGetRequirementList() {
-	return dbManager.getAll(Stores.requirements).then((data) => ({
+	return ensureRequirementsInDB().then((data) => ({
 		data,
 		total: data.length,
 	}));
 }
 
-/**
- * 分页获取需求列表，按状态优先级升序排列
- * @param {number} page - 当前页码（从1开始）
- * @param {number} pageSize - 每页条数
- * @returns {Promise<{data: Array, total: number}>}
- */
 export function serviceGetRequirementListPage(page, pageSize) {
-	return dbManager.getAll(Stores.requirements).then((allRequirements) => {
+	return ensureRequirementsInDB().then((allRequirements) => {
 		allRequirements.sort(compareByStatusPriority);
 		const start = (page - 1) * pageSize;
 		const end = start + pageSize;
@@ -59,45 +76,21 @@ export function serviceGetRequirementListPage(page, pageSize) {
 	});
 }
 
-/**
- * 新增需求
- * @param {Object} record - 需求数据（不含 id）
- * @param {string} record.name - 需求名称
- * @param {number[]} [record.projectIds] - 关联的项目 ID 数组
- * @param {string} [record.aoneUrl] - Aone 地址
- * @param {string} [record.prdUrl] - PRD 地址
- * @param {string} [record.designUrl] - 设计稿地址
- * @param {string} [record.testUrl] - 效果测试地址
- * @param {string} [record.crUrl] - 代码 CR 地址
- * @param {string} [record.iterationUrl] - 迭代地址
- * @param {number} record.devTime - 开发时间（时间戳）
- * @param {number} record.testTime - 提测时间（时间戳）
- * @param {number} record.onlineTime - 上线时间（时间戳）
- * @param {string} [record.status] - 状态（默认待开发）
- * @returns {Promise<{success: boolean}>}
- */
 export function serviceAddRequirement(record) {
 	return getNextId(Stores.requirements).then((id) => {
 		record.id = id;
 		record.createTime = Date.now();
-		if (!record.projectIds) {
-			record.projectIds = [];
-		}
-		if (!record.status) {
-			record.status = RequirementStatusEnum.pending;
-		}
+		if (!record.projectIds) record.projectIds = [];
+		if (!record.status) record.status = RequirementStatusEnum.pending;
 		return dbManager.add(Stores.requirements, record).then(() => {
-			return updateProjectRequirementIds(record.id, record.projectIds, "add").then(() => ({ success: true }));
+			return updateProjectRequirementIds(record.id, record.projectIds, "add").then(() => {
+				syncToServer("POST", `${PROJECT_MANAGER_BASE}/requirements`, record);
+				return { success: true };
+			});
 		});
 	});
 }
 
-/**
- * 更新需求
- * @param {number} id - 需求 ID
- * @param {Object} record - 要更新的字段（与新增相同，不含 comment）
- * @returns {Promise<{success: boolean}>}
- */
 export function serviceUpdateRequirement(id, record) {
 	return dbManager.getAll(Stores.requirements).then((requirements) => {
 		let target = null;
@@ -107,9 +100,7 @@ export function serviceUpdateRequirement(id, record) {
 				break;
 			}
 		}
-		if (!target) {
-			return Promise.reject(new Error("需求不存在"));
-		}
+		if (!target) return Promise.reject(new Error("需求不存在"));
 		return updateProjectRequirementIds(id, target.projectIds || [], "remove").then(() => {
 			target.name = record.name;
 			target.projectIds = record.projectIds || [];
@@ -124,17 +115,15 @@ export function serviceUpdateRequirement(id, record) {
 			target.onlineTime = record.onlineTime;
 			target.status = record.status || RequirementStatusEnum.pending;
 			return dbManager.put(Stores.requirements, target).then(() => {
-				return updateProjectRequirementIds(id, target.projectIds, "add").then(() => ({ success: true }));
+				return updateProjectRequirementIds(id, target.projectIds, "add").then(() => {
+					syncToServer("PUT", `${PROJECT_MANAGER_BASE}/requirements/${id}`, target);
+					return { success: true };
+				});
 			});
 		});
 	});
 }
 
-/**
- * 删除需求（同时从项目中移除该需求引用）
- * @param {number} id - 需求 ID
- * @returns {Promise<{success: boolean}>}
- */
 export function serviceDeleteRequirement(id) {
 	return dbManager.getAll(Stores.requirements).then((requirements) => {
 		let target = null;
@@ -144,31 +133,23 @@ export function serviceDeleteRequirement(id) {
 				break;
 			}
 		}
-		if (!target) {
-			return Promise.reject(new Error("需求不存在"));
-		}
+		if (!target) return Promise.reject(new Error("需求不存在"));
 		return updateProjectRequirementIds(id, target.projectIds || [], "remove").then(() => {
-			return dbManager.delete(Stores.requirements, id).then(() => ({ success: true }));
+			return dbManager.delete(Stores.requirements, id).then(() => {
+				syncToServer("DELETE", `${PROJECT_MANAGER_BASE}/requirements/${id}`);
+				return { success: true };
+			});
 		});
 	});
 }
 
-/**
- * 导入需求数据（清空现有需求后导入，并重建项目关联）
- * @param {Array} requirementList - 需求数组
- * @returns {Promise<{success: boolean}>}
- */
 export function serviceImportRequirements(requirementList) {
 	return dbManager.clear(Stores.requirements).then(() => {
 		const addPromises = [];
 		for (let i = 0; i < requirementList.length; i++) {
 			const req = requirementList[i];
-			if (!req.projectIds) {
-				req.projectIds = [];
-			}
-			if (!req.createTime) {
-				req.createTime = Date.now();
-			}
+			if (!req.projectIds) req.projectIds = [];
+			if (!req.createTime) req.createTime = Date.now();
 			addPromises.push(dbManager.add(Stores.requirements, req));
 		}
 		return Promise.all(addPromises).then(() => {
@@ -179,7 +160,10 @@ export function serviceImportRequirements(requirementList) {
 					relinkPromises.push(updateProjectRequirementIds(req.id, req.projectIds, "add"));
 				}
 			}
-			return Promise.all(relinkPromises).then(() => ({ success: true }));
+			return Promise.all(relinkPromises).then(() => {
+				syncToServer("POST", `${PROJECT_MANAGER_BASE}/import`, { requirements: requirementList });
+				return { success: true };
+			});
 		});
 	});
 }

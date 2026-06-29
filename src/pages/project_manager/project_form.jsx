@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useImperativeHandle, useState } from "react";
-import { Modal, Form, Input } from "antd";
+import { Modal, Form, Input, Button } from "antd";
 import { ModalStatusTypeEnum } from "../../utils/global_constant.js";
 import {
 	ProjectFormItemNames,
@@ -34,7 +34,6 @@ export const ProjectForm = forwardRef((props, ref) => {
 	const isAdd = status === ModalStatusTypeEnum.Add;
 	const isEdit = status === ModalStatusTypeEnum.Edit;
 	const isView = status === ModalStatusTypeEnum.View;
-
 	const modalTitle = ModalTitleMap[status] || "";
 
 	const setProjectFormValues = useCallback(
@@ -103,8 +102,7 @@ export const ProjectForm = forwardRef((props, ref) => {
 			open={visible}
 			onOk={handleOnOk}
 			onCancel={handleOnCancel}
-			okButtonProps={{ style: isView ? { display: "none" } : {} }}
-			cancelText={isView ? "关闭" : "取消"}
+			footer={isView ? <Button onClick={handleOnCancel}>关闭</Button> : undefined}
 		>
 			<Form form={form} labelCol={labelCol}>
 				{!(isView && !record?.name) && (

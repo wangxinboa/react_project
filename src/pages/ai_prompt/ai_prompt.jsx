@@ -18,6 +18,12 @@ import styles from "./ai_prompt.module.scss";
  * @property {string[]} [props.checkedKeys]
  * @property {Object<string, AppType.FileInfo>} [props.codeFilesMap]
  * @property {string} [props.value]
+ * @property {string} [props.rootPath]
+ * @property {string} [props.exclude]
+ * @property {Object[]} [props.treeData]
+ * @property {{value: string, label: string}[]} [props.suffixOptions]
+ * @property {string[]} [props.allFileKeys]
+ * @property {boolean} [props.shouldPrint]
  */
 
 /**
@@ -49,13 +55,9 @@ export const AIPrompt = React.memo(function AIPrompt() {
 	);
 
 	const handleAdd = (type) => {
-		const defaultProps =
-			type === PromptComponentType.TextArea
-				? { value: "" }
-				: { rootPath: "", exclude: "", checkedKeys: [], codeFilesMap: {} };
 		const next = [];
 		for (let i = 0; i < components.length; i++) next.push(components[i]);
-		next.push({ type, props: defaultProps });
+		next.push({ type, props: { shouldPrint: true } });
 		setComponents(next);
 	};
 
@@ -77,7 +79,7 @@ export const AIPrompt = React.memo(function AIPrompt() {
 			const payload = [];
 			for (let i = 0; i < components.length; i++) {
 				const c = components[i];
-				const { codeFilesMap, ...restProps } = c.props;
+				const { codeFilesMap, treeData, suffixOptions, allFileKeys, ...restProps } = c.props;
 				payload.push({ type: c.type, props: restProps });
 			}
 			if (promptId) {
@@ -101,6 +103,7 @@ export const AIPrompt = React.memo(function AIPrompt() {
 		let full = "";
 		for (let i = 0; i < components.length; i++) {
 			const comp = components[i];
+			if (comp.props.shouldPrint === false) continue;
 			full += generatePromptStringByType(comp.type, comp.props);
 		}
 		console.info(full);
@@ -116,7 +119,7 @@ export const AIPrompt = React.memo(function AIPrompt() {
 					if (data.components) {
 						for (let i = 0; i < data.components.length; i++) {
 							const { type, props } = data.components[i];
-							comps.push({ type, props: { ...props, codeFilesMap: {} } });
+							comps.push({ type, props: { shouldPrint: true, ...props } });
 						}
 					}
 					setComponents(comps);
@@ -145,35 +148,13 @@ export const AIPrompt = React.memo(function AIPrompt() {
 				{components.map((comp, index) => {
 					const Component = PromptComponentMap[comp.type];
 					if (!Component) return null;
-					if (comp.type === PromptComponentType.CodeTree) {
-						return (
-							<div key={index} className={styles.componentItem}>
-								<div className={styles.componentHeader}>
-									<span>代码树</span>
-									<Button size="small" danger onClick={() => handleDelete(index)}>
-										删除
-									</Button>
-								</div>
-								<Component
-									rootPath={comp.props.rootPath}
-									exclude={comp.props.exclude}
-									checkedKeys={comp.props.checkedKeys}
-									onConfigChange={(config) => updateComponentProps(index, config)}
-									onCodeFilesMapChange={(map) => updateComponentProps(index, { codeFilesMap: map })}
-								/>
-							</div>
-						);
-					}
 					return (
-						<div key={index} className={styles.componentItem}>
-							<div className={styles.componentHeader}>
-								<span>文本域</span>
-								<Button size="small" danger onClick={() => handleDelete(index)}>
-									删除
-								</Button>
-							</div>
-							<Component value={comp.props.value} onChange={(value) => updateComponentProps(index, { value })} />
-						</div>
+						<Component
+							key={index}
+							{...comp.props}
+							onChange={(config) => updateComponentProps(index, config)}
+							onDelete={() => handleDelete(index)}
+						/>
 					);
 				})}
 			</div>

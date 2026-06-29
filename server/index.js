@@ -3,6 +3,9 @@ const cors = require("cors");
 const path = require("path");
 const fs = require("fs").promises;
 
+const aiPromptRouter = require("./ai_prompt_server");
+const projectManagerRouter = require("./project_manager_server");
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -43,17 +46,14 @@ app.get("/api/file-tree", async (req, res) => {
 	try {
 		const { rootPath, exclude } = req.query;
 		if (!rootPath) return res.status(400).json({ error: "rootPath is required" });
-
 		const absoluteRoot = path.resolve(rootPath);
-		await fs.access(absoluteRoot); // 简单的存在性检查，不区分文件/文件夹
-
+		await fs.access(absoluteRoot);
 		const excludeList = exclude
 			? exclude
 					.split(",")
 					.map((s) => s.trim())
 					.filter(Boolean)
 			: [];
-
 		const children = await buildFileTree(absoluteRoot, excludeList);
 		const rootNode = {
 			key: absoluteRoot,
@@ -69,91 +69,13 @@ app.get("/api/file-tree", async (req, res) => {
 	}
 });
 
-// ==================== 提示词配置管理 ====================
-const DATA_FILE = path.join(__dirname, "prompts.json");
-let promptsData = [];
-let nextId = 1;
+// 挂载 AI 提示词路由
+app.use("/api/ai_prompt", aiPromptRouter);
 
-async function loadPrompts() {
-	try {
-		const raw = await fs.readFile(DATA_FILE, "utf-8");
-		promptsData = JSON.parse(raw);
-		nextId = 1;
-		for (let i = 0; i < promptsData.length; i++) {
-			if (promptsData[i].id >= nextId) nextId = promptsData[i].id + 1;
-		}
-	} catch (e) {
-		promptsData = [];
-		nextId = 1;
-	}
-}
-
-async function savePrompts() {
-	await fs.writeFile(DATA_FILE, JSON.stringify(promptsData, null, 2), "utf-8");
-}
-
-app.get("/api/prompts", (req, res) => {
-	res.json({ success: true, data: promptsData });
-});
-
-app.get("/api/prompts/:id", (req, res) => {
-	const id = parseInt(req.params.id, 10);
-	const item = promptsData.find((p) => p.id === id);
-	if (!item) return res.status(404).json({ success: false, error: "未找到" });
-	res.json({ success: true, data: item });
-});
-
-app.post("/api/prompts", async (req, res) => {
-	try {
-		const { name, components } = req.body;
-		if (!name) return res.status(400).json({ success: false, error: "名称不能为空" });
-		const newItem = {
-			id: nextId++,
-			name,
-			components: components || [],
-			createTime: Date.now(),
-			updateTime: Date.now(),
-		};
-		promptsData.push(newItem);
-		await savePrompts();
-		res.json({ success: true, data: newItem });
-	} catch (err) {
-		res.status(500).json({ success: false, error: err.message });
-	}
-});
-
-app.put("/api/prompts/:id", async (req, res) => {
-	try {
-		const id = parseInt(req.params.id, 10);
-		const item = promptsData.find((p) => p.id === id);
-		if (!item) return res.status(404).json({ success: false, error: "未找到" });
-		const { name, components } = req.body;
-		if (name !== undefined) item.name = name;
-		if (components !== undefined) item.components = components;
-		item.updateTime = Date.now();
-		await savePrompts();
-		res.json({ success: true, data: item });
-	} catch (err) {
-		res.status(500).json({ success: false, error: err.message });
-	}
-});
-
-app.delete("/api/prompts/:id", async (req, res) => {
-	try {
-		const id = parseInt(req.params.id, 10);
-		const idx = promptsData.findIndex((p) => p.id === id);
-		if (idx === -1) return res.status(404).json({ success: false, error: "未找到" });
-		promptsData.splice(idx, 1);
-		await savePrompts();
-		res.json({ success: true });
-	} catch (err) {
-		res.status(500).json({ success: false, error: err.message });
-	}
-});
+// 挂载项目管理路由
+app.use("/api/project_manager", projectManagerRouter);
 
 const PORT = 2998;
-loadPrompts().then(() => {
-	app.listen(PORT, () => {
-		console.log(`服务已启动: http://localhost:${PORT}`);
-	});
+app.listen(PORT, () => {
+	console.log(`服务已启动: http://localhost:${PORT}`);
 });

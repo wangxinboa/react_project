@@ -1,25 +1,52 @@
 import { dbManager, getNextId } from "./project_manager_db.js";
 import { Stores } from "./project_manager_constants.js";
 
+const PROJECT_MANAGER_BASE = "http://localhost:2998/api/project_manager";
+
+// ---------- 辅助函数 ----------
 /**
- * 比较函数：按关联需求数量降序
- * @param {Object} a - 项目 A
- * @param {Object} b - 项目 B
- * @returns {number}
+ * 从 server 获取所有项目并写入 IndexedDB
  */
-function compareByRequirementCount(a, b) {
-	const lenA = (a.requirementIds && a.requirementIds.length) || 0;
-	const lenB = (b.requirementIds && b.requirementIds.length) || 0;
-	return lenB - lenA;
+function fetchProjectsFromServerAndStore() {
+	return fetch(`${PROJECT_MANAGER_BASE}/projects`)
+		.then((res) => res.json())
+		.then((json) => {
+			if (!json.success) throw new Error("Server error");
+			const projects = json.data || [];
+			return dbManager
+				.clear(Stores.projects)
+				.then(() => {
+					const addPromises = [];
+					for (let i = 0; i < projects.length; i++) {
+						addPromises.push(dbManager.add(Stores.projects, projects[i]));
+					}
+					return Promise.all(addPromises);
+				})
+				.then(() => projects);
+		});
 }
 
 /**
- * 更新所有需求中对特定项目的引用（添加或移除需求ID）
- * @param {number} requirementId - 需求 ID
- * @param {number[]} projectIds - 关联的项目 ID 数组
- * @param {'add'|'remove'} operation - 操作类型
- * @returns {Promise<void>}
+ * 确保 IndexedDB 中有数据，若无则从 server 拉取
+ * @returns {Promise<Array>} 全部项目数组
  */
+function ensureProjectsInDB() {
+	return dbManager.getAll(Stores.projects).then((projects) => {
+		if (projects.length > 0) return projects;
+		return fetchProjectsFromServerAndStore();
+	});
+}
+
+// 同步 server 操作（fire-and-forget，仅 log 错误）
+function syncToServer(method, url, body) {
+	const options = {
+		method,
+		headers: { "Content-Type": "application/json" },
+	};
+	if (body) options.body = JSON.stringify(body);
+	fetch(url, options).catch((err) => console.error("Server sync error:", err));
+}
+
 export function updateProjectRequirementIds(requirementId, projectIds, operation) {
 	return dbManager.getAll(Stores.projects).then((projects) => {
 		const updatePromises = [];
@@ -62,25 +89,21 @@ export function updateProjectRequirementIds(requirementId, projectIds, operation
 	});
 }
 
-/**
- * 获取所有项目列表（不分页）
- * @returns {Promise<{data: Array, total: number}>}
- */
+function compareByRequirementCount(a, b) {
+	const lenA = (a.requirementIds && a.requirementIds.length) || 0;
+	const lenB = (b.requirementIds && b.requirementIds.length) || 0;
+	return lenB - lenA;
+}
+
 export function serviceGetProjectList() {
-	return dbManager.getAll(Stores.projects).then((data) => ({
-		data,
-		total: data.length,
+	return ensureProjectsInDB().then((projects) => ({
+		data: projects,
+		total: projects.length,
 	}));
 }
 
-/**
- * 分页获取项目列表，按关联需求数量降序排列
- * @param {number} page - 当前页码（从1开始）
- * @param {number} pageSize - 每页条数
- * @returns {Promise<{data: Array, total: number}>}
- */
 export function serviceGetProjectListPage(page, pageSize) {
-	return dbManager.getAll(Stores.projects).then((allProjects) => {
+	return ensureProjectsInDB().then((allProjects) => {
 		allProjects.sort(compareByRequirementCount);
 		const start = (page - 1) * pageSize;
 		const end = start + pageSize;
@@ -95,34 +118,19 @@ export function serviceGetProjectListPage(page, pageSize) {
 	});
 }
 
-/**
- * 新增项目
- * @param {Object} record - 项目数据（不含 id）
- * @param {string} record.name - 项目名称
- * @param {string} record.gitUrl - Git 仓库地址
- * @param {string} [record.o2Url] - O2 地址
- * @returns {Promise<{success: boolean}>}
- */
 export function serviceAddProject(record) {
 	return getNextId(Stores.projects).then((id) => {
 		record.id = id;
 		record.createTime = Date.now();
-		if (!record.requirementIds) {
-			record.requirementIds = [];
-		}
-		return dbManager.add(Stores.projects, record).then(() => ({ success: true }));
+		if (!record.requirementIds) record.requirementIds = [];
+		return dbManager.add(Stores.projects, record).then(() => {
+			// 同步到 server
+			syncToServer("POST", `${PROJECT_MANAGER_BASE}/projects`, record);
+			return { success: true };
+		});
 	});
 }
 
-/**
- * 更新项目
- * @param {number} id - 项目 ID
- * @param {Object} record - 要更新的字段
- * @param {string} record.name - 项目名称
- * @param {string} record.gitUrl - Git 仓库地址
- * @param {string} [record.o2Url] - O2 地址
- * @returns {Promise<{success: boolean}>}
- */
 export function serviceUpdateProject(id, record) {
 	return dbManager.getAll(Stores.projects).then((projects) => {
 		let target = null;
@@ -132,21 +140,21 @@ export function serviceUpdateProject(id, record) {
 				break;
 			}
 		}
-		if (!target) {
-			return Promise.reject(new Error("项目不存在"));
-		}
+		if (!target) return Promise.reject(new Error("项目不存在"));
 		target.name = record.name;
 		target.gitUrl = record.gitUrl;
 		target.o2Url = record.o2Url;
-		return dbManager.put(Stores.projects, target).then(() => ({ success: true }));
+		return dbManager.put(Stores.projects, target).then(() => {
+			syncToServer("PUT", `${PROJECT_MANAGER_BASE}/projects/${id}`, {
+				name: record.name,
+				gitUrl: record.gitUrl,
+				o2Url: record.o2Url,
+			});
+			return { success: true };
+		});
 	});
 }
 
-/**
- * 删除项目（同时解除所有需求对该项目的引用）
- * @param {number} id - 项目 ID
- * @returns {Promise<{success: boolean}>}
- */
 export function serviceDeleteProject(id) {
 	return dbManager
 		.getAll(Stores.requirements)
@@ -168,36 +176,31 @@ export function serviceDeleteProject(id) {
 			return Promise.all(requirementUpdates);
 		})
 		.then(() => {
-			return dbManager.delete(Stores.projects, id).then(() => ({ success: true }));
+			return dbManager.delete(Stores.projects, id).then(() => {
+				syncToServer("DELETE", `${PROJECT_MANAGER_BASE}/projects/${id}`);
+				return { success: true };
+			});
 		});
 }
 
-/**
- * 获取全部项目（供导出使用）
- * @returns {Promise<Array>}
- */
 export function serviceGetAllProjects() {
 	return dbManager.getAll(Stores.projects);
 }
 
-/**
- * 导入项目数据（会清空现有项目）
- * @param {Array} projectList - 要导入的项目数组
- * @returns {Promise<{success: boolean}>}
- */
 export function serviceImportProjects(projectList) {
 	return dbManager.clear(Stores.projects).then(() => {
 		const addPromises = [];
 		for (let i = 0; i < projectList.length; i++) {
 			const project = projectList[i];
-			if (!project.requirementIds) {
-				project.requirementIds = [];
-			}
+			if (!project.requirementIds) project.requirementIds = [];
 			if (project.createTime === undefined || project.createTime === null) {
 				project.createTime = Date.now();
 			}
 			addPromises.push(dbManager.add(Stores.projects, project));
 		}
-		return Promise.all(addPromises).then(() => ({ success: true }));
+		return Promise.all(addPromises).then(() => {
+			syncToServer("POST", `${PROJECT_MANAGER_BASE}/import`, { projects: projectList });
+			return { success: true };
+		});
 	});
 }
