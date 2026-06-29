@@ -3,7 +3,17 @@ const fs = require("fs");
 const path = require("path");
 
 const router = express.Router();
-const DATA_FILE = path.join(__dirname, "project_manager.json");
+const DATA_DIR = path.join(__dirname, "server_data");
+const DATA_FILE = path.join(DATA_DIR, "project_manager_data.json");
+
+// 确保 server_data 目录存在
+try {
+	if (!fs.existsSync(DATA_DIR)) {
+		fs.mkdirSync(DATA_DIR, { recursive: true });
+	}
+} catch (e) {
+	console.error("创建 server_data 目录失败", e);
+}
 
 let data = { projects: [], requirements: [] };
 let nextProjectId = 1;
@@ -30,7 +40,7 @@ function saveData() {
 	fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), "utf-8");
 }
 
-// ==================== 项目 ====================
+// ==================== 项目接口 ====================
 router.get("/projects", (req, res) => {
 	res.json({ success: true, data: data.projects });
 });
@@ -89,7 +99,7 @@ router.delete("/projects/:id", (req, res) => {
 	}
 });
 
-// ==================== 需求 ====================
+// ==================== 需求接口 ====================
 router.get("/requirements", (req, res) => {
 	res.json({ success: true, data: data.requirements });
 });
@@ -152,7 +162,6 @@ router.put("/requirements/:id", (req, res) => {
 		if (onlineTime !== undefined) existing.onlineTime = onlineTime;
 		if (status !== undefined) existing.status = status;
 
-		// 更新项目引用
 		for (let i = 0; i < data.projects.length; i++) {
 			const proj = data.projects[i];
 			if (
@@ -210,7 +219,7 @@ router.delete("/requirements/:id", (req, res) => {
 	}
 });
 
-// ==================== 导入（完全替换） ====================
+// ==================== 导入接口 ====================
 router.post("/import", (req, res) => {
 	try {
 		const { projects, requirements } = req.body;

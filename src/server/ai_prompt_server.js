@@ -3,7 +3,17 @@ const fs = require("fs");
 const path = require("path");
 
 const router = express.Router();
-const DATA_FILE = path.join(__dirname, "prompts.json");
+const DATA_DIR = path.join(__dirname, "server_data");
+const DATA_FILE = path.join(DATA_DIR, "ai_prompt_data.json");
+
+// 确保 server_data 目录存在
+try {
+	if (!fs.existsSync(DATA_DIR)) {
+		fs.mkdirSync(DATA_DIR, { recursive: true });
+	}
+} catch (e) {
+	console.error("创建 server_data 目录失败", e);
+}
 
 let promptsData = [];
 let nextId = 1;
