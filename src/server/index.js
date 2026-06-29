@@ -10,7 +10,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ==================== 文件树相关 ====================
 function sortFilesAndFolders(a, b) {
 	const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
 	if (a.isFolder && !b.isFolder) return -1;
@@ -69,10 +68,7 @@ app.get("/api/file-tree", async (req, res) => {
 	}
 });
 
-// 挂载 AI 提示词路由
 app.use("/api/ai_prompt", aiPromptRouter);
-
-// 挂载项目管理路由
 app.use("/api/project_manager", projectManagerRouter);
 
 const PORT = 2998;

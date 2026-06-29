@@ -30,7 +30,7 @@ function saveData() {
 	fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), "utf-8");
 }
 
-// ==================== 项目接口 ====================
+// ==================== 项目 ====================
 router.get("/projects", (req, res) => {
 	res.json({ success: true, data: data.projects });
 });
@@ -72,7 +72,6 @@ router.delete("/projects/:id", (req, res) => {
 		const index = data.projects.findIndex((p) => p.id === id);
 		if (index === -1) return res.status(404).json({ success: false, error: "项目不存在" });
 		data.projects.splice(index, 1);
-		// 同时清理需求中对应该项目的引用
 		for (let i = 0; i < data.requirements.length; i++) {
 			const req = data.requirements[i];
 			if (req.projectIds) {
@@ -90,7 +89,7 @@ router.delete("/projects/:id", (req, res) => {
 	}
 });
 
-// ==================== 需求接口 ====================
+// ==================== 需求 ====================
 router.get("/requirements", (req, res) => {
 	res.json({ success: true, data: data.requirements });
 });
@@ -103,7 +102,6 @@ router.post("/requirements", (req, res) => {
 		if (!requirement.projectIds) requirement.projectIds = [];
 		if (!requirement.status) requirement.status = "待开发";
 		data.requirements.push(requirement);
-		// 更新项目中的 requirementIds
 		for (let i = 0; i < data.projects.length; i++) {
 			const proj = data.projects[i];
 			if (requirement.projectIds.indexOf(proj.id) !== -1) {
@@ -154,8 +152,7 @@ router.put("/requirements/:id", (req, res) => {
 		if (onlineTime !== undefined) existing.onlineTime = onlineTime;
 		if (status !== undefined) existing.status = status;
 
-		// 更新项目中的需求引用
-		// 先移除旧引用
+		// 更新项目引用
 		for (let i = 0; i < data.projects.length; i++) {
 			const proj = data.projects[i];
 			if (
@@ -171,7 +168,6 @@ router.put("/requirements/:id", (req, res) => {
 				}
 			}
 		}
-		// 再添加新引用
 		if (existing.projectIds) {
 			for (let i = 0; i < data.projects.length; i++) {
 				const proj = data.projects[i];
@@ -197,7 +193,6 @@ router.delete("/requirements/:id", (req, res) => {
 		const index = data.requirements.findIndex((r) => r.id === id);
 		if (index === -1) return res.status(404).json({ success: false, error: "需求不存在" });
 		data.requirements.splice(index, 1);
-		// 清理项目中的引用
 		for (let i = 0; i < data.projects.length; i++) {
 			const proj = data.projects[i];
 			if (proj.requirementIds) {
@@ -215,14 +210,12 @@ router.delete("/requirements/:id", (req, res) => {
 	}
 });
 
-// ==================== 批量导入接口 ====================
+// ==================== 导入（完全替换） ====================
 router.post("/import", (req, res) => {
 	try {
 		const { projects, requirements } = req.body;
-		// 清空并写入
 		data.projects = Array.isArray(projects) ? projects : [];
 		data.requirements = Array.isArray(requirements) ? requirements : [];
-		// 重新计算 nextId
 		nextProjectId = 1;
 		for (let i = 0; i < data.projects.length; i++) {
 			if (data.projects[i].id >= nextProjectId) nextProjectId = data.projects[i].id + 1;

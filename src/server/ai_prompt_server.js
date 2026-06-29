@@ -8,7 +8,6 @@ const DATA_FILE = path.join(__dirname, "prompts.json");
 let promptsData = [];
 let nextId = 1;
 
-// 初始化加载数据
 try {
 	const raw = fs.readFileSync(DATA_FILE, "utf-8");
 	promptsData = JSON.parse(raw);

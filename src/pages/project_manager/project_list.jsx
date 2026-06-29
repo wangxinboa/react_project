@@ -3,17 +3,13 @@ import { Button, Table, Pagination, Popconfirm, Tooltip, Tag, message } from "an
 import { usePagination } from "../../hooks/use_pagination.js";
 import { ProjectForm } from "./project_form.jsx";
 import {
-	serviceGetProjectListPage,
+	serviceGetAllProjects,
 	serviceAddProject,
 	serviceUpdateProject,
 	serviceDeleteProject,
-	serviceGetAllProjects,
-	serviceImportProjects,
+	serviceImportProjectManager,
 } from "../../service/project_manager/project_service.js";
-import {
-	serviceImportRequirements,
-	serviceGetRequirementList,
-} from "../../service/project_manager/project_requirement_service.js";
+import { serviceGetAllRequirements } from "../../service/project_manager/project_requirement_service.js";
 import {
 	RequirementStatusEnum,
 	RequirementStatusColorMap,
@@ -22,6 +18,12 @@ import { downloadJSON } from "../../utils/download/download.js";
 import { CFileUpload } from "../../components/c_file_upload/c_file_upload.jsx";
 import { CTooltipProps } from "../../components/c_tooltip_props.js";
 import styles from "./project_manager.module.scss";
+
+function compareByRequirementCount(a, b) {
+	const lenA = (a.requirementIds && a.requirementIds.length) || 0;
+	const lenB = (b.requirementIds && b.requirementIds.length) || 0;
+	return lenB - lenA;
+}
 
 /**
  * 项目管理 - 独立页面
@@ -34,22 +36,32 @@ export function ProjectList() {
 	const [requirements, setRequirements] = useState([]);
 	const { page, setPage, pageSize, setPageSize, total, setTotal } = usePagination(1, 10);
 
-	/** 获取项目列表（分页） */
-	const fetchProjectList = useCallback(() => {
-		serviceGetProjectListPage(page, pageSize).then((res) => {
-			setProjectList(res.data);
-			setTotal(res.total);
-		});
+	const fetchData = useCallback(async () => {
+		try {
+			const allProjects = await serviceGetAllProjects();
+			allProjects.sort(compareByRequirementCount);
+			const start = (page - 1) * pageSize;
+			const end = start + pageSize;
+			const paged = [];
+			for (let i = start; i < end && i < allProjects.length; i++) {
+				paged.push(allProjects[i]);
+			}
+			setProjectList(paged);
+			setTotal(allProjects.length);
+		} catch (e) {
+			message.error("加载项目失败");
+		}
 	}, [page, pageSize, setTotal]);
 
-	/** 获取所有需求数据（用于关联显示） */
-	const fetchRequirements = useCallback(() => {
-		serviceGetRequirementList().then((res) => {
-			setRequirements(res.data);
-		});
+	const fetchRequirements = useCallback(async () => {
+		try {
+			const allReqs = await serviceGetAllRequirements();
+			setRequirements(allReqs);
+		} catch (e) {
+			message.error("加载需求失败");
+		}
 	}, []);
 
-	/** 分页变化回调 */
 	const handlePaginationChange = useCallback(
 		(page, pageSize) => {
 			setPage(page);
@@ -58,125 +70,103 @@ export function ProjectList() {
 		[setPage, setPageSize],
 	);
 
-	/** 打开新增项目对话框 */
 	const startAddProject = useCallback(() => {
 		projectFormRef.current.startAddProject();
 	}, []);
 
-	/** 新增项目成功回调 */
 	const handleAddOk = useCallback(
-		(data) => {
-			serviceAddProject(data).then(() => {
+		async (data) => {
+			try {
+				await serviceAddProject(data);
 				message.success("项目添加成功");
-				fetchProjectList();
+				fetchData();
 				fetchRequirements();
-			});
+			} catch (e) {
+				message.error("新增失败");
+			}
 		},
-		[fetchProjectList, fetchRequirements],
+		[fetchData, fetchRequirements],
 	);
 
-	/** 编辑项目成功回调 */
 	const handleEditOk = useCallback(
-		(id, data) => {
-			serviceUpdateProject(id, data).then(() => {
+		async (id, data) => {
+			try {
+				await serviceUpdateProject(id, data);
 				message.success("项目更新成功");
-				fetchProjectList();
-			});
+				fetchData();
+			} catch (e) {
+				message.error("更新失败");
+			}
 		},
-		[fetchProjectList],
+		[fetchData],
 	);
 
-	/** 删除项目 */
 	const handleDelete = useCallback(
-		(id) => {
-			serviceDeleteProject(id).then(() => {
+		async (id) => {
+			try {
+				await serviceDeleteProject(id);
 				message.success("项目删除成功");
-				fetchProjectList();
+				fetchData();
 				fetchRequirements();
-			});
+			} catch (e) {
+				message.error("删除失败");
+			}
 		},
-		[fetchProjectList, fetchRequirements],
+		[fetchData, fetchRequirements],
 	);
 
-	/** 打开编辑项目对话框 */
 	const handleEdit = useCallback((record) => {
 		projectFormRef.current.startEditProject(record);
 	}, []);
 
-	/** 打开查看项目对话框 */
 	const handleView = useCallback((record) => {
 		projectFormRef.current.startViewProject(record);
 	}, []);
 
-	// ---------- 导入/导出 ----------
-	/**
-	 * 导出项目列表和需求列表为 JSON 文件
-	 */
-	const handleExportProjects = useCallback(() => {
-		Promise.all([serviceGetAllProjects(), serviceGetRequirementList()]).then(([projects, requirementsRes]) => {
+	const handleExportProjects = useCallback(async () => {
+		try {
+			const projects = await serviceGetAllProjects();
+			const reqList = await serviceGetAllRequirements();
 			const exportData = {
-				projects: projects,
-				requirements: requirementsRes.data,
+				projects,
+				requirements: reqList,
 			};
-			const jsonStr = JSON.stringify(exportData, null, 2);
-			downloadJSON(jsonStr, "project_backup.json");
-			message.success("导出成功（包含项目和需求）");
-		});
+			downloadJSON(JSON.stringify(exportData, null, 2), "project_backup.json");
+			message.success("导出成功");
+		} catch (e) {
+			message.error("导出失败");
+		}
 	}, []);
 
-	/**
-	 * 处理导入文件选择（仅支持 { projects, requirements } 格式）
-	 * @param {React.ChangeEvent<HTMLInputElement>} e
-	 */
 	const handleImportFileChange = useCallback(
 		(e) => {
 			const file = e.target.files && e.target.files[0];
 			if (!file) return;
 			const reader = new FileReader();
-			reader.onload = (event) => {
+			reader.onload = async (event) => {
 				try {
 					const data = JSON.parse(event.target.result);
 					if (typeof data !== "object" || data === null) {
-						message.error("文件格式不正确，需要包含 projects 和 requirements 的对象");
+						message.error("文件格式不正确");
 						return;
 					}
-					const projectsToImport = Array.isArray(data.projects) ? data.projects : [];
-					const requirementsToImport = Array.isArray(data.requirements) ? data.requirements : [];
-
-					if (projectsToImport.length === 0 && requirementsToImport.length === 0) {
-						message.warning("文件中没有找到有效的项目或需求数据");
-						return;
-					}
-
-					const importChain =
-						projectsToImport.length > 0 ? serviceImportProjects(projectsToImport) : Promise.resolve({ success: true });
-
-					importChain
-						.then(() => {
-							if (requirementsToImport.length > 0) {
-								return serviceImportRequirements(requirementsToImport);
-							}
-							return { success: true };
-						})
-						.then(() => {
-							message.success("导入成功");
-							fetchProjectList();
-							fetchRequirements();
-						})
-						.catch(() => {
-							message.error("导入失败");
-						});
+					const projects = Array.isArray(data.projects) ? data.projects : [];
+					const requirements = Array.isArray(data.requirements) ? data.requirements : [];
+					await serviceImportProjectManager({ projects, requirements });
+					message.success("导入成功");
+					fetchData();
+					fetchRequirements();
 				} catch (err) {
-					message.error("文件解析失败，请确认是有效的 JSON");
+					message.error("导入失败");
 				}
 			};
 			reader.readAsText(file);
 			e.target.value = "";
 		},
-		[fetchProjectList, fetchRequirements],
+		[fetchData, fetchRequirements],
 	);
 
-	// ---------- 表格列定义 ----------
+	// 表格列定义
 	const columns = useMemo(() => {
 		const reqMap = {};
 		for (let i = 0; i < requirements.length; i++) {
@@ -184,13 +174,7 @@ export function ProjectList() {
 		}
 
 		return [
-			{
-				title: "ID",
-				dataIndex: "id",
-				key: "id",
-				width: 80,
-				hidden: true,
-			},
+			{ title: "ID", dataIndex: "id", key: "id", width: 80, hidden: true },
 			{
 				title: "项目名称",
 				dataIndex: "name",
@@ -239,9 +223,7 @@ export function ProjectList() {
 				key: "requirementIds",
 				width: 250,
 				render: (ids) => {
-					if (!ids || ids.length === 0) {
-						return <span>无</span>;
-					}
+					if (!ids || ids.length === 0) return <span>无</span>;
 					const tags = [];
 					for (let j = 0; j < ids.length; j++) {
 						const req = reqMap[ids[j]];
@@ -254,9 +236,7 @@ export function ProjectList() {
 							);
 						}
 					}
-					if (tags.length === 0) {
-						return <span>无</span>;
-					}
+					if (tags.length === 0) return <span>无</span>;
 					return (
 						<Tooltip title={<div className={styles.tagList}>{tags}</div>} {...CTooltipProps}>
 							<div className={styles.cellFlexContainer}>
@@ -271,37 +251,34 @@ export function ProjectList() {
 				key: "operation",
 				width: 240,
 				fixed: "end",
-				render: (_, record) => {
-					return (
-						<div className={styles.operationCell}>
-							<Button type="text" onClick={() => handleView(record)}>
-								查看
+				render: (_, record) => (
+					<div className={styles.operationCell}>
+						<Button type="text" onClick={() => handleView(record)}>
+							查看
+						</Button>
+						<Button type="text" onClick={() => handleEdit(record)}>
+							编辑
+						</Button>
+						<Popconfirm
+							title="确定删除该项目吗？"
+							onConfirm={() => handleDelete(record.id)}
+							okText="确定"
+							cancelText="取消"
+						>
+							<Button type="text" danger>
+								删除
 							</Button>
-							<Button type="text" onClick={() => handleEdit(record)}>
-								编辑
-							</Button>
-							<Popconfirm
-								title="确定删除该项目吗？"
-								onConfirm={() => handleDelete(record.id)}
-								okText="确定"
-								cancelText="取消"
-							>
-								<Button type="text" danger>
-									删除
-								</Button>
-							</Popconfirm>
-						</div>
-					);
-				},
+						</Popconfirm>
+					</div>
+				),
 			},
 		];
 	}, [requirements, handleView, handleEdit, handleDelete]);
 
 	useEffect(() => {
-		fetchProjectList();
+		fetchData();
 		fetchRequirements();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [fetchData, fetchRequirements]);
 
 	return (
 		<div className={styles.projectList}>

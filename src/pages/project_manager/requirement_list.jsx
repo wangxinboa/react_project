@@ -3,7 +3,7 @@ import { Button, Table, Pagination, Popconfirm, Tooltip, message } from "antd";
 import { usePagination } from "../../hooks/use_pagination.js";
 import { RequirementForm } from "./requirement_form.jsx";
 import {
-	serviceGetRequirementListPage,
+	serviceGetAllRequirements,
 	serviceAddRequirement,
 	serviceUpdateRequirement,
 	serviceDeleteRequirement,
@@ -14,12 +14,20 @@ import { CTooltipProps } from "../../components/c_tooltip_props.js";
 import { formatDate } from "../../utils/date_format/date_format.js";
 import styles from "./project_manager.module.scss";
 
-/**
- * 渲染 URL 列
- * @param {string} text - URL 值
- * @param {string} label - 列名
- * @returns {JSX.Element}
- */
+const StatusPriority = Object.freeze({
+	正在开发: 1,
+	正在联调: 2,
+	正在测试: 3,
+	待开发: 4,
+	已上线: 5,
+});
+
+function compareByStatusPriority(a, b) {
+	const pA = StatusPriority[a.status] || 99;
+	const pB = StatusPriority[b.status] || 99;
+	return pA - pB;
+}
+
 function renderUrl(text, label) {
 	return text ? (
 		<a href={text} target="_blank" rel="noopener noreferrer">
@@ -30,27 +38,36 @@ function renderUrl(text, label) {
 	);
 }
 
-/**
- * 需求管理 - 独立页面
- * @returns {JSX.Element}
- */
 export function RequirementList() {
 	const requirementFormRef = useRef(null);
 	const [requirementList, setRequirementList] = useState([]);
 	const [allProjects, setAllProjects] = useState([]);
 	const { page, setPage, pageSize, setPageSize, total, setTotal } = usePagination(1, 10);
 
-	const fetchRequirementList = useCallback(() => {
-		serviceGetRequirementListPage(page, pageSize).then((res) => {
-			setRequirementList(res.data);
-			setTotal(res.total);
-		});
+	const fetchData = useCallback(async () => {
+		try {
+			const allReqs = await serviceGetAllRequirements();
+			allReqs.sort(compareByStatusPriority);
+			const start = (page - 1) * pageSize;
+			const end = start + pageSize;
+			const paged = [];
+			for (let i = start; i < end && i < allReqs.length; i++) {
+				paged.push(allReqs[i]);
+			}
+			setRequirementList(paged);
+			setTotal(allReqs.length);
+		} catch (e) {
+			message.error("加载需求失败");
+		}
 	}, [page, pageSize, setTotal]);
 
-	const fetchAllProjects = useCallback(() => {
-		serviceGetAllProjects().then((projects) => {
+	const fetchProjects = useCallback(async () => {
+		try {
+			const projects = await serviceGetAllProjects();
 			setAllProjects(projects);
-		});
+		} catch (e) {
+			message.error("加载项目失败");
+		}
 	}, []);
 
 	const handlePaginationChange = useCallback(
@@ -66,36 +83,45 @@ export function RequirementList() {
 	}, []);
 
 	const handleAddOk = useCallback(
-		(data) => {
-			serviceAddRequirement(data).then(() => {
+		async (data) => {
+			try {
+				await serviceAddRequirement(data);
 				message.success("需求添加成功");
-				fetchRequirementList();
-				fetchAllProjects();
-			});
+				fetchData();
+				fetchProjects();
+			} catch (e) {
+				message.error("新增失败");
+			}
 		},
-		[fetchRequirementList, fetchAllProjects],
+		[fetchData, fetchProjects],
 	);
 
 	const handleEditOk = useCallback(
-		(id, data) => {
-			serviceUpdateRequirement(id, data).then(() => {
+		async (id, data) => {
+			try {
+				await serviceUpdateRequirement(id, data);
 				message.success("需求更新成功");
-				fetchRequirementList();
-				fetchAllProjects();
-			});
+				fetchData();
+				fetchProjects();
+			} catch (e) {
+				message.error("更新失败");
+			}
 		},
-		[fetchRequirementList, fetchAllProjects],
+		[fetchData, fetchProjects],
 	);
 
 	const handleDelete = useCallback(
-		(id) => {
-			serviceDeleteRequirement(id).then(() => {
+		async (id) => {
+			try {
+				await serviceDeleteRequirement(id);
 				message.success("需求删除成功");
-				fetchRequirementList();
-				fetchAllProjects();
-			});
+				fetchData();
+				fetchProjects();
+			} catch (e) {
+				message.error("删除失败");
+			}
 		},
-		[fetchRequirementList, fetchAllProjects],
+		[fetchData, fetchProjects],
 	);
 
 	const handleEdit = useCallback((record) => {
@@ -113,13 +139,7 @@ export function RequirementList() {
 		}
 
 		return [
-			{
-				title: "ID",
-				dataIndex: "id",
-				key: "id",
-				width: 80,
-				hidden: true,
-			},
+			{ title: "ID", dataIndex: "id", key: "id", width: 80, hidden: true },
 			{
 				title: "需求名称",
 				dataIndex: "name",
@@ -203,68 +223,44 @@ export function RequirementList() {
 				dataIndex: "status",
 				key: "status",
 				width: 100,
-				render: (status) => {
-					return <span style={{ color: RequirementStatusColorMap[status] || "black" }}>{status}</span>;
-				},
+				render: (status) => <span style={{ color: RequirementStatusColorMap[status] || "black" }}>{status}</span>,
 			},
-			{
-				title: "开发时间",
-				dataIndex: "devTime",
-				key: "devTime",
-				width: 120,
-				render: (ts) => formatDate(ts),
-			},
-			{
-				title: "提测时间",
-				dataIndex: "testTime",
-				key: "testTime",
-				width: 120,
-				render: (ts) => formatDate(ts),
-			},
-			{
-				title: "上线时间",
-				dataIndex: "onlineTime",
-				key: "onlineTime",
-				width: 120,
-				render: (ts) => formatDate(ts),
-			},
+			{ title: "开发时间", dataIndex: "devTime", key: "devTime", width: 120, render: (ts) => formatDate(ts) },
+			{ title: "提测时间", dataIndex: "testTime", key: "testTime", width: 120, render: (ts) => formatDate(ts) },
+			{ title: "上线时间", dataIndex: "onlineTime", key: "onlineTime", width: 120, render: (ts) => formatDate(ts) },
 			{
 				title: "操作",
 				key: "operation",
-				dataIndex: "operation",
 				width: 240,
 				fixed: "end",
-				render: (_, record) => {
-					return (
-						<div className={styles.operationCell}>
-							<Button type="text" onClick={() => handleView(record)}>
-								查看
+				render: (_, record) => (
+					<div className={styles.operationCell}>
+						<Button type="text" onClick={() => handleView(record)}>
+							查看
+						</Button>
+						<Button type="text" onClick={() => handleEdit(record)}>
+							编辑
+						</Button>
+						<Popconfirm
+							title="确定删除该需求吗？"
+							onConfirm={() => handleDelete(record.id)}
+							okText="确定"
+							cancelText="取消"
+						>
+							<Button type="text" danger>
+								删除
 							</Button>
-							<Button type="text" onClick={() => handleEdit(record)}>
-								编辑
-							</Button>
-							<Popconfirm
-								title="确定删除该需求吗？"
-								onConfirm={() => handleDelete(record.id)}
-								okText="确定"
-								cancelText="取消"
-							>
-								<Button type="text" danger>
-									删除
-								</Button>
-							</Popconfirm>
-						</div>
-					);
-				},
+						</Popconfirm>
+					</div>
+				),
 			},
 		];
 	}, [allProjects, handleView, handleEdit, handleDelete]);
 
 	useEffect(() => {
-		fetchRequirementList();
-		fetchAllProjects();
-		// eslint-disable-next-line
-	}, []);
+		fetchData();
+		fetchProjects();
+	}, [fetchData, fetchProjects]);
 
 	return (
 		<div className={styles.requirementList}>
