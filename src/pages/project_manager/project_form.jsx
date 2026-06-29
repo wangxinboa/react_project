@@ -100,7 +100,7 @@ export const ProjectForm = forwardRef((props, ref) => {
 			title={modalTitle}
 			placement="right"
 			open={visible}
-			width={700}
+			size={700}
 			onClose={handleOnCancel}
 			footer={
 				<div className={styles.drawerFooter}>

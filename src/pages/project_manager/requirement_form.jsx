@@ -143,7 +143,7 @@ export const RequirementForm = forwardRef((props, ref) => {
 		<Drawer
 			title={modalTitle}
 			placement="right"
-			width={700}
+			size={700}
 			open={visible}
 			onClose={handleOnCancel}
 			footer={
