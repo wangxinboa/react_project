@@ -3,6 +3,7 @@ import { ProjectList } from "../pages/project_manager/project_list.jsx";
 import { RequirementList } from "../pages/project_manager/requirement_list.jsx";
 import { AIPromptList } from "../pages/ai_prompt/ai_prompt_list.jsx";
 import { AIPrompt } from "../pages/ai_prompt/ai_prompt.jsx";
+import { SpriteSheet } from "../pages/sprite_sheet/sprite_sheet.jsx";
 
 export const history = createHashHistory();
 
@@ -14,6 +15,7 @@ export const RequirementListPage = {
 	label: "需求列表",
 	Component: RequirementList,
 };
+export const SpriteSheetPage = { path: "/SpriteSheet", label: "Sprite Sheet 测试", Component: SpriteSheet };
 
 /** 跳转到新建/编辑提示词页面，id 为空则为新建 */
 export function toAIPromptEditor(id) {
@@ -21,7 +23,7 @@ export function toAIPromptEditor(id) {
 	history.push(path);
 }
 
-export const PageItems = [AIPromptPage, AIPromptEditorPage, ProjectListPage, RequirementListPage];
+export const PageItems = [AIPromptPage, AIPromptEditorPage, ProjectListPage, RequirementListPage, SpriteSheetPage];
 export const MenuItems = [
 	{ key: AIPromptPage.path, label: AIPromptPage.label },
 	{
@@ -32,4 +34,5 @@ export const MenuItems = [
 			{ key: RequirementListPage.path, label: RequirementListPage.label },
 		],
 	},
+	{ key: SpriteSheetPage.path, label: SpriteSheetPage.label },
 ];

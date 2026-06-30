@@ -1,0 +1,62 @@
+.spriteSheetPage {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	overflow: auto;
+	padding: 10px;
+
+	> .toolbar {
+		display: flex;
+		gap: 12px;
+		align-items: center;
+		padding: 0 0 10px 0;
+		flex-wrap: wrap;
+	}
+
+	> .animationList {
+		border: 1px solid #d9d9d9;
+		border-radius: 6px;
+		padding: 10px;
+
+		> .animationListTitle {
+			font-weight: 500;
+			margin-bottom: 8px;
+		}
+
+		> .animationItem {
+			display: flex;
+			align-items: center;
+			padding: 8px 0;
+			border-bottom: 1px solid #f0f0f0;
+
+			&:last-child {
+				border-bottom: none;
+			}
+
+			> .animationName {
+				flex: 0 0 120px;
+				font-size: 16px;
+				font-weight: 500;
+			}
+
+			> .animationInfo {
+				flex: 1;
+				font-size: 13px;
+				color: rgba(0, 0, 0, 0.65);
+			}
+
+			> .animationActions {
+				display: flex;
+				gap: 8px;
+				margin-left: 16px;
+			}
+		}
+	}
+
+	> .emptyTip {
+		text-align: center;
+		color: rgba(0, 0, 0, 0.45);
+		font-size: 16px;
+		margin-top: 60px;
+	}
+}

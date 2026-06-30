@@ -17,8 +17,8 @@
           "rootPath": "/Users/wangxinbo/Desktop/my_git/react_project",
           "exclude": "node_modules",
           "checkedKeys": [
-            "/Users/wangxinbo/Desktop/my_git/react_project/public/index.html",
             "/Users/wangxinbo/Desktop/my_git/react_project/tsconfig.json",
+            "/Users/wangxinbo/Desktop/my_git/react_project/public/index.html",
             "/Users/wangxinbo/Desktop/my_git/react_project/src",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/components",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/hooks",
@@ -42,6 +42,7 @@
             "/Users/wangxinbo/Desktop/my_git/react_project/src/hooks/use_pagination.js",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/ai_prompt",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/project_manager",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/router/router.js",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/server/server_data",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/server/ai_prompt_server.js",
@@ -75,6 +76,9 @@
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/project_manager/project_manager.module.scss",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/project_manager/requirement_form.jsx",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/project_manager/requirement_list.jsx",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/components",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/sprite_sheet.jsx",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/sprite_sheet.module.scss",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/server/server_data/ai_prompt_data.json",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/services/project_manager/project_manager_constants.js",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/services/project_manager/project_requirement_service.js",
@@ -94,7 +98,18 @@
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/ai_prompt/prompt_components/prompt_code_tree.jsx",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/ai_prompt/prompt_components/prompt_components.js",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/ai_prompt/prompt_components/prompt_components.module.scss",
-            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/ai_prompt/prompt_components/prompt_text_area.jsx"
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/ai_prompt/prompt_components/prompt_text_area.jsx",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/components/frame_manager",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/components/animation_drawer.jsx",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/components/animation_drawer.module.scss",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/components/control_bar.jsx",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/components/control_bar.module.scss",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/components/sprite_display.jsx",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/components/sprite_display.module.scss",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/components/frame_manager/frame_manager_drawer.jsx",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/components/frame_manager/frame_manager_drawer.module.scss",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/components/frame_manager/frame_table.jsx",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/components/frame_manager/frame_table.module.scss"
           ]
         }
       },
@@ -102,12 +117,12 @@
         "type": "textarea",
         "props": {
           "shouldPrint": true,
-          "value": "先阅读理解以上代码，然后描述一下项目信息，之后我会提出需求让你帮我实现一下相关代码，代码的实现有以下标准，必须时刻保持，优先级 max，如果就代码存在不符合标准的情况，以标准为准进行修改，如果有不确定的疑问的话，可以找我确认:\n\n除了 jsx 之外的数组或者我特别说明允许，都不准使用 .map， .forEach 等原生函数, 只能使用 for 循环\n如果只是单纯的使用字符串或者数字作为 key 的话，不准使用 Map，必须先使用对象代替，因为对象的性能明显比 map 高，而在字符串或者数字作为 key 的时候，两者在功能上完全一致。\n把 export default 的导入方式改成 export ，import 的导入方式也作对应的修改\n禁止三目运算嵌套\n函数执行过程中有中间过渡变量的话，尽可能少的生成对象、数组这些复杂数据类\n时间类的属性值都设置为时间戳\n完全一样可以复用的代码不要重复，抽离成一个，通用的常量或者函数放到 utils (可以在其他项目直接服用)，组件类或者和组件相关的放到 components\n常量名不要出现 TOOLTIP_PROPS 这样的命名，改成 TooltipProps 这样的\n接口函数必须要有前缀 service\n涉及到路由跳转的话，如果有额外的参数需要添加，必须在 src/router/router.js 中添加跳转函数，使用 history，然后在对应的文件中调用。如果只是单纯的 key 调用，就不需要这样\n\n不要有内联 style css 样式\nmodule.scss 如果存在父子关系的话，必须用 >. 的方式\n样式不要用 * 这种浪费性能\n\n如果代码里存在 jsdoc 需要的类型，运行时没有类型的话，再 import 会报警告 xxx is defined but never used.。将类型添加到 src/type.ts ，再在 jsdoc 中使用\n如果代码中执行时需要用到的类型，而 type.ts 中也有的话，优先直接使用类型，举个例子，有 Folder 类中的 children 的 jsdoc 的中有 Folder 类型，type.ts 中也有 AppType.Folder，这样的话，直接用 Folder 而不是 AppType.Folder\n注释说明的话，如果类型是 Object ，需要详细说明起属性类别，起到让人了解代码数据结构的作用\n服务端返回的类型 jsdoc 注释，放到对应的后端接口文件中\njsdoc 不要有 import('xxx') 的情况，如果存在的话，放到 type.ts 代码文件里\n\nuseEffect 放到函数中组件代码的最下面，return 的 jsx 代码的前面\nsetState 的话，直接传入变量而不是传入函数\n如非必要，不要在函数式组件内再添加函数渲染，返回 jsx 这种情况。（table column 内的操作除外），将这类渲染函数提出来\n文件夹下的文件名需要带有本身的特色指向，比如说一个负责项目管理业务的文件夹，下面有一个负责常量的文件，不能命名为 constants.js，需要命名为 project_manager_constants.js \n函数式组件的组件名必须和文件名保持一致，不过不是完全一样，举个例子，文件名是 a_b，函数名为 AB \n\n最后给出可以直接复制替换原文件代码的完整文件代码（内容只需要给代码，不要在代码里面加代码路径。代码路径直接在对话里和我说明就可以，方便我找到需要复制的文件位置）"
+          "value": "先阅读理解以上代码，然后描述一下项目信息，之后我会提出需求让你帮我实现一下相关代码\n\n代码的实现有以下标准，必须时刻保持，优先级 max，如果就代码存在不符合标准的情况，以标准为准进行修改，如果有不确定的疑问的话，可以找我确认:\n\n代码组件的实现要高内聚低耦合，不要把所有的代码都堆在一个文件之内\nDrawer 的实现需要使用 useImperativeHandle 的方式，把参数放到 SpriteSheetAnimationDrawer 组件内，外部通过 ref 控制 Drawer 组件，减轻一下主组件的代码量，高内聚低耦合\n根据数组渲染 jsx 内容的话，必须使用 .map 的方式\n除了 jsx 之外的数组或者我特别说明允许，都不准使用 .map， .forEach 等原生函数, 只能使用 for 循环\n如果只是单纯的使用字符串或者数字作为 key 的话，不准使用 Map，必须先使用对象代替，因为对象的性能明显比 map 高，而在字符串或者数字作为 key 的时候，两者在功能上完全一致。\n把 export default 的导入方式改成 export ，import 的导入方式也作对应的修改\n禁止三目运算嵌套\n函数执行过程中有中间过渡变量的话，尽可能少的生成对象、数组这些复杂数据类\n时间类的属性值都设置为时间戳\n完全一样可以复用的代码不要重复，抽离成一个，通用的常量或者函数放到 utils (可以在其他项目直接服用)，组件类或者和组件相关的放到 components\n常量名不要出现 TOOLTIP_PROPS 这样全大写加下划线的命名，改成 TooltipProps 这样的驼峰命名\n接口函数必须要有前缀 service\n涉及到路由跳转的话，如果有额外的参数需要添加，必须在 src/router/router.js 中添加跳转函数，使用 history，然后在对应的文件中调用。如果只是单纯的 key 调用，就不需要这样\n\n不要有内联 style css 样式\nmodule.scss 如果存在父子关系的话，必须用 >. 的方式\n样式不要用 * 这种浪费性能\n\n如果代码里存在 jsdoc 需要的类型，运行时没有类型的话，再 import 会报警告 xxx is defined but never used.。将类型添加到 src/type.ts ，再在 jsdoc 中使用\n如果代码中执行时需要用到的类型，而 type.ts 中也有的话，优先直接使用类型，举个例子，有 Folder 类中的 children 的 jsdoc 的中有 Folder 类型，type.ts 中也有 AppType.Folder，这样的话，直接用 Folder 而不是 AppType.Folder\n注释说明的话，如果类型是 Object ，需要详细说明起属性类别，起到让人了解代码数据结构的作用\n服务端返回的类型 jsdoc 注释，放到对应的后端接口文件中\njsdoc 不要有 import('xxx') 的情况，如果存在的话，放到 type.ts 代码文件里\n\nuseEffect 放到函数中组件代码的最下面，return 的 jsx 代码的前面\nsetState 的话，直接传入变量而不是传入函数\n如非必要，不要在函数式组件内再添加函数渲染，返回 jsx 这种情况。（table column 内的操作除外），将这类渲染函数提出来\n文件夹下的文件名需要带有本身的特色指向，比如说一个负责项目管理业务的文件夹，下面有一个负责常量的文件，不能命名为 constants.js，需要命名为 project_manager_constants.js \n函数式组件的组件名必须和文件名保持一致，不过不是完全一样，举个例子，文件名是 a_b，函数名为 AB \n\n最后给出可以直接复制替换原文件代码的完整文件代码（内容只需要给代码，不要在代码里面加代码路径。代码路径直接在对话里和我说明就可以，方便我找到需要复制的文件位置）"
         }
       }
     ],
     "createTime": 1782464386439,
-    "updateTime": 1782702673637
+    "updateTime": 1782813909742
   },
   {
     "id": 3,
@@ -117,7 +132,7 @@
         "type": "textarea",
         "props": {
           "shouldPrint": true,
-          "value": "阅读文件中的代码信息，了解其中的代码风格，并且描述一下。在之后我提出需求，延续之前的代码风格实现相关代码"
+          "value": "阅读文件中的代码信息，了解其中的代码风格，并且深入理解掌握代码的运行逻辑，描述一下。在之后我提出需求，延续之前的代码风格实现相关代码"
         }
       },
       {
@@ -236,6 +251,6 @@
       }
     ],
     "createTime": 1782550587875,
-    "updateTime": 1782720737373
+    "updateTime": 1782723103415
   }
 ]

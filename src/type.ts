@@ -42,5 +42,27 @@ declare global {
 			/** 文件后缀（含.），如 ".js" */
 			suffix: string;
 		}
+
+		/** 帧信息数据结构 */
+		interface SpriteFrame {
+			/** 帧左上角 x 坐标 */
+			x: number;
+			/** 帧左上角 y 坐标 */
+			y: number;
+			/** 帧宽度 */
+			w: number;
+			/** 帧高度 */
+			h: number;
+		}
+
+		/** 动画配置数据结构 */
+		interface SpriteAnimation {
+			/** 动画名称（唯一） */
+			name: string;
+			/** 帧索引数组 */
+			frameIds: number[];
+			/** 动画总时长（毫秒） */
+			duration: number;
+		}
 	}
 }

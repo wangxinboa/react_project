@@ -1,0 +1,49 @@
+.container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	gap: 16px;
+
+	> .generateSection {
+		border: 1px solid #d9d9d9;
+		border-radius: 6px;
+		padding: 12px;
+		display: grid;
+		grid-template-columns: repeat(4, auto);
+		gap: 8px;
+		align-items: center;
+
+		> .sectionTitle {
+			grid-column: 1 / -1;
+			font-weight: 500;
+			margin-bottom: 4px;
+		}
+
+		> .fieldItem {
+			display: flex;
+			align-items: center;
+			gap: 4px;
+
+			> span {
+				width: 60px;
+				text-align: right;
+			}
+			> .fieldInput {
+				width: 0;
+				flex: 1;
+			}
+		}
+
+		> .genBtn {
+			grid-column: 3 / -1;
+			justify-self: end;
+		}
+	}
+}
+
+.drawerFooter {
+	text-align: right;
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+}

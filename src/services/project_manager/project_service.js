@@ -1,14 +1,14 @@
-const BASE_URL = "http://localhost:2998/api/project_manager";
+const BaseUrl = "http://localhost:2998/api/project_manager";
 
 export async function serviceGetAllProjects() {
-	const res = await fetch(`${BASE_URL}/projects`);
+	const res = await fetch(`${BaseUrl}/projects`);
 	const json = await res.json();
 	if (!json.success) throw new Error(json.error || "获取项目列表失败");
 	return json.data;
 }
 
 export async function serviceAddProject(record) {
-	const res = await fetch(`${BASE_URL}/projects`, {
+	const res = await fetch(`${BaseUrl}/projects`, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(record),
@@ -19,7 +19,7 @@ export async function serviceAddProject(record) {
 }
 
 export async function serviceUpdateProject(id, record) {
-	const res = await fetch(`${BASE_URL}/projects/${id}`, {
+	const res = await fetch(`${BaseUrl}/projects/${id}`, {
 		method: "PUT",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(record),
@@ -30,7 +30,7 @@ export async function serviceUpdateProject(id, record) {
 }
 
 export async function serviceDeleteProject(id) {
-	const res = await fetch(`${BASE_URL}/projects/${id}`, {
+	const res = await fetch(`${BaseUrl}/projects/${id}`, {
 		method: "DELETE",
 	});
 	const json = await res.json();
@@ -42,7 +42,7 @@ export async function serviceDeleteProject(id) {
  * @param {{ projects: Array, requirements: Array }} data
  */
 export async function serviceImportProjectManager({ projects, requirements }) {
-	const res = await fetch(`${BASE_URL}/import`, {
+	const res = await fetch(`${BaseUrl}/import`, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ projects, requirements }),

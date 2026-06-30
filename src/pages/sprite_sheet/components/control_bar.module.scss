@@ -1,0 +1,16 @@
+.controlBar {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	font-size: 14px;
+	line-height: 32px;
+	padding: 0 0 10px 0;
+
+	> .inputFrameIndex {
+		width: 80px;
+	}
+
+	> .inputInterval {
+		width: 90px;
+	}
+}
