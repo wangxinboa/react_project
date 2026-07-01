@@ -40,7 +40,7 @@ function saveData() {
 	fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), "utf-8");
 }
 
-// ==================== 项目接口（不变） ====================
+// ==================== 项目接口 ====================
 router.get("/projects", (req, res) => {
 	res.json({ success: true, data: data.projects });
 });
@@ -95,7 +95,6 @@ router.delete("/projects/:id", (req, res) => {
 				req.projectItems = newItems;
 			}
 		}
-		// 同时清理项目 requirementIds（其他项目同理，无需变更）
 		saveData();
 		res.json({ success: true });
 	} catch (err) {
@@ -103,7 +102,7 @@ router.delete("/projects/:id", (req, res) => {
 	}
 });
 
-// ==================== 需求接口（调整数据结构） ====================
+// ==================== 需求接口（新数据结构：projectItems） ====================
 router.get("/requirements", (req, res) => {
 	res.json({ success: true, data: data.requirements });
 });
@@ -113,7 +112,6 @@ router.post("/requirements", (req, res) => {
 		const requirement = req.body;
 		requirement.id = nextRequirementId++;
 		requirement.createTime = requirement.createTime || Date.now();
-		// 确保 projectItems 为数组，内部对象包含 projectId 和 crUrl
 		if (!requirement.projectItems) requirement.projectItems = [];
 		if (!requirement.status) requirement.status = "待开发";
 		data.requirements.push(requirement);
@@ -172,7 +170,6 @@ router.put("/requirements/:id", (req, res) => {
 		const newProjectIds = existing.projectItems ? existing.projectItems.map((item) => item.projectId) : [];
 		for (let i = 0; i < data.projects.length; i++) {
 			const proj = data.projects[i];
-			// 移除不再关联的项目
 			if (oldProjectIds.indexOf(proj.id) !== -1 && newProjectIds.indexOf(proj.id) === -1) {
 				if (proj.requirementIds) {
 					const newReqIds = [];
@@ -182,7 +179,6 @@ router.put("/requirements/:id", (req, res) => {
 					proj.requirementIds = newReqIds;
 				}
 			}
-			// 添加新关联的项目
 			if (oldProjectIds.indexOf(proj.id) === -1 && newProjectIds.indexOf(proj.id) !== -1) {
 				if (!proj.requirementIds) proj.requirementIds = [];
 				if (proj.requirementIds.indexOf(existing.id) === -1) {
@@ -222,42 +218,7 @@ router.delete("/requirements/:id", (req, res) => {
 	}
 });
 
-// ==================== 数据校正接口 ====================
-router.post("/correct-requirements", (req, res) => {
-	try {
-		for (let i = 0; i < data.requirements.length; i++) {
-			const req = data.requirements[i];
-			// 如果已经存在 projectItems 且格式正确（数组，元素含 projectId）则跳过
-			if (
-				req.projectItems &&
-				Array.isArray(req.projectItems) &&
-				req.projectItems.length > 0 &&
-				req.projectItems[0].projectId !== undefined
-			) {
-				continue;
-			}
-			// 旧数据转换
-			const oldProjectIds = Array.isArray(req.projectIds) ? req.projectIds : [];
-			const oldCrUrl = req.crUrl || "";
-			const newProjectItems = [];
-			for (let j = 0; j < oldProjectIds.length; j++) {
-				newProjectItems.push({
-					projectId: oldProjectIds[j],
-					crUrl: j === 0 ? oldCrUrl : "",
-				});
-			}
-			req.projectItems = newProjectItems;
-			delete req.projectIds;
-			delete req.crUrl;
-		}
-		saveData();
-		res.json({ success: true, message: "数据校正完成" });
-	} catch (err) {
-		res.status(500).json({ success: false, error: err.message });
-	}
-});
-
-// ==================== 导入接口（适配新结构） ====================
+// ==================== 导入接口 ====================
 router.post("/import", (req, res) => {
 	try {
 		const { projects, requirements } = req.body;

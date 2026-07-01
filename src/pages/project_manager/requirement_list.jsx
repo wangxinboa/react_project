@@ -161,33 +161,34 @@ export function RequirementList() {
 				width: 300,
 				render: (items) => {
 					if (!items || items.length === 0) return "未关联";
-					const tags = [];
+					const projectLinks = [];
 					for (let i = 0; i < items.length; i++) {
 						const item = items[i];
 						const proj = projectMap[item.projectId];
 						const projectName = proj ? proj.name : "未知项目";
 						const o2Url = proj ? proj.o2Url : "";
 						const crUrl = item.crUrl || "";
-						tags.push(
+						const linkElement = (
 							<Tag key={item.projectId + "_" + i}>
 								{projectName}
 								{o2Url && (
-									<a href={o2Url} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 4 }}>
-										【o2 地址】
+									<a href={o2Url} target="_blank" rel="noopener noreferrer" className={styles.projectLink}>
+										[o2]
 									</a>
 								)}
 								{crUrl && (
-									<a href={crUrl} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 4 }}>
-										【cr 地址】
+									<a href={crUrl} target="_blank" rel="noopener noreferrer" className={styles.projectLink}>
+										[cr]
 									</a>
 								)}
-							</Tag>,
+							</Tag>
 						);
+						projectLinks.push(linkElement);
 					}
 					return (
-						<Tooltip title={<div className={styles.tagList}>{tags}</div>} {...CTooltipProps}>
+						<Tooltip title={<div className={styles.tagList}>{projectLinks}</div>} {...CTooltipProps}>
 							<div className={styles.cellFlexContainer}>
-								<div className={styles.cellFlexText}>{tags}</div>
+								<div className={styles.cellFlexText}>{projectLinks}</div>
 							</div>
 						</Tooltip>
 					);

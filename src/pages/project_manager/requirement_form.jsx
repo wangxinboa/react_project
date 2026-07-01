@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useImperativeHandle, useState, useMemo } from "react";
-import { Drawer, Form, Input, Select, Button, Space } from "antd";
+import { Drawer, Form, Input, Select, Button } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { ModalStatusTypeEnum } from "../../utils/global_constant.js";
@@ -133,67 +133,6 @@ export const RequirementForm = forwardRef((props, ref) => {
 		[form, setRequirementFormValues],
 	);
 
-	// 渲染关联项目 Form.List（编辑/查看模式不同）
-	const renderProjectItemsField = () => {
-		if (isView) {
-			const items = record?.projectItems || [];
-			if (items.length === 0) return null;
-			return (
-				<Form.Item label={RequirementFormItemLabels.projectItems}>
-					<Space direction="vertical">
-						{items.map((item, idx) => {
-							const proj = projects.find((p) => p.id === item.projectId);
-							const projectName = proj ? proj.name : "未知项目";
-							const crUrl = item.crUrl || "";
-							return (
-								<div key={idx}>
-									<span>{projectName}</span>
-									{crUrl && (
-										<a href={crUrl} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8 }}>
-											CR 地址
-										</a>
-									)}
-								</div>
-							);
-						})}
-					</Space>
-				</Form.Item>
-			);
-		}
-		return (
-			<Form.List name={RequirementFormItemNames.projectItems}>
-				{(fields, { add, remove }) => (
-					<>
-						{fields.map(({ key, name, ...restField }) => (
-							<Space key={key} style={{ display: "flex", marginBottom: 8 }} align="baseline">
-								<Form.Item
-									{...restField}
-									name={[name, "projectId"]}
-									label={RequirementFormItemLabels.projectItems}
-									rules={[{ required: true, message: "请选择项目" }]}
-								>
-									<Select placeholder="选择项目" options={projectOptions} style={{ width: 200 }} />
-								</Form.Item>
-								<Form.Item {...restField} name={[name, "crUrl"]} label="CR 地址">
-									<Input placeholder="CR 地址" style={{ width: 200 }} />
-								</Form.Item>
-								<Button type="text" danger icon={<DeleteOutlined />} onClick={() => remove(name)} />
-							</Space>
-						))}
-						<Button
-							type="dashed"
-							onClick={() => add({ projectId: undefined, crUrl: "" })}
-							block
-							icon={<PlusOutlined />}
-						>
-							添加关联项目
-						</Button>
-					</>
-				)}
-			</Form.List>
-		);
-	};
-
 	const aoneUrl = record ? record.aoneUrl : "";
 	const prdUrl = record ? record.prdUrl : "";
 	const designUrl = record ? record.designUrl : "";
@@ -232,7 +171,65 @@ export const RequirementForm = forwardRef((props, ref) => {
 						{isView ? <span>{record.name}</span> : <Input />}
 					</Form.Item>
 				)}
-				{renderProjectItemsField()}
+
+				{isView ? (
+					record?.projectItems &&
+					record.projectItems.length > 0 && (
+						<Form.Item label={RequirementFormItemLabels.projectItems}>
+							<div className={styles.projectItemsViewList}>
+								{record.projectItems.map((item, idx) => {
+									const proj = projects.find((p) => p.id === item.projectId);
+									const projectName = proj ? proj.name : "未知项目";
+									const crUrl = item.crUrl || "";
+									return (
+										<div key={idx} className={styles.projectItemsViewItem}>
+											<span>{projectName}</span>
+											{crUrl && (
+												<a href={crUrl} target="_blank" rel="noopener noreferrer" className={styles.crLink}>
+													CR 地址
+												</a>
+											)}
+										</div>
+									);
+								})}
+							</div>
+						</Form.Item>
+					)
+				) : (
+					<Form.List name={RequirementFormItemNames.projectItems}>
+						{(fields, { add, remove }) => (
+							<>
+								{fields.map(({ key, name, ...restField }) => (
+									<div key={key} className={styles.formListItem}>
+										<Form.Item
+											{...restField}
+											name={[name, "projectId"]}
+											label={RequirementFormItemLabels.projectItems}
+											rules={[{ required: true, message: "请选择项目" }]}
+											className={styles.formItemFlex}
+										>
+											<Select placeholder="选择项目" options={projectOptions} />
+										</Form.Item>
+										<Form.Item {...restField} name={[name, "crUrl"]} label="CR 地址" className={styles.formItemFlex}>
+											<Input placeholder="CR 地址" />
+										</Form.Item>
+										<Button type="text" danger icon={<DeleteOutlined />} onClick={() => remove(name)} />
+									</div>
+								))}
+								<Button
+									type="dashed"
+									onClick={() => add({ projectId: undefined, crUrl: "" })}
+									block
+									icon={<PlusOutlined />}
+									className={styles.addProjectItemBtn}
+								>
+									添加关联项目
+								</Button>
+							</>
+						)}
+					</Form.List>
+				)}
+
 				<CUrlFormItem
 					isView={isView}
 					url={aoneUrl}

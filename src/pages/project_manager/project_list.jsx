@@ -8,7 +8,6 @@ import {
 	serviceUpdateProject,
 	serviceDeleteProject,
 	serviceImportProjectManager,
-	serviceCorrectRequirements,
 } from "../../services/project_manager/project_service.js";
 import { serviceGetAllRequirements } from "../../services/project_manager/project_requirement_service.js";
 import {
@@ -167,18 +166,6 @@ export function ProjectList() {
 		[fetchData, fetchRequirements],
 	);
 
-	// 新增：数据校正
-	const handleCorrectData = useCallback(async () => {
-		try {
-			await serviceCorrectRequirements();
-			message.success("数据校正完成");
-			fetchData();
-			fetchRequirements();
-		} catch (e) {
-			message.error("数据校正失败");
-		}
-	}, [fetchData, fetchRequirements]);
-
 	// 表格列定义
 	const columns = useMemo(() => {
 		const reqMap = {};
@@ -302,7 +289,6 @@ export function ProjectList() {
 					导入项目
 					<CFileUpload onInput={handleImportFileChange} accept=".json" />
 				</Button>
-				<Button onClick={handleCorrectData}>数据校正</Button>
 			</div>
 			<div className={styles.tableWrapper}>
 				<Table

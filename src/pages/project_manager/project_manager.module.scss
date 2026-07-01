@@ -82,3 +82,43 @@
 .drawerFooter {
 	text-align: right;
 }
+
+.formListItem {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	margin-bottom: 8px;
+}
+
+.formItemFlex {
+	flex: 1;
+}
+
+.projectSelect {
+	width: 100%;
+}
+
+.crInput {
+	width: 100%;
+}
+
+.projectItemsViewList {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.projectItemsViewItem {
+	> .crLink {
+		margin-left: 8px;
+	}
+}
+
+.addProjectItemBtn {
+	margin-bottom: 24px;
+}
+
+.projectLink {
+	margin-left: 4px;
+	color: #1677ff !important;
+}

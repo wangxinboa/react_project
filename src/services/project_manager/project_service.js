@@ -50,15 +50,3 @@ export async function serviceImportProjectManager({ projects, requirements }) {
 	const json = await res.json();
 	if (!json.success) throw new Error(json.error || "导入失败");
 }
-
-/**
- * 数据校正：将旧需求数据结构迁移为新结构
- */
-export async function serviceCorrectRequirements() {
-	const res = await fetch(`${BaseUrl}/correct-requirements`, {
-		method: "POST",
-	});
-	const json = await res.json();
-	if (!json.success) throw new Error(json.error || "数据校正失败");
-	return json;
-}
