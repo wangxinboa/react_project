@@ -1,16 +1,16 @@
 import { forwardRef, useCallback, useImperativeHandle, useState, useMemo } from "react";
 import { Drawer, Form, Input, Select, Button } from "antd";
-import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { ModalStatusTypeEnum } from "../../utils/global_constant.js";
+import { ModalStatusTypeEnum } from "../../../utils/global_constant.js";
 import {
 	RequirementFormItemNames,
 	RequirementFormItemLabels,
 	RequirementStatusEnum,
-} from "../../services/project_manager/project_manager_constants.js";
-import { CUrlFormItem } from "../../components/c_url_form_item/c_url_form_item.jsx";
-import { CTimestampDatePicker } from "../../components/c_timestamp_date_picker/c_timestamp_date_picker.jsx";
-import styles from "./project_manager.module.scss";
+} from "../../../services/project_manager/project_manager_constants.js";
+import { CUrlFormItem } from "../../../components/c_url_form_item/c_url_form_item.jsx";
+import { CTimestampDatePicker } from "../../../components/c_timestamp_date_picker/c_timestamp_date_picker.jsx";
+import { ProjectItemsForm } from "./project_items_form.jsx";
+import styles from "../project_manager.module.scss";
 
 const { Option } = Select;
 const labelCol = { flex: "110px" };
@@ -21,25 +21,11 @@ const ModalTitleMap = {
 	[ModalStatusTypeEnum.View]: "查看需求",
 };
 
-/**
- * 格式化时间戳为日期字符串（查看模式）
- * @param {number} ts - 时间戳
- * @returns {string}
- */
 function formatTs(ts) {
 	if (!ts) return "";
 	return dayjs(ts).format("YYYY-MM-DD");
 }
 
-/**
- * 需求管理 - 新增/编辑/查看需求表单组件
- * @param {Object} props
- * @param {Function} props.onAddOk - 新增成功回调
- * @param {Function} props.onEditOk - 编辑成功回调
- * @param {Object[]} props.projects - 所有项目列表
- * @param {React.Ref} ref
- * @returns {JSX.Element}
- */
 export const RequirementForm = forwardRef((props, ref) => {
 	const { onAddOk, onEditOk, projects } = props;
 	const [form] = Form.useForm();
@@ -172,63 +158,13 @@ export const RequirementForm = forwardRef((props, ref) => {
 					</Form.Item>
 				)}
 
-				{isView ? (
-					record?.projectItems &&
-					record.projectItems.length > 0 && (
-						<Form.Item label={RequirementFormItemLabels.projectItems}>
-							<div className={styles.projectItemsViewList}>
-								{record.projectItems.map((item, idx) => {
-									const proj = projects.find((p) => p.id === item.projectId);
-									const projectName = proj ? proj.name : "未知项目";
-									const crUrl = item.crUrl || "";
-									return (
-										<div key={idx} className={styles.projectItemsViewItem}>
-											<span>{projectName}</span>
-											{crUrl && (
-												<a href={crUrl} target="_blank" rel="noopener noreferrer" className={styles.crLink}>
-													CR 地址
-												</a>
-											)}
-										</div>
-									);
-								})}
-							</div>
-						</Form.Item>
-					)
-				) : (
-					<Form.List name={RequirementFormItemNames.projectItems}>
-						{(fields, { add, remove }) => (
-							<>
-								{fields.map(({ key, name, ...restField }) => (
-									<div key={key} className={styles.formListItem}>
-										<Form.Item
-											{...restField}
-											name={[name, "projectId"]}
-											label={RequirementFormItemLabels.projectItems}
-											rules={[{ required: true, message: "请选择项目" }]}
-											className={styles.formItemFlex}
-										>
-											<Select placeholder="选择项目" options={projectOptions} />
-										</Form.Item>
-										<Form.Item {...restField} name={[name, "crUrl"]} label="CR 地址" className={styles.formItemFlex}>
-											<Input placeholder="CR 地址" />
-										</Form.Item>
-										<Button type="text" danger icon={<DeleteOutlined />} onClick={() => remove(name)} />
-									</div>
-								))}
-								<Button
-									type="dashed"
-									onClick={() => add({ projectId: undefined, crUrl: "" })}
-									block
-									icon={<PlusOutlined />}
-									className={styles.addProjectItemBtn}
-								>
-									添加关联项目
-								</Button>
-							</>
-						)}
-					</Form.List>
-				)}
+				<ProjectItemsForm
+					isView={isView}
+					projectOptions={projectOptions}
+					value={record?.projectItems}
+					name={RequirementFormItemNames.projectItems}
+					label={RequirementFormItemLabels.projectItems}
+				/>
 
 				<CUrlFormItem
 					isView={isView}

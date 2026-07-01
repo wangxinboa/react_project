@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import { Button, Table, Pagination, Popconfirm, Tooltip, message, Tag } from "antd";
 import { usePagination } from "../../hooks/use_pagination.js";
-import { RequirementForm } from "./requirement_form.jsx";
+import { RequirementForm } from "./requirement_form/requirement_form.jsx";
 import {
 	serviceGetAllRequirements,
 	serviceAddRequirement,

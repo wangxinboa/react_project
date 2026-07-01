@@ -1,0 +1,25 @@
+.listItem {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+}
+
+.formItemFlex {
+	flex: 1;
+}
+
+.addBtn {
+	margin-bottom: 24px;
+}
+
+.viewList {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.viewItem {
+	> .crLink {
+		margin-left: 8px;
+	}
+}
