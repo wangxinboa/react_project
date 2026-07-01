@@ -132,7 +132,7 @@
         "type": "textarea",
         "props": {
           "shouldPrint": true,
-          "value": "阅读文件中的代码信息，了解其中的代码风格，并且深入理解掌握代码的运行逻辑，并且描述一下。在之后我提出需求，延续之前的代码风格实现相关代码"
+          "value": "阅读文件中的代码信息，了解其中的代码风格，并且深入理解掌握代码的运行逻辑，并且描述一下。在之后我提出需求，延续之前的代码风格实现相关代码，并且给出可以直接复制替换原文件代码的完整文件代码（内容只需要给代码，不要在代码里面加代码路径。代码路径直接在对话里和我说明就可以，方便我找到需要复制的文件位置）"
         }
       },
       {
@@ -145,6 +145,12 @@
             "/Users/wangxinbo/Desktop/my_git/accumulate/css/common.css",
             "/Users/wangxinbo/Desktop/my_git/accumulate/css/default.css",
             "/Users/wangxinbo/Desktop/my_git/accumulate/css",
+            "/Users/wangxinbo/Desktop/my_git/accumulate/products/cinder_keep",
+            "/Users/wangxinbo/Desktop/my_git/accumulate/products/cinder_keep/assets",
+            "/Users/wangxinbo/Desktop/my_git/accumulate/products/cinder_keep/src",
+            "/Users/wangxinbo/Desktop/my_git/accumulate/products/cinder_keep/cinder_keep.html",
+            "/Users/wangxinbo/Desktop/my_git/accumulate/products/cinder_keep/cinder_keep.module.js",
+            "/Users/wangxinbo/Desktop/my_git/accumulate/products/cinder_keep/logo.png",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/javascript_utils",
@@ -325,9 +331,9 @@
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_texture",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_2d_renderer.js",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_extensions.js",
-            "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/render_nodes/2d/sprite_sheet/sprite_sheet_webgl_pipe",
+            "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/render_nodes/2d/sprite_sheet/sprite_sheet_pipe",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/render_nodes/2d/sprite_sheet/sprite_sheet.js",
-            "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/render_nodes/2d/sprite2d/sprite2d_webgl_pipe",
+            "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/render_nodes/2d/sprite2d/sprite2d_pipe",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/render_nodes/2d/sprite2d/sprite2d.js",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/renderer_systems/background/background_system.js",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/renderer_systems/canvas_dom/canvas_dom_system.js",
@@ -341,8 +347,8 @@
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_texture/gl_texture_type.js",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_texture/gl_texture.js",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_texture/webgl_texture_system.js",
-            "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/render_nodes/2d/sprite_sheet/sprite_sheet_webgl_pipe/gl_program_format.js",
-            "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/render_nodes/2d/sprite2d/sprite2d_webgl_pipe/gl_program_format.js",
+            "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/render_nodes/2d/sprite_sheet/sprite_sheet_pipe/gl_program_format.js",
+            "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/render_nodes/2d/sprite2d/sprite2d_pipe/gl_program_format.js",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_buffer/gl_attribs/gl_attrib.js",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_buffer/gl_attribs/gl_attribs.js",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_buffer/gl_attribs/gl_buffer_type.js",
@@ -352,13 +358,7 @@
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_program/gl_program/gl_program.js",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_program/gl_program/gl_location/attrib_location.js",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_program/gl_program/gl_location/gl_location.js",
-            "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_program/gl_program/gl_location/uniform_location.js",
-            "/Users/wangxinbo/Desktop/my_git/accumulate/products/cinder_keep",
-            "/Users/wangxinbo/Desktop/my_git/accumulate/products/cinder_keep/assets",
-            "/Users/wangxinbo/Desktop/my_git/accumulate/products/cinder_keep/src",
-            "/Users/wangxinbo/Desktop/my_git/accumulate/products/cinder_keep/cinder_keep.html",
-            "/Users/wangxinbo/Desktop/my_git/accumulate/products/cinder_keep/cinder_keep.module.js",
-            "/Users/wangxinbo/Desktop/my_git/accumulate/products/cinder_keep/logo.png"
+            "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_program/gl_program/gl_location/uniform_location.js"
           ]
         }
       },
@@ -371,6 +371,6 @@
       }
     ],
     "createTime": 1782550587875,
-    "updateTime": 1782873810815
+    "updateTime": 1782876172359
   }
 ]

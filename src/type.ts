@@ -47,6 +47,14 @@ declare global {
 			isImage?: boolean;
 		}
 
+		/** 需求关联项目中的单项 */
+		interface ProjectItem {
+			/** 项目 id */
+			projectId: number;
+			/** 该项目对应的 CR 地址 */
+			crUrl: string;
+		}
+
 		/** 帧信息数据结构 */
 		interface SpriteFrame {
 			/** 帧左上角 x 坐标 */

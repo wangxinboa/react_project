@@ -48,12 +48,11 @@ export const ProjectFormItemLabels = Object.freeze({
  */
 export const RequirementFormItemNames = Object.freeze({
 	name: "name",
-	projectIds: "projectIds",
+	projectItems: "projectItems",
 	aoneUrl: "aoneUrl",
 	prdUrl: "prdUrl",
 	designUrl: "designUrl",
 	testUrl: "testUrl",
-	crUrl: "crUrl",
 	iterationUrl: "iterationUrl",
 	devTime: "devTime",
 	testTime: "testTime",
@@ -68,12 +67,11 @@ export const RequirementFormItemNames = Object.freeze({
  */
 export const RequirementFormItemLabels = Object.freeze({
 	name: "需求名称",
-	projectIds: "关联项目",
+	projectItems: "关联项目",
 	aoneUrl: "Aone 地址",
 	prdUrl: "PRD 地址",
 	designUrl: "设计稿地址",
 	testUrl: "效果测试地址",
-	crUrl: "代码 CR 地址",
 	iterationUrl: "迭代地址",
 	devTime: "开发时间",
 	testTime: "提测时间",

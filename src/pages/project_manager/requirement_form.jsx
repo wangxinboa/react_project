@@ -1,5 +1,6 @@
 import { forwardRef, useCallback, useImperativeHandle, useState, useMemo } from "react";
-import { Drawer, Form, Input, Select, Button } from "antd";
+import { Drawer, Form, Input, Select, Button, Space } from "antd";
+import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { ModalStatusTypeEnum } from "../../utils/global_constant.js";
 import {
@@ -66,12 +67,11 @@ export const RequirementForm = forwardRef((props, ref) => {
 		(data) => {
 			form.setFieldsValue({
 				[RequirementFormItemNames.name]: data.name,
-				[RequirementFormItemNames.projectIds]: data.projectIds,
+				[RequirementFormItemNames.projectItems]: data.projectItems || [],
 				[RequirementFormItemNames.aoneUrl]: data.aoneUrl,
 				[RequirementFormItemNames.prdUrl]: data.prdUrl,
 				[RequirementFormItemNames.designUrl]: data.designUrl,
 				[RequirementFormItemNames.testUrl]: data.testUrl,
-				[RequirementFormItemNames.crUrl]: data.crUrl,
 				[RequirementFormItemNames.iterationUrl]: data.iterationUrl,
 				[RequirementFormItemNames.devTime]: data.devTime,
 				[RequirementFormItemNames.testTime]: data.testTime,
@@ -114,6 +114,7 @@ export const RequirementForm = forwardRef((props, ref) => {
 				form.resetFields();
 				form.setFieldsValue({
 					[RequirementFormItemNames.status]: RequirementStatusEnum.pending,
+					[RequirementFormItemNames.projectItems]: [],
 				});
 			},
 			startEditRequirement(record) {
@@ -132,11 +133,71 @@ export const RequirementForm = forwardRef((props, ref) => {
 		[form, setRequirementFormValues],
 	);
 
+	// 渲染关联项目 Form.List（编辑/查看模式不同）
+	const renderProjectItemsField = () => {
+		if (isView) {
+			const items = record?.projectItems || [];
+			if (items.length === 0) return null;
+			return (
+				<Form.Item label={RequirementFormItemLabels.projectItems}>
+					<Space direction="vertical">
+						{items.map((item, idx) => {
+							const proj = projects.find((p) => p.id === item.projectId);
+							const projectName = proj ? proj.name : "未知项目";
+							const crUrl = item.crUrl || "";
+							return (
+								<div key={idx}>
+									<span>{projectName}</span>
+									{crUrl && (
+										<a href={crUrl} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8 }}>
+											CR 地址
+										</a>
+									)}
+								</div>
+							);
+						})}
+					</Space>
+				</Form.Item>
+			);
+		}
+		return (
+			<Form.List name={RequirementFormItemNames.projectItems}>
+				{(fields, { add, remove }) => (
+					<>
+						{fields.map(({ key, name, ...restField }) => (
+							<Space key={key} style={{ display: "flex", marginBottom: 8 }} align="baseline">
+								<Form.Item
+									{...restField}
+									name={[name, "projectId"]}
+									label={RequirementFormItemLabels.projectItems}
+									rules={[{ required: true, message: "请选择项目" }]}
+								>
+									<Select placeholder="选择项目" options={projectOptions} style={{ width: 200 }} />
+								</Form.Item>
+								<Form.Item {...restField} name={[name, "crUrl"]} label="CR 地址">
+									<Input placeholder="CR 地址" style={{ width: 200 }} />
+								</Form.Item>
+								<Button type="text" danger icon={<DeleteOutlined />} onClick={() => remove(name)} />
+							</Space>
+						))}
+						<Button
+							type="dashed"
+							onClick={() => add({ projectId: undefined, crUrl: "" })}
+							block
+							icon={<PlusOutlined />}
+						>
+							添加关联项目
+						</Button>
+					</>
+				)}
+			</Form.List>
+		);
+	};
+
 	const aoneUrl = record ? record.aoneUrl : "";
 	const prdUrl = record ? record.prdUrl : "";
 	const designUrl = record ? record.designUrl : "";
 	const testUrl = record ? record.testUrl : "";
-	const crUrl = record ? record.crUrl : "";
 	const iterationUrl = record ? record.iterationUrl : "";
 
 	return (
@@ -171,20 +232,7 @@ export const RequirementForm = forwardRef((props, ref) => {
 						{isView ? <span>{record.name}</span> : <Input />}
 					</Form.Item>
 				)}
-				{!(isView && (!record?.projectIds || record.projectIds.length === 0)) && (
-					<Form.Item name={RequirementFormItemNames.projectIds} label={RequirementFormItemLabels.projectIds}>
-						{isView ? (
-							<span>
-								{projectOptions
-									.filter((opt) => record.projectIds.includes(opt.value))
-									.map((opt) => opt.label)
-									.join(", ")}
-							</span>
-						) : (
-							<Select mode="multiple" placeholder="请选择关联项目" options={projectOptions} />
-						)}
-					</Form.Item>
-				)}
+				{renderProjectItemsField()}
 				<CUrlFormItem
 					isView={isView}
 					url={aoneUrl}
@@ -208,12 +256,6 @@ export const RequirementForm = forwardRef((props, ref) => {
 					url={testUrl}
 					name={RequirementFormItemNames.testUrl}
 					label={RequirementFormItemLabels.testUrl}
-				/>
-				<CUrlFormItem
-					isView={isView}
-					url={crUrl}
-					name={RequirementFormItemNames.crUrl}
-					label={RequirementFormItemLabels.crUrl}
 				/>
 				<CUrlFormItem
 					isView={isView}

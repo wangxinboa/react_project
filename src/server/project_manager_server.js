@@ -40,7 +40,7 @@ function saveData() {
 	fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), "utf-8");
 }
 
-// ==================== 项目接口 ====================
+// ==================== 项目接口（不变） ====================
 router.get("/projects", (req, res) => {
 	res.json({ success: true, data: data.projects });
 });
@@ -82,16 +82,20 @@ router.delete("/projects/:id", (req, res) => {
 		const index = data.projects.findIndex((p) => p.id === id);
 		if (index === -1) return res.status(404).json({ success: false, error: "项目不存在" });
 		data.projects.splice(index, 1);
+		// 清理需求中对本项目的引用
 		for (let i = 0; i < data.requirements.length; i++) {
 			const req = data.requirements[i];
-			if (req.projectIds) {
-				const newIds = [];
-				for (let j = 0; j < req.projectIds.length; j++) {
-					if (req.projectIds[j] !== id) newIds.push(req.projectIds[j]);
+			if (req.projectItems) {
+				const newItems = [];
+				for (let j = 0; j < req.projectItems.length; j++) {
+					if (req.projectItems[j].projectId !== id) {
+						newItems.push(req.projectItems[j]);
+					}
 				}
-				req.projectIds = newIds;
+				req.projectItems = newItems;
 			}
 		}
+		// 同时清理项目 requirementIds（其他项目同理，无需变更）
 		saveData();
 		res.json({ success: true });
 	} catch (err) {
@@ -99,7 +103,7 @@ router.delete("/projects/:id", (req, res) => {
 	}
 });
 
-// ==================== 需求接口 ====================
+// ==================== 需求接口（调整数据结构） ====================
 router.get("/requirements", (req, res) => {
 	res.json({ success: true, data: data.requirements });
 });
@@ -109,15 +113,19 @@ router.post("/requirements", (req, res) => {
 		const requirement = req.body;
 		requirement.id = nextRequirementId++;
 		requirement.createTime = requirement.createTime || Date.now();
-		if (!requirement.projectIds) requirement.projectIds = [];
+		// 确保 projectItems 为数组，内部对象包含 projectId 和 crUrl
+		if (!requirement.projectItems) requirement.projectItems = [];
 		if (!requirement.status) requirement.status = "待开发";
 		data.requirements.push(requirement);
+		// 更新项目中的 requirementIds
 		for (let i = 0; i < data.projects.length; i++) {
 			const proj = data.projects[i];
-			if (requirement.projectIds.indexOf(proj.id) !== -1) {
-				if (!proj.requirementIds) proj.requirementIds = [];
-				if (proj.requirementIds.indexOf(requirement.id) === -1) {
-					proj.requirementIds.push(requirement.id);
+			for (let j = 0; j < requirement.projectItems.length; j++) {
+				if (requirement.projectItems[j].projectId === proj.id) {
+					if (!proj.requirementIds) proj.requirementIds = [];
+					if (proj.requirementIds.indexOf(requirement.id) === -1) {
+						proj.requirementIds.push(requirement.id);
+					}
 				}
 			}
 		}
@@ -134,15 +142,14 @@ router.put("/requirements/:id", (req, res) => {
 		const index = data.requirements.findIndex((r) => r.id === id);
 		if (index === -1) return res.status(404).json({ success: false, error: "需求不存在" });
 		const existing = data.requirements[index];
-		const oldProjectIds = existing.projectIds || [];
+		const oldProjectIds = existing.projectItems ? existing.projectItems.map((item) => item.projectId) : [];
 		const {
 			name,
-			projectIds,
+			projectItems,
 			aoneUrl,
 			prdUrl,
 			designUrl,
 			testUrl,
-			crUrl,
 			iterationUrl,
 			devTime,
 			testTime,
@@ -150,24 +157,23 @@ router.put("/requirements/:id", (req, res) => {
 			status,
 		} = req.body;
 		if (name !== undefined) existing.name = name;
-		if (projectIds !== undefined) existing.projectIds = projectIds;
+		if (projectItems !== undefined) existing.projectItems = projectItems;
 		if (aoneUrl !== undefined) existing.aoneUrl = aoneUrl;
 		if (prdUrl !== undefined) existing.prdUrl = prdUrl;
 		if (designUrl !== undefined) existing.designUrl = designUrl;
 		if (testUrl !== undefined) existing.testUrl = testUrl;
-		if (crUrl !== undefined) existing.crUrl = crUrl;
 		if (iterationUrl !== undefined) existing.iterationUrl = iterationUrl;
 		if (devTime !== undefined) existing.devTime = devTime;
 		if (testTime !== undefined) existing.testTime = testTime;
 		if (onlineTime !== undefined) existing.onlineTime = onlineTime;
 		if (status !== undefined) existing.status = status;
 
+		// 更新项目中的 requirementIds（根据新旧 projectItems 差异）
+		const newProjectIds = existing.projectItems ? existing.projectItems.map((item) => item.projectId) : [];
 		for (let i = 0; i < data.projects.length; i++) {
 			const proj = data.projects[i];
-			if (
-				oldProjectIds.indexOf(proj.id) !== -1 &&
-				(!existing.projectIds || existing.projectIds.indexOf(proj.id) === -1)
-			) {
+			// 移除不再关联的项目
+			if (oldProjectIds.indexOf(proj.id) !== -1 && newProjectIds.indexOf(proj.id) === -1) {
 				if (proj.requirementIds) {
 					const newReqIds = [];
 					for (let j = 0; j < proj.requirementIds.length; j++) {
@@ -176,15 +182,11 @@ router.put("/requirements/:id", (req, res) => {
 					proj.requirementIds = newReqIds;
 				}
 			}
-		}
-		if (existing.projectIds) {
-			for (let i = 0; i < data.projects.length; i++) {
-				const proj = data.projects[i];
-				if (existing.projectIds.indexOf(proj.id) !== -1) {
-					if (!proj.requirementIds) proj.requirementIds = [];
-					if (proj.requirementIds.indexOf(existing.id) === -1) {
-						proj.requirementIds.push(existing.id);
-					}
+			// 添加新关联的项目
+			if (oldProjectIds.indexOf(proj.id) === -1 && newProjectIds.indexOf(proj.id) !== -1) {
+				if (!proj.requirementIds) proj.requirementIds = [];
+				if (proj.requirementIds.indexOf(existing.id) === -1) {
+					proj.requirementIds.push(existing.id);
 				}
 			}
 		}
@@ -202,6 +204,7 @@ router.delete("/requirements/:id", (req, res) => {
 		const index = data.requirements.findIndex((r) => r.id === id);
 		if (index === -1) return res.status(404).json({ success: false, error: "需求不存在" });
 		data.requirements.splice(index, 1);
+		// 清理项目中的 requirementIds
 		for (let i = 0; i < data.projects.length; i++) {
 			const proj = data.projects[i];
 			if (proj.requirementIds) {
@@ -219,7 +222,42 @@ router.delete("/requirements/:id", (req, res) => {
 	}
 });
 
-// ==================== 导入接口 ====================
+// ==================== 数据校正接口 ====================
+router.post("/correct-requirements", (req, res) => {
+	try {
+		for (let i = 0; i < data.requirements.length; i++) {
+			const req = data.requirements[i];
+			// 如果已经存在 projectItems 且格式正确（数组，元素含 projectId）则跳过
+			if (
+				req.projectItems &&
+				Array.isArray(req.projectItems) &&
+				req.projectItems.length > 0 &&
+				req.projectItems[0].projectId !== undefined
+			) {
+				continue;
+			}
+			// 旧数据转换
+			const oldProjectIds = Array.isArray(req.projectIds) ? req.projectIds : [];
+			const oldCrUrl = req.crUrl || "";
+			const newProjectItems = [];
+			for (let j = 0; j < oldProjectIds.length; j++) {
+				newProjectItems.push({
+					projectId: oldProjectIds[j],
+					crUrl: j === 0 ? oldCrUrl : "",
+				});
+			}
+			req.projectItems = newProjectItems;
+			delete req.projectIds;
+			delete req.crUrl;
+		}
+		saveData();
+		res.json({ success: true, message: "数据校正完成" });
+	} catch (err) {
+		res.status(500).json({ success: false, error: err.message });
+	}
+});
+
+// ==================== 导入接口（适配新结构） ====================
 router.post("/import", (req, res) => {
 	try {
 		const { projects, requirements } = req.body;

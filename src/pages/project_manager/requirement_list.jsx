@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState, useEffect } from "react";
-import { Button, Table, Pagination, Popconfirm, Tooltip, message } from "antd";
+import { Button, Table, Pagination, Popconfirm, Tooltip, message, Tag } from "antd";
 import { usePagination } from "../../hooks/use_pagination.js";
 import { RequirementForm } from "./requirement_form.jsx";
 import {
@@ -135,7 +135,7 @@ export function RequirementList() {
 	const columns = useMemo(() => {
 		const projectMap = {};
 		for (let i = 0; i < allProjects.length; i++) {
-			projectMap[allProjects[i].id] = allProjects[i].name;
+			projectMap[allProjects[i].id] = allProjects[i];
 		}
 
 		return [
@@ -156,21 +156,38 @@ export function RequirementList() {
 			},
 			{
 				title: "关联项目",
-				dataIndex: "projectIds",
-				key: "projectIds",
-				width: 200,
-				render: (ids) => {
-					if (!ids || ids.length === 0) return "未关联";
-					const names = [];
-					for (let i = 0; i < ids.length; i++) {
-						const name = projectMap[ids[i]];
-						if (name) names.push(name);
+				dataIndex: "projectItems",
+				key: "projectItems",
+				width: 300,
+				render: (items) => {
+					if (!items || items.length === 0) return "未关联";
+					const tags = [];
+					for (let i = 0; i < items.length; i++) {
+						const item = items[i];
+						const proj = projectMap[item.projectId];
+						const projectName = proj ? proj.name : "未知项目";
+						const o2Url = proj ? proj.o2Url : "";
+						const crUrl = item.crUrl || "";
+						tags.push(
+							<Tag key={item.projectId + "_" + i}>
+								{projectName}
+								{o2Url && (
+									<a href={o2Url} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 4 }}>
+										【o2 地址】
+									</a>
+								)}
+								{crUrl && (
+									<a href={crUrl} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 4 }}>
+										【cr 地址】
+									</a>
+								)}
+							</Tag>,
+						);
 					}
-					const fullText = names.join(", ");
 					return (
-						<Tooltip title={fullText} {...CTooltipProps}>
+						<Tooltip title={<div className={styles.tagList}>{tags}</div>} {...CTooltipProps}>
 							<div className={styles.cellFlexContainer}>
-								<div className={styles.cellFlexText}>{fullText}</div>
+								<div className={styles.cellFlexText}>{tags}</div>
 							</div>
 						</Tooltip>
 					);
@@ -203,13 +220,6 @@ export function RequirementList() {
 				key: "testUrl",
 				width: 150,
 				render: (text) => renderUrl(text, "效果测试地址"),
-			},
-			{
-				title: "代码 CR 地址",
-				dataIndex: "crUrl",
-				key: "crUrl",
-				width: 150,
-				render: (text) => renderUrl(text, "代码 CR 地址"),
 			},
 			{
 				title: "迭代地址",
