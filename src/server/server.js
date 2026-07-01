@@ -10,6 +10,19 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+/** 常见图片后缀映射，用于判断文件是否为图片 */
+const imageSuffixMap = {
+	".png": true,
+	".jpg": true,
+	".jpeg": true,
+	".gif": true,
+	".bmp": true,
+	".webp": true,
+	".svg": true,
+	".ico": true,
+	".tiff": true,
+};
+
 function sortFilesAndFolders(a, b) {
 	const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
 	if (a.isFolder && !b.isFolder) return -1;
@@ -27,14 +40,37 @@ async function buildFileTree(dirPath, excludeDirs) {
 		if (entry.isDirectory()) {
 			if (excludeDirs.includes(entry.name)) continue;
 			const subChildren = await buildFileTree(fullPath, excludeDirs);
-			children.push({ key: fullPath, title: entry.name, isFolder: true, selectable: false, children: subChildren });
+			children.push({
+				key: fullPath,
+				title: entry.name,
+				isFolder: true,
+				selectable: false,
+				children: subChildren,
+			});
 		} else if (entry.isFile()) {
-			let codeString = "";
-			try {
-				codeString = await fs.readFile(fullPath, "utf-8");
-			} catch (e) {}
 			const suffix = path.extname(entry.name).toLowerCase();
-			children.push({ key: fullPath, title: entry.name, suffix, isLeaf: true, selectable: true, codeString });
+			const isImage = !!imageSuffixMap[suffix];
+			let codeString = "";
+			if (isImage) {
+				// 图片文件不读取内容，直接返回描述
+				const suffixName = suffix.replace(".", "");
+				codeString = `${suffixName} 类型图片`;
+			} else {
+				try {
+					codeString = await fs.readFile(fullPath, "utf-8");
+				} catch (e) {
+					// 读取失败时保持 codeString 为空字符串
+				}
+			}
+			children.push({
+				key: fullPath,
+				title: entry.name,
+				suffix,
+				isLeaf: true,
+				selectable: true,
+				codeString,
+				isImage,
+			});
 		}
 	}
 	children.sort(sortFilesAndFolders);

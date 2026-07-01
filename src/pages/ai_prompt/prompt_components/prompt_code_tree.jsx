@@ -14,7 +14,11 @@ function convertNode(node, codeFilesMap) {
 		return { key: node.key, title: node.title, selectable: false, children: convertedChildren };
 	}
 	const fileSuffix = node.suffix || node.title;
-	codeFilesMap[node.key] = { codeString: node.codeString || "", suffix: fileSuffix };
+	codeFilesMap[node.key] = {
+		codeString: node.codeString || "",
+		suffix: fileSuffix,
+		isImage: node.isImage || false,
+	};
 	return { key: node.key, title: node.title, isLeaf: true, selectable: true };
 }
 
@@ -33,7 +37,11 @@ export function generateCodeTreePromptString(checkedKeys, codeFilesMap) {
 	for (let i = 0; i < checkedKeys.length; i++) {
 		const fi = codeFilesMap[checkedKeys[i]];
 		if (fi) {
-			str += `文件目录:\n${checkedKeys[i]}\n文件代码:\n${fi.codeString}\n\n`;
+			str += `文件目录:\n${checkedKeys[i]}\n`;
+			if (!fi.isImage) {
+				str += `文件代码:\n${fi.codeString}\n`;
+			}
+			str += "\n";
 		}
 	}
 	return str;

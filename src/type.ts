@@ -30,6 +30,8 @@ declare global {
 			suffix?: string;
 			/** 文件内容字符串，仅文件节点存在 */
 			codeString?: string;
+			/** 是否为图片文件，仅文件节点存在 */
+			isImage?: boolean;
 		}
 
 		/**
@@ -41,6 +43,8 @@ declare global {
 			codeString: string;
 			/** 文件后缀（含.），如 ".js" */
 			suffix: string;
+			/** 是否为图片 */
+			isImage?: boolean;
 		}
 
 		/** 帧信息数据结构 */
