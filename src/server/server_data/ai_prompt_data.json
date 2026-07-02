@@ -13,7 +13,7 @@
       {
         "type": "codeTree",
         "props": {
-          "shouldPrint": true,
+          "shouldPrint": false,
           "rootPath": "/Users/wangxinbo/Desktop/my_git/react_project",
           "exclude": "node_modules",
           "checkedKeys": [
@@ -71,10 +71,10 @@
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/ai_prompt/ai_prompt_list.module.scss",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/ai_prompt/ai_prompt.jsx",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/ai_prompt/ai_prompt.module.scss",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/project_manager/requirement_form",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/project_manager/project_form.jsx",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/project_manager/project_list.jsx",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/project_manager/project_manager.module.scss",
-            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/project_manager/requirement_form.jsx",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/project_manager/requirement_list.jsx",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/components",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/sprite_sheet.jsx",
@@ -99,6 +99,9 @@
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/ai_prompt/prompt_components/prompt_components.js",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/ai_prompt/prompt_components/prompt_components.module.scss",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/ai_prompt/prompt_components/prompt_text_area.jsx",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/project_manager/requirement_form/project_items_form.jsx",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/project_manager/requirement_form/project_items_form.module.scss",
+            "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/project_manager/requirement_form/requirement_form.jsx",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/components/frame_manager",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/components/animation_drawer.jsx",
             "/Users/wangxinbo/Desktop/my_git/react_project/src/pages/sprite_sheet/components/animation_drawer.module.scss",
@@ -122,7 +125,7 @@
       }
     ],
     "createTime": 1782464386439,
-    "updateTime": 1782873654947
+    "updateTime": 1782979754532
   },
   {
     "id": 3,

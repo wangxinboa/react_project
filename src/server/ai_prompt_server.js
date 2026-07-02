@@ -1,15 +1,14 @@
 const express = require("express");
 const fs = require("fs");
-const path = require("path");
+
+const { dataDir, aiPromptDataFile } = require("./server_constants.js");
 
 const router = express.Router();
-const DATA_DIR = path.join(__dirname, "server_data");
-const DATA_FILE = path.join(DATA_DIR, "ai_prompt_data.json");
 
-// 确保 server_data 目录存在
+// 确保 dataDir 目录存在
 try {
-	if (!fs.existsSync(DATA_DIR)) {
-		fs.mkdirSync(DATA_DIR, { recursive: true });
+	if (!fs.existsSync(dataDir)) {
+		fs.mkdirSync(dataDir, { recursive: true });
 	}
 } catch (e) {
 	console.error("创建 server_data 目录失败", e);
@@ -19,7 +18,7 @@ let promptsData = [];
 let nextId = 1;
 
 try {
-	const raw = fs.readFileSync(DATA_FILE, "utf-8");
+	const raw = fs.readFileSync(aiPromptDataFile, "utf-8");
 	promptsData = JSON.parse(raw);
 	nextId = 1;
 	for (let i = 0; i < promptsData.length; i++) {
@@ -31,7 +30,7 @@ try {
 }
 
 function savePrompts() {
-	fs.writeFileSync(DATA_FILE, JSON.stringify(promptsData, null, 2), "utf-8");
+	fs.writeFileSync(aiPromptDataFile, JSON.stringify(promptsData, null, 2), "utf-8");
 }
 
 router.get("/", (req, res) => {
@@ -69,9 +68,25 @@ router.put("/:id", (req, res) => {
 		const id = parseInt(req.params.id, 10);
 		const item = promptsData.find((p) => p.id === id);
 		if (!item) return res.status(404).json({ success: false, error: "未找到" });
-		const { name, components } = req.body;
-		if (name !== undefined) item.name = name;
-		if (components !== undefined) item.components = components;
+
+		if (Object.prototype.hasOwnProperty.call(req.body, "name")) {
+			const value = req.body.name;
+			if (value === undefined || value === null || value === "") {
+				delete item.name;
+			} else {
+				item.name = value;
+			}
+		}
+
+		if (Object.prototype.hasOwnProperty.call(req.body, "components")) {
+			const value = req.body.components;
+			if (value === undefined || value === null || value === "") {
+				delete item.components;
+			} else {
+				item.components = value;
+			}
+		}
+
 		item.updateTime = Date.now();
 		savePrompts();
 		res.json({ success: true, data: item });

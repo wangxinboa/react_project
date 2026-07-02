@@ -1,15 +1,15 @@
 const express = require("express");
 const fs = require("fs");
-const path = require("path");
+
+const { dataDir, projectManagerDataFile } = require("./server_constants.js");
+const { projectUpdateFields, requirementUpdateFields } = require("./project_manager_server_constants.js");
 
 const router = express.Router();
-const DATA_DIR = path.join(__dirname, "server_data");
-const DATA_FILE = path.join(DATA_DIR, "project_manager_data.json");
 
-// 确保 server_data 目录存在
+// 确保 dataDir 目录存在
 try {
-	if (!fs.existsSync(DATA_DIR)) {
-		fs.mkdirSync(DATA_DIR, { recursive: true });
+	if (!fs.existsSync(dataDir)) {
+		fs.mkdirSync(dataDir, { recursive: true });
 	}
 } catch (e) {
 	console.error("创建 server_data 目录失败", e);
@@ -20,7 +20,7 @@ let nextProjectId = 1;
 let nextRequirementId = 1;
 
 try {
-	const raw = fs.readFileSync(DATA_FILE, "utf-8");
+	const raw = fs.readFileSync(projectManagerDataFile, "utf-8");
 	const parsed = JSON.parse(raw);
 	if (parsed && typeof parsed === "object") {
 		if (Array.isArray(parsed.projects)) data.projects = parsed.projects;
@@ -37,7 +37,7 @@ for (let i = 0; i < data.requirements.length; i++) {
 }
 
 function saveData() {
-	fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), "utf-8");
+	fs.writeFileSync(projectManagerDataFile, JSON.stringify(data, null, 2), "utf-8");
 }
 
 // ==================== 项目接口 ====================
@@ -65,10 +65,19 @@ router.put("/projects/:id", (req, res) => {
 		const index = data.projects.findIndex((p) => p.id === id);
 		if (index === -1) return res.status(404).json({ success: false, error: "项目不存在" });
 		const existing = data.projects[index];
-		const { name, gitUrl, o2Url } = req.body;
-		if (name !== undefined) existing.name = name;
-		if (gitUrl !== undefined) existing.gitUrl = gitUrl;
-		if (o2Url !== undefined) existing.o2Url = o2Url;
+
+		for (let i = 0; i < projectUpdateFields.length; i++) {
+			const field = projectUpdateFields[i];
+			if (Object.prototype.hasOwnProperty.call(req.body, field)) {
+				const value = req.body[field];
+				if (value === undefined || value === null || value === "") {
+					delete existing[field];
+				} else {
+					existing[field] = value;
+				}
+			}
+		}
+
 		saveData();
 		res.json({ success: true, data: existing });
 	} catch (err) {
@@ -82,7 +91,6 @@ router.delete("/projects/:id", (req, res) => {
 		const index = data.projects.findIndex((p) => p.id === id);
 		if (index === -1) return res.status(404).json({ success: false, error: "项目不存在" });
 		data.projects.splice(index, 1);
-		// 清理需求中对本项目的引用
 		for (let i = 0; i < data.requirements.length; i++) {
 			const req = data.requirements[i];
 			if (req.projectItems) {
@@ -102,7 +110,7 @@ router.delete("/projects/:id", (req, res) => {
 	}
 });
 
-// ==================== 需求接口（新数据结构：projectItems） ====================
+// ==================== 需求接口 ====================
 router.get("/requirements", (req, res) => {
 	res.json({ success: true, data: data.requirements });
 });
@@ -115,7 +123,6 @@ router.post("/requirements", (req, res) => {
 		if (!requirement.projectItems) requirement.projectItems = [];
 		if (!requirement.status) requirement.status = "待开发";
 		data.requirements.push(requirement);
-		// 更新项目中的 requirementIds
 		for (let i = 0; i < data.projects.length; i++) {
 			const proj = data.projects[i];
 			for (let j = 0; j < requirement.projectItems.length; j++) {
@@ -140,34 +147,33 @@ router.put("/requirements/:id", (req, res) => {
 		const index = data.requirements.findIndex((r) => r.id === id);
 		if (index === -1) return res.status(404).json({ success: false, error: "需求不存在" });
 		const existing = data.requirements[index];
-		const oldProjectIds = existing.projectItems ? existing.projectItems.map((item) => item.projectId) : [];
-		const {
-			name,
-			projectItems,
-			aoneUrl,
-			prdUrl,
-			designUrl,
-			testUrl,
-			iterationUrl,
-			devTime,
-			testTime,
-			onlineTime,
-			status,
-		} = req.body;
-		if (name !== undefined) existing.name = name;
-		if (projectItems !== undefined) existing.projectItems = projectItems;
-		if (aoneUrl !== undefined) existing.aoneUrl = aoneUrl;
-		if (prdUrl !== undefined) existing.prdUrl = prdUrl;
-		if (designUrl !== undefined) existing.designUrl = designUrl;
-		if (testUrl !== undefined) existing.testUrl = testUrl;
-		if (iterationUrl !== undefined) existing.iterationUrl = iterationUrl;
-		if (devTime !== undefined) existing.devTime = devTime;
-		if (testTime !== undefined) existing.testTime = testTime;
-		if (onlineTime !== undefined) existing.onlineTime = onlineTime;
-		if (status !== undefined) existing.status = status;
 
-		// 更新项目中的 requirementIds（根据新旧 projectItems 差异）
-		const newProjectIds = existing.projectItems ? existing.projectItems.map((item) => item.projectId) : [];
+		const oldProjectIds = [];
+		if (existing.projectItems) {
+			for (let i = 0; i < existing.projectItems.length; i++) {
+				oldProjectIds.push(existing.projectItems[i].projectId);
+			}
+		}
+
+		for (let i = 0; i < requirementUpdateFields.length; i++) {
+			const field = requirementUpdateFields[i];
+			if (Object.prototype.hasOwnProperty.call(req.body, field)) {
+				const value = req.body[field];
+				if (value === undefined || value === null || value === "") {
+					delete existing[field];
+				} else {
+					existing[field] = value;
+				}
+			}
+		}
+
+		const newProjectIds = [];
+		if (existing.projectItems) {
+			for (let i = 0; i < existing.projectItems.length; i++) {
+				newProjectIds.push(existing.projectItems[i].projectId);
+			}
+		}
+
 		for (let i = 0; i < data.projects.length; i++) {
 			const proj = data.projects[i];
 			if (oldProjectIds.indexOf(proj.id) !== -1 && newProjectIds.indexOf(proj.id) === -1) {
@@ -200,7 +206,6 @@ router.delete("/requirements/:id", (req, res) => {
 		const index = data.requirements.findIndex((r) => r.id === id);
 		if (index === -1) return res.status(404).json({ success: false, error: "需求不存在" });
 		data.requirements.splice(index, 1);
-		// 清理项目中的 requirementIds
 		for (let i = 0; i < data.projects.length; i++) {
 			const proj = data.projects[i];
 			if (proj.requirementIds) {
