@@ -64,6 +64,16 @@ export const PromptCodeTree = React.memo(function PromptCodeTree({
 	const initialLoadDone = useRef(false);
 	const prevSelectedSuffixesRef = useRef([]);
 
+	// 高效提取文件夹名（避免 split/filter）
+	const folderName = useMemo(() => {
+		if (!rootPath) {
+			return "";
+		}
+		const trimmed = rootPath.replace(/\/+$/, "");
+		const lastSlash = trimmed.lastIndexOf("/");
+		return lastSlash === -1 ? trimmed : trimmed.substring(lastSlash + 1);
+	}, [rootPath]);
+
 	const suffixToKeysMap = useMemo(() => {
 		const map = {};
 		for (let i = 0; i < allFileKeys.length; i++) {
@@ -193,7 +203,6 @@ export const PromptCodeTree = React.memo(function PromptCodeTree({
 				const fi = codeFilesMap[key];
 				if (!fi) continue;
 				const suffix = fi.suffix;
-				// 没有后缀的文件直接保留，有后缀的文件仅当后缀在选中集合中才保留
 				if (!suffix || newSuffixSet[suffix]) {
 					resultKeysObj[key] = true;
 				}
@@ -230,8 +239,9 @@ export const PromptCodeTree = React.memo(function PromptCodeTree({
 
 	const handleExport = useCallback(() => {
 		const promptStr = generateCodeTreePromptString(checkedKeys, codeFilesMap);
-		downloadText(promptStr, "代码树提示词.txt");
-	}, [checkedKeys, codeFilesMap]);
+		const fileName = folderName ? `${folderName}提示词.txt` : "代码树提示词.txt";
+		downloadText(promptStr, fileName);
+	}, [checkedKeys, codeFilesMap, folderName]);
 
 	useEffect(() => {
 		if (!initialLoadDone.current) {
@@ -245,7 +255,7 @@ export const PromptCodeTree = React.memo(function PromptCodeTree({
 	return (
 		<div className={styles.componentItem}>
 			<div className={styles.componentHeader}>
-				<span>代码树</span>
+				<span>{folderName ? `${folderName} - 代码树` : "代码树"}</span>
 				<div className={styles.headerActions}>
 					<span className={styles.switchLabel}>是否打印</span>
 					<Switch size="small" checked={shouldPrint} onChange={handleShouldPrintChange} />

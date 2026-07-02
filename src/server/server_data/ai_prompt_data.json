@@ -148,12 +148,6 @@
             "/Users/wangxinbo/Desktop/my_git/accumulate/css/common.css",
             "/Users/wangxinbo/Desktop/my_git/accumulate/css/default.css",
             "/Users/wangxinbo/Desktop/my_git/accumulate/css",
-            "/Users/wangxinbo/Desktop/my_git/accumulate/products/cinder_keep",
-            "/Users/wangxinbo/Desktop/my_git/accumulate/products/cinder_keep/assets",
-            "/Users/wangxinbo/Desktop/my_git/accumulate/products/cinder_keep/src",
-            "/Users/wangxinbo/Desktop/my_git/accumulate/products/cinder_keep/cinder_keep.html",
-            "/Users/wangxinbo/Desktop/my_git/accumulate/products/cinder_keep/cinder_keep.module.js",
-            "/Users/wangxinbo/Desktop/my_git/accumulate/products/cinder_keep/logo.png",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/javascript_utils",
@@ -351,7 +345,9 @@
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_texture/gl_texture.js",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_texture/webgl_texture_system.js",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/render_nodes/2d/sprite_sheet/sprite_sheet_pipe/gl_program_format.js",
+            "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/render_nodes/2d/sprite_sheet/sprite_sheet_pipe/sprite_sheet_pipe.js",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/render_nodes/2d/sprite2d/sprite2d_pipe/gl_program_format.js",
+            "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/render_nodes/2d/sprite2d/sprite2d_pipe/sprite2d_pipe.js",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_buffer/gl_attribs/gl_attrib.js",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_buffer/gl_attribs/gl_attribs.js",
             "/Users/wangxinbo/Desktop/my_git/accumulate/javascript_libs/canvas_engine/src/renderers/webgl_renderer/webgl_buffer/gl_attribs/gl_buffer_type.js",
@@ -374,6 +370,6 @@
       }
     ],
     "createTime": 1782550587875,
-    "updateTime": 1782876172359
+    "updateTime": 1782985614330
   }
 ]
