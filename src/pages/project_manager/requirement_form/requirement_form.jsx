@@ -197,11 +197,7 @@ export const RequirementForm = forwardRef((props, ref) => {
 					label={RequirementFormItemLabels.iterationUrl}
 				/>
 				{!(isView && !record?.devTime) && (
-					<Form.Item
-						name={RequirementFormItemNames.devTime}
-						label={RequirementFormItemLabels.devTime}
-						rules={[{ required: !isView }]}
-					>
+					<Form.Item name={RequirementFormItemNames.devTime} label={RequirementFormItemLabels.devTime}>
 						{isView ? <span>{formatTs(record.devTime)}</span> : <CTimestampDatePicker />}
 					</Form.Item>
 				)}
