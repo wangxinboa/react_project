@@ -69,22 +69,18 @@ router.put("/:id", (req, res) => {
 		const item = promptsData.find((p) => p.id === id);
 		if (!item) return res.status(404).json({ success: false, error: "未找到" });
 
-		if (Object.prototype.hasOwnProperty.call(req.body, "name")) {
-			const value = req.body.name;
-			if (value === undefined || value === null || value === "") {
-				delete item.name;
-			} else {
-				item.name = value;
-			}
+		const name = req.body.name;
+		if (name === undefined || name === null || name === "") {
+			delete item.name;
+		} else {
+			item.name = name;
 		}
 
-		if (Object.prototype.hasOwnProperty.call(req.body, "components")) {
-			const value = req.body.components;
-			if (value === undefined || value === null || value === "") {
-				delete item.components;
-			} else {
-				item.components = value;
-			}
+		const components = req.body.components;
+		if (components === undefined || components === null || components === "") {
+			delete item.components;
+		} else {
+			item.components = components;
 		}
 
 		item.updateTime = Date.now();

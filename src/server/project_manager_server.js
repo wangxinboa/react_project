@@ -68,13 +68,11 @@ router.put("/projects/:id", (req, res) => {
 
 		for (let i = 0; i < projectUpdateFields.length; i++) {
 			const field = projectUpdateFields[i];
-			if (Object.prototype.hasOwnProperty.call(req.body, field)) {
-				const value = req.body[field];
-				if (value === undefined || value === null || value === "") {
-					delete existing[field];
-				} else {
-					existing[field] = value;
-				}
+			const value = req.body[field];
+			if (value === undefined || value === null || value === "") {
+				delete existing[field];
+			} else {
+				existing[field] = value;
 			}
 		}
 
@@ -157,13 +155,11 @@ router.put("/requirements/:id", (req, res) => {
 
 		for (let i = 0; i < requirementUpdateFields.length; i++) {
 			const field = requirementUpdateFields[i];
-			if (Object.prototype.hasOwnProperty.call(req.body, field)) {
-				const value = req.body[field];
-				if (value === undefined || value === null || value === "") {
-					delete existing[field];
-				} else {
-					existing[field] = value;
-				}
+			const value = req.body[field];
+			if (value === undefined || value === null || value === "") {
+				delete existing[field];
+			} else {
+				existing[field] = value;
 			}
 		}
 
